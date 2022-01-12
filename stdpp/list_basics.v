@@ -813,6 +813,7 @@ Proof.
     exists l1, (l2 ++ [y]).
     rewrite elem_of_app, list_elem_of_singleton, <-(assoc_L (++)). naive_solver.
 Qed.
+
 Lemma list_elem_of_insert l i x : i < length l → x ∈ <[i:=x]>l.
 Proof. intros. by eapply list_elem_of_lookup_2, list_lookup_insert_eq. Qed.
 Lemma nth_elem_of l i d : i < length l → nth i l d ∈ l.
@@ -820,6 +821,14 @@ Proof.
   intros; eapply list_elem_of_lookup_2.
   destruct (nth_lookup_or_length l i d); [done | by lia].
 Qed.
+
+Lemma list_elem_of_delete_inv x i l : x ∈ delete i l → x ∈ l.
+Proof.
+  rewrite !list_elem_of_lookup. intros [j Hj].
+  rewrite list_lookup_delete in Hj. case_decide; eauto.
+Qed.
+Lemma list_elem_of_foldr_delete_inv x is l : x ∈ foldr delete l is → x ∈ l.
+Proof. induction is; simpl; eauto using list_elem_of_delete_inv. Qed.
 
 Lemma not_elem_of_app_cons_inv_l x y l1 l2 k1 k2 :
   x ∉ k1 → y ∉ l1 →
