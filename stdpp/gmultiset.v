@@ -96,7 +96,7 @@ Section basic_lemmas.
   Lemma multiplicity_empty x : multiplicity x ∅ = 0.
   Proof. done. Qed.
   Lemma multiplicity_singleton x : multiplicity x {[+ x +]} = 1.
-  Proof. unfold multiplicity; simpl. by rewrite lookup_singleton. Qed.
+  Proof. unfold multiplicity; simpl. by rewrite lookup_singleton_eq. Qed.
   Lemma multiplicity_singleton_ne x y : x ≠ y → multiplicity x {[+ y +]} = 0.
   Proof. intros. unfold multiplicity; simpl. by rewrite lookup_singleton_ne. Qed.
   Lemma multiplicity_singleton' x y :
@@ -538,7 +538,7 @@ Section more_lemmas.
     - rewrite <-(insert_delete Y x n') by done.
       erewrite <-insert_union_with by done.
       rewrite !map_to_list_insert, !bind_cons
-        by (by rewrite ?lookup_union_with, ?lookup_delete, ?HX).
+        by (by rewrite ?lookup_union_with, ?lookup_delete_eq, ?HX).
       rewrite (assoc_L _), <-(comm (++) (f (_,n'))), <-!(assoc_L _), <-IH.
       rewrite (assoc_L _). f_equiv.
       rewrite (comm _); simpl. by rewrite Pos2Nat.inj_add, replicate_add.
@@ -807,7 +807,7 @@ Section map.
     rewrite multiplicity_disj_union, list_to_set_disj_replicate.
     rewrite multiplicity_scalar_mul, multiplicity_singleton'.
     unfold multiplicity; simpl. destruct (decide (y = f x)) as [->|].
-    - rewrite lookup_partial_alter; simpl. destruct (_ !! f x); simpl; lia.
+    - rewrite lookup_partial_alter_eq; simpl. destruct (_ !! f x); simpl; lia.
     - rewrite lookup_partial_alter_ne by done. lia.
   Qed.
 

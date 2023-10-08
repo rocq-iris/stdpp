@@ -244,7 +244,8 @@ Proof.
   assert (i ∉ dom m2) by (by apply not_elem_of_dom).
   assert (i ∈ dom m1) as [x' Hx']%elem_of_dom by set_solver.
   rewrite <-(insert_delete m1 i x') by done.
-  rewrite !map_size_insert_None, <-Nat.succ_le_mono by (by rewrite ?lookup_delete).
+  rewrite !map_size_insert_None, <-Nat.succ_le_mono
+    by (by rewrite ?lookup_delete_eq).
   apply IH. rewrite dom_delete. set_solver.
 Qed.
 Lemma dom_subset_size {A} (m1 m2 : M A) : dom m2 ⊂ dom m1 → size m2 < size m1.
@@ -257,7 +258,8 @@ Proof.
   assert (i ∉ dom m2) by (by apply not_elem_of_dom).
   assert (i ∈ dom m1) as [x' Hx']%elem_of_dom by set_solver.
   rewrite <-(insert_delete m1 i x') by done.
-  rewrite !map_size_insert_None, <-Nat.succ_lt_mono by (by rewrite ?lookup_delete).
+  rewrite !map_size_insert_None, <-Nat.succ_lt_mono
+    by (by rewrite ?lookup_delete_eq).
   apply IH. rewrite dom_delete. split; [set_solver|].
   intros ?. destruct Hdom as [? []].
   intros j. destruct (decide (i = j)); set_solver.

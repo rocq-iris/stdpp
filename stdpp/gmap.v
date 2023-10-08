@@ -335,7 +335,7 @@ Proof.
       by rewrite !gmap_dep_lookup_GNode.
 Qed.
 
-Local Lemma gmap_dep_ne_lookup_singleton {A P} i (p : P i) (x : A) :
+Local Lemma gmap_dep_ne_lookup_singleton_eq {A P} i (p : P i) (x : A) :
   gmap_dep_ne_lookup i (gmap_dep_ne_singleton i p x) = Some x.
 Proof. revert P p. induction i; by simpl. Qed.
 Local Lemma gmap_dep_ne_lookup_singleton_ne {A P} i j (p : P i) (x : A) :
@@ -352,13 +352,13 @@ Local Lemma gmap_dep_partial_alter_GNode {A P} (f : option A → option A)
     | i~1 => λ p, GNode ml mx (gmap_dep_partial_alter f i p mr)
     end p.
 Proof. by destruct ml, mx as [[]|], mr. Qed.
-Local Lemma gmap_dep_lookup_partial_alter {A P} (f : option A → option A)
+Local Lemma gmap_dep_lookup_partial_alter_eq {A P} (f : option A → option A)
     (mt : gmap_dep A P) i (p : P i) :
   gmap_dep_lookup i (gmap_dep_partial_alter f i p mt) = f (gmap_dep_lookup i mt).
 Proof.
   revert i p. induction mt using gmap_dep_ind.
   { intros i p; simpl. destruct (f None); simpl; [|done].
-    by rewrite gmap_dep_ne_lookup_singleton. }
+    by rewrite gmap_dep_ne_lookup_singleton_eq. }
   intros [] ?;
     rewrite gmap_dep_partial_alter_GNode, !gmap_dep_lookup_GNode by done;
     done || by destruct (f _).
@@ -514,7 +514,7 @@ Proof.
   - intros A [mt1] [mt2] Hlookup. f_equal. apply (gmap_dep_eq _ _ _).
     intros i [Hk]. destruct (decode i) as [k|]; simplify_eq/=. apply Hlookup.
   - done.
-  - intros A f [mt] i. apply gmap_dep_lookup_partial_alter.
+  - intros A f [mt] i. apply gmap_dep_lookup_partial_alter_eq.
   - intros A f [mt] i j ?. apply gmap_dep_lookup_partial_alter_ne. naive_solver.
   - intros A b f [mt] i. apply gmap_dep_lookup_fmap.
   - intros A B f [mt] i. apply gmap_dep_lookup_omap.

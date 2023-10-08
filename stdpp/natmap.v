@@ -52,13 +52,13 @@ Fixpoint natmap_singleton_raw {A} (i : nat) (x : A) : natmap_raw A :=
 Lemma natmap_singleton_wf {A} (i : nat) (x : A) :
   natmap_wf (natmap_singleton_raw i x).
 Proof. unfold natmap_wf. induction i as [|[]]; simplify_eq/=; eauto. Qed.
-Lemma natmap_lookup_singleton_raw {A} (i : nat) (x : A) :
+Lemma natmap_lookup_singleton_raw_eq {A} (i : nat) (x : A) :
   mjoin (natmap_singleton_raw i x !! i) = Some x.
 Proof. induction i; simpl; auto. Qed.
 Lemma natmap_lookup_singleton_raw_ne {A} (i j : nat) (x : A) :
   i ≠ j → mjoin (natmap_singleton_raw i x !! j) = None.
 Proof. revert j; induction i; intros [|?]; simpl; auto with congruence. Qed.
-Local Hint Rewrite @natmap_lookup_singleton_raw : natmap.
+Local Hint Rewrite @natmap_lookup_singleton_raw_eq : natmap.
 
 Definition natmap_cons_canon {A} (o : option A) (l : natmap_raw A) :=
   match o, l with None, [] => [] | _, _ => o :: l end.
@@ -94,7 +94,7 @@ Proof.
 Qed.
 Global Instance natmap_partial_alter {A} : PartialAlter nat A (natmap A) := λ f i m,
   let (l,Hl) := m in NatMap _ (natmap_partial_alter_wf f i l Hl).
-Lemma natmap_lookup_partial_alter_raw {A} (f : option A → option A) i l :
+Lemma natmap_lookup_partial_alter_raw_eq {A} (f : option A → option A) i l :
   mjoin (natmap_partial_alter_raw f i l !! i) = f (mjoin (l !! i)).
 Proof.
   revert i. induction l; intros [|?]; simpl; repeat case_match; simpl;
@@ -241,7 +241,7 @@ Proof.
     + by specialize (E 0).
     + f_equal. apply IH; eauto using natmap_wf_inv. intros i. apply (E (S i)).
   - done.
-  - intros ?? [??] ?. apply natmap_lookup_partial_alter_raw.
+  - intros ?? [??] ?. apply natmap_lookup_partial_alter_raw_eq.
   - intros ?? [??] ??. apply natmap_lookup_partial_alter_raw_ne.
   - intros ??? [??] ?. apply natmap_lookup_fmap_raw.
   - intros ??? [??] ?. by apply natmap_lookup_omap_raw.

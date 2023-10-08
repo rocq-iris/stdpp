@@ -56,7 +56,7 @@ Class FinMap K M `{FMap M, ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A,
     EqDecision K} := {
   map_eq {A} (m1 m2 : M A) : (∀ i, m1 !! i = m2 !! i) → m1 = m2;
   lookup_empty {A} i : (∅ : M A) !! i = None;
-  lookup_partial_alter {A} f (m : M A) i :
+  lookup_partial_alter_eq {A} f (m : M A) i :
     partial_alter f i m !! i = f (m !! i);
   lookup_partial_alter_ne {A} f (m : M A) i j :
     i ≠ j → partial_alter f i m !! j = m !! j;
@@ -401,7 +401,7 @@ Proof.
   intros i x m l ? [IH1 IH2]. split; [constructor; naive_solver|].
   intros j y. rewrite elem_of_cons, IH2.
   unfold insert, map_insert. destruct (decide (i = j)) as [->|].
-  - rewrite lookup_partial_alter. naive_solver.
+  - rewrite lookup_partial_alter_eq. naive_solver.
   - rewrite lookup_partial_alter_ne by done. naive_solver.
 Qed.
 Lemma NoDup_map_to_list {A} (m : M A) : NoDup (map_to_list m).
@@ -427,69 +427,93 @@ Proof.
 Qed.
 
 (** ** Properties of the [partial_alter] operation *)
+Lemma lookup_partial_alter {A} f (m : M A) i j :
+  partial_alter f i m !! j = if decide (i = j) then f (m !! i) else m !! j.
+Proof.
+  case_decide; subst; eauto using lookup_partial_alter_eq, lookup_partial_alter_ne.
+Qed.
+
+Lemma lookup_total_partial_alter `{!Inhabited A}
+    (f : option A → option A) (m : M A) i j :
+  partial_alter f i m !!! j =
+    if decide (i = j) then default inhabitant (f (m !! i)) else m !!! j.
+Proof.
+  rewrite lookup_total_alt, lookup_partial_alter. case_decide; naive_solver.
+Qed.
+Lemma lookup_total_partial_alter_eq `{!Inhabited A}
+    (f : option A → option A) (m : M A) i :
+  partial_alter f i m !!! i = default inhabitant (f (m !! i)).
+Proof. by rewrite lookup_total_partial_alter, decide_True. Qed.
+Lemma lookup_total_partial_alter_ne `{!Inhabited A}
+    (f : option A → option A) (m : M A) i j :
+  i ≠ j → partial_alter f i m !!! j = m !!! j.
+Proof. intros. by rewrite lookup_total_partial_alter, decide_False. Qed.
+
 Lemma partial_alter_ext {A} (f g : option A → option A) (m : M A) i :
   (∀ x, m !! i = x → f x = g x) → partial_alter f i m = partial_alter g i m.
 Proof.
-  intros. apply map_eq; intros j. by destruct (decide (i = j)) as [->|?];
-    rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne; auto.
+  intros. apply map_eq; intros j. rewrite !lookup_partial_alter.
+  repeat case_decide; naive_solver.
 Qed.
-Lemma partial_alter_compose {A} f g (m : M A) i:
+Lemma partial_alter_compose {A} f g (m : M A) i :
   partial_alter (f ∘ g) i m = partial_alter f i (partial_alter g i m).
 Proof.
-  intros. apply map_eq. intros ii. by destruct (decide (i = ii)) as [->|?];
-    rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne.
+  intros. apply map_eq. intros ii. rewrite !lookup_partial_alter.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma partial_alter_commute {A} f g (m : M A) i j :
   i ≠ j → partial_alter f i (partial_alter g j m) =
     partial_alter g j (partial_alter f i m).
 Proof.
-  intros. apply map_eq; intros jj. destruct (decide (jj = j)) as [->|?].
-  { by rewrite lookup_partial_alter_ne,
-      !lookup_partial_alter, lookup_partial_alter_ne. }
-  destruct (decide (jj = i)) as [->|?].
-  - by rewrite lookup_partial_alter,
-     !lookup_partial_alter_ne, lookup_partial_alter by congruence.
-  - by rewrite !lookup_partial_alter_ne by congruence.
+  intros. apply map_eq; intros jj. rewrite !lookup_partial_alter.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma partial_alter_self_alt {A} (m : M A) i x :
   x = m !! i → partial_alter (λ _, x) i m = m.
 Proof.
-  intros. apply map_eq. intros ii. by destruct (decide (i = ii)) as [->|];
-    rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne.
+  intros. apply map_eq. intros ii. rewrite !lookup_partial_alter.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma partial_alter_self {A} (m : M A) i : partial_alter (λ _, m !! i) i m = m.
 Proof. by apply partial_alter_self_alt. Qed.
 Lemma partial_alter_subseteq {A} f (m : M A) i :
   m !! i = None → m ⊆ partial_alter f i m.
 Proof.
-  rewrite map_subseteq_spec. intros Hi j x Hj.
-  rewrite lookup_partial_alter_ne; congruence.
+  rewrite map_subseteq_spec. intros Hi j x Hj. rewrite !lookup_partial_alter.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma partial_alter_subset {A} f (m : M A) i :
   m !! i = None → is_Some (f (m !! i)) → m ⊂ partial_alter f i m.
 Proof.
   intros Hi Hfi. apply map_subset_alt; split; [by apply partial_alter_subseteq|].
-  exists i. by rewrite lookup_partial_alter.
+  exists i. by rewrite lookup_partial_alter_eq.
 Qed.
 Lemma lookup_partial_alter_Some {A} (f : option A → option A) (m : M A) i j x :
   partial_alter f i m !! j = Some x ↔
     (i = j ∧ f (m !! i) = Some x) ∨ (i ≠ j ∧ m !! j = Some x).
-Proof.
-  destruct (decide (i = j)); subst.
-  - rewrite lookup_partial_alter. naive_solver.
-  - rewrite lookup_partial_alter_ne; naive_solver.
-Qed.
-Lemma lookup_total_partial_alter {A} `{Inhabited A}
-    (f : option A → option A) (m : M A) i:
-  partial_alter f i m !!! i = default inhabitant (f (m !! i)).
-Proof. by rewrite lookup_total_alt, lookup_partial_alter. Qed.
+Proof. rewrite lookup_partial_alter. repeat case_decide; naive_solver. Qed.
 
 (** ** Properties of the [alter] operation *)
-Lemma lookup_alter {A} (f : A → A) (m : M A) i : alter f i m !! i = f <$> m !! i.
-Proof. unfold alter. apply lookup_partial_alter. Qed.
+Lemma lookup_alter {A} (f : A → A) (m : M A) i j :
+  alter f i m !! j = if decide (i = j) then f <$> m !! i else m !! j.
+Proof. apply lookup_partial_alter. Qed.
+Lemma lookup_alter_eq {A} (f : A → A) (m : M A) i : alter f i m !! i = f <$> m !! i.
+Proof. apply lookup_partial_alter_eq. Qed.
 Lemma lookup_alter_ne {A} (f : A → A) (m : M A) i j :
   i ≠ j → alter f i m !! j = m !! j.
-Proof. unfold alter. apply lookup_partial_alter_ne. Qed.
+Proof. apply lookup_partial_alter_ne. Qed.
+
+Lemma lookup_total_alter `{!Inhabited A} (f : A → A) (m : M A) i j :
+  alter f i m !!! j =
+    if decide (i = j) then default inhabitant (f <$> m !! i) else m !!! j.
+Proof. apply lookup_total_partial_alter. Qed.
+Lemma lookup_total_alter_eq `{!Inhabited A} (f : A → A) (m : M A) i :
+  alter f i m !!! i = default inhabitant (f <$> m !! i).
+Proof. apply lookup_total_partial_alter_eq. Qed.
+Lemma lookup_total_alter_ne `{!Inhabited A} (f : A → A) (m : M A) i j :
+  i ≠ j → alter f i m !!! j = m !!! j.
+Proof. apply lookup_total_partial_alter_ne. Qed.
+
 Lemma alter_ext {A} (f g : A → A) (m : M A) i :
   (∀ x, m !! i = Some x → f x = g x) → alter f i m = alter g i m.
 Proof. intro. apply partial_alter_ext. intros [x|] ?; f_equal/=; auto. Qed.
@@ -516,16 +540,11 @@ Lemma lookup_alter_Some {A} (f : A → A) (m : M A) i j y :
   alter f i m !! j = Some y ↔
     (i = j ∧ ∃ x, m !! j = Some x ∧ y = f x) ∨ (i ≠ j ∧ m !! j = Some y).
 Proof.
-  destruct (decide (i = j)) as [->|?].
-  - rewrite lookup_alter. naive_solver (simplify_option_eq; eauto).
-  - rewrite lookup_alter_ne by done. naive_solver.
+  rewrite lookup_alter. case_decide; naive_solver (simplify_option_eq; eauto).
 Qed.
 Lemma lookup_alter_None {A} (f : A → A) (m : M A) i j :
   alter f i m !! j = None ↔ m !! j = None.
-Proof.
-  by destruct (decide (i = j)) as [->|?];
-    rewrite ?lookup_alter, ?fmap_None, ?lookup_alter_ne.
-Qed.
+Proof. rewrite lookup_alter. case_decide; rewrite ?fmap_None; naive_solver. Qed.
 Lemma lookup_alter_is_Some {A} (f : A → A) (m : M A) i j :
   is_Some (alter f i m !! j) ↔ is_Some (m !! j).
 Proof. by rewrite <-!not_eq_None_Some, lookup_alter_None. Qed.
@@ -533,7 +552,7 @@ Lemma alter_id {A} (f : A → A) (m : M A) i :
   (∀ x, m !! i = Some x → f x = x) → alter f i m = m.
 Proof.
   intros Hi; apply map_eq; intros j; destruct (decide (i = j)) as [->|?].
-  { rewrite lookup_alter; destruct (m !! j); f_equal/=; auto. }
+  { rewrite lookup_alter_eq; destruct (m !! j); f_equal/=; auto. }
   by rewrite lookup_alter_ne by done.
 Qed.
 Lemma alter_mono {A} f (m1 m2 : M A) i : m1 ⊆ m2 → alter f i m1 ⊆ alter f i m2.
@@ -550,33 +569,33 @@ Proof.
 Qed.
 
 (** ** Properties of the [delete] operation *)
-Lemma lookup_delete {A} (m : M A) i : delete i m !! i = None.
+Lemma lookup_delete {A} (m : M A) i j :
+  delete i m !! j = if decide (i = j) then None else m !! j.
 Proof. apply lookup_partial_alter. Qed.
-Lemma lookup_total_delete `{!Inhabited A} (m : M A) i :
-  delete i m !!! i = inhabitant.
-Proof. by rewrite lookup_total_alt, lookup_delete. Qed.
+Lemma lookup_delete_eq {A} (m : M A) i : delete i m !! i = None.
+Proof. apply lookup_partial_alter_eq. Qed.
 Lemma lookup_delete_ne {A} (m : M A) i j : i ≠ j → delete i m !! j = m !! j.
 Proof. apply lookup_partial_alter_ne. Qed.
+
+Lemma lookup_total_delete `{!Inhabited A} (m : M A) i j :
+  delete i m !! j = if decide (i = j) then inhabitant else m !! j.
+Proof. apply lookup_partial_alter. Qed.
+Lemma lookup_total_delete_eq `{!Inhabited A} (m : M A) i :
+  delete i m !!! i = inhabitant.
+Proof. by rewrite lookup_total_alt, lookup_delete_eq. Qed.
 Lemma lookup_total_delete_ne `{!Inhabited A} (m : M A) i j :
   i ≠ j → delete i m !!! j = m !!! j.
 Proof. intros. by rewrite lookup_total_alt, lookup_delete_ne. Qed.
+
 Lemma lookup_delete_Some {A} (m : M A) i j y :
   delete i m !! j = Some y ↔ i ≠ j ∧ m !! j = Some y.
-Proof.
-  split.
-  - destruct (decide (i = j)) as [->|?];
-      rewrite ?lookup_delete, ?lookup_delete_ne; intuition congruence.
-  - intros [??]. by rewrite lookup_delete_ne.
-Qed.
+Proof. rewrite lookup_delete. case_decide; naive_solver. Qed.
 Lemma lookup_delete_is_Some {A} (m : M A) i j :
   is_Some (delete i m !! j) ↔ i ≠ j ∧ is_Some (m !! j).
 Proof. unfold is_Some; setoid_rewrite lookup_delete_Some; naive_solver. Qed.
 Lemma lookup_delete_None {A} (m : M A) i j :
   delete i m !! j = None ↔ i = j ∨ m !! j = None.
-Proof.
-  destruct (decide (i = j)) as [->|?];
-    rewrite ?lookup_delete, ?lookup_delete_ne; tauto.
-Qed.
+Proof. rewrite lookup_delete. case_decide; naive_solver. Qed.
 Lemma delete_empty {A} i : delete i ∅ =@{M A} ∅.
 Proof. rewrite <-(partial_alter_self ∅) at 2. by rewrite lookup_empty. Qed.
 Lemma delete_commute {A} (m : M A) i j :
@@ -586,8 +605,8 @@ Proof.
 Qed.
 Lemma delete_notin {A} (m : M A) i : m !! i = None → delete i m = m.
 Proof.
-  intros. apply map_eq. intros j. by destruct (decide (i = j)) as [->|?];
-    rewrite ?lookup_delete, ?lookup_delete_ne.
+  intros. apply map_eq. intros j.
+  rewrite lookup_delete. case_decide; naive_solver.
 Qed.
 Lemma delete_idemp {A} (m : M A) i :
   delete i (delete i m) = delete i m.
@@ -623,7 +642,7 @@ Qed.
 Lemma delete_subset {A} (m : M A) i : is_Some (m !! i) → delete i m ⊂ m.
 Proof.
   intros [x ?]; apply map_subset_alt; split; [apply delete_subseteq|].
-  exists i. rewrite lookup_delete; eauto.
+  exists i. rewrite lookup_delete_eq; eauto.
 Qed.
 Lemma delete_mono {A} (m1 m2 : M A) i : m1 ⊆ m2 → delete i m1 ⊆ delete i m2.
 Proof.
@@ -632,17 +651,25 @@ Proof.
 Qed.
 
 (** ** Properties of the [insert] operation *)
-Lemma lookup_insert {A} (m : M A) i x : <[i:=x]>m !! i = Some x.
-Proof. unfold insert. apply lookup_partial_alter. Qed.
-Lemma lookup_total_insert `{!Inhabited A} (m : M A) i x : <[i:=x]>m !!! i = x.
-Proof. by rewrite lookup_total_alt, lookup_insert. Qed.
-Lemma lookup_insert_rev {A}  (m : M A) i x y : <[i:=x]>m !! i = Some y → x = y.
-Proof. rewrite lookup_insert. congruence. Qed.
+Lemma lookup_insert {A} (m : M A) i j x : 
+  <[i:=x]>m !! j = if decide (i = j) then Some x else m !! j.
+Proof. apply lookup_partial_alter. Qed.
+Lemma lookup_insert_eq {A} (m : M A) i x : <[i:=x]>m !! i = Some x.
+Proof. apply lookup_partial_alter_eq. Qed.
 Lemma lookup_insert_ne {A} (m : M A) i j x : i ≠ j → <[i:=x]>m !! j = m !! j.
-Proof. unfold insert. apply lookup_partial_alter_ne. Qed.
+Proof. apply lookup_partial_alter_ne. Qed.
+
+Lemma lookup_total_insert `{!Inhabited A} (m : M A) i j x : 
+  <[i:=x]>m !!! j = if decide (i = j) then x else m !!! j.
+Proof. apply lookup_total_partial_alter. Qed.
+Lemma lookup_total_insert_eq `{!Inhabited A} (m : M A) i x : <[i:=x]>m !!! i = x.
+Proof. apply lookup_total_partial_alter_eq. Qed.
 Lemma lookup_total_insert_ne `{!Inhabited A} (m : M A) i j x :
   i ≠ j → <[i:=x]>m !!! j = m !!! j.
-Proof. intros. by rewrite lookup_total_alt, lookup_insert_ne. Qed.
+Proof. apply lookup_total_partial_alter_ne. Qed.
+
+Lemma lookup_insert_rev {A} (m : M A) i x y : <[i:=x]>m !! i = Some y → x = y.
+Proof. rewrite lookup_insert_eq. congruence. Qed.
 Lemma insert_insert {A} (m : M A) i x y : <[i:=x]>(<[i:=y]>m) = <[i:=x]>m.
 Proof. unfold insert, map_insert. by rewrite <-partial_alter_compose. Qed.
 Lemma insert_commute {A} (m : M A) i j x y :
@@ -650,12 +677,7 @@ Lemma insert_commute {A} (m : M A) i j x y :
 Proof. apply partial_alter_commute. Qed.
 Lemma lookup_insert_Some {A} (m : M A) i j x y :
   <[i:=x]>m !! j = Some y ↔ (i = j ∧ x = y) ∨ (i ≠ j ∧ m !! j = Some y).
-Proof.
-  split.
-  - destruct (decide (i = j)) as [->|?];
-      rewrite ?lookup_insert, ?lookup_insert_ne; intuition congruence.
-  - intros [[-> ->]|[??]]; [apply lookup_insert|]. by rewrite lookup_insert_ne.
-Qed.
+Proof. rewrite lookup_insert. case_decide; naive_solver. Qed.
 Lemma lookup_insert_is_Some {A} (m : M A) i j x :
   is_Some (<[i:=x]>m !! j) ↔ i = j ∨ i ≠ j ∧ is_Some (m !! j).
 Proof. unfold is_Some; setoid_rewrite lookup_insert_Some; naive_solver. Qed.
@@ -664,28 +686,23 @@ Lemma lookup_insert_is_Some' {A} (m : M A) i j x :
 Proof. rewrite lookup_insert_is_Some. destruct (decide (i=j)); naive_solver. Qed.
 Lemma lookup_insert_None {A} (m : M A) i j x :
   <[i:=x]>m !! j = None ↔ m !! j = None ∧ i ≠ j.
-Proof.
-  split; [|by intros [??]; rewrite lookup_insert_ne].
-  destruct (decide (i = j)) as [->|];
-    rewrite ?lookup_insert, ?lookup_insert_ne; intuition congruence.
-Qed.
+Proof. rewrite lookup_insert. case_decide; naive_solver. Qed.
 Lemma insert_id {A} (m : M A) i x : m !! i = Some x → <[i:=x]>m = m.
 Proof.
-  intros; apply map_eq; intros j; destruct (decide (i = j)) as [->|];
-    by rewrite ?lookup_insert, ?lookup_insert_ne by done.
+  intros; apply map_eq; intros j. rewrite lookup_insert.
+  case_decide; naive_solver.
 Qed.
 Lemma insert_included {A} R `{!∀ i, Reflexive (R i)} (m : M A) i x :
   (∀ y, m !! i = Some y → R i y x) → map_included R m (<[i:=x]>m).
 Proof.
-  intros ? j; destruct (decide (i = j)) as [->|].
-  - rewrite lookup_insert. destruct (m !! j); simpl; eauto.
-  - rewrite lookup_insert_ne by done. by destruct (m !! j); simpl.
+  intros ? j. rewrite lookup_insert.
+  destruct (decide (i = j)), (m !! j) eqn:?; naive_solver.
 Qed.
 Lemma insert_empty {A} i (x : A) : <[i:=x]> ∅ =@{M A} {[i := x]}.
 Proof. done. Qed.
 Lemma insert_non_empty {A} (m : M A) i x : <[i:=x]>m ≠ ∅.
 Proof.
-  intros Hi%(f_equal (.!! i)). by rewrite lookup_insert, lookup_empty in Hi.
+  intros Hi%(f_equal (.!! i)). by rewrite lookup_insert_eq, lookup_empty in Hi.
 Qed.
 Lemma insert_delete_insert {A} (m : M A) i x : <[i:=x]>(delete i m) = <[i:=x]> m.
 Proof. symmetry; apply (partial_alter_compose (λ _, Some x)). Qed.
@@ -726,7 +743,7 @@ Lemma delete_insert_subseteq {A} (m1 m2 : M A) i x :
 Proof.
   rewrite !map_subseteq_spec.
   intros Hix Hi j y Hj. destruct (decide (i = j)) as [->|?].
-  - rewrite lookup_insert. congruence.
+  - rewrite lookup_insert_eq. congruence.
   - rewrite lookup_insert_ne by done. apply Hi. by rewrite lookup_delete_ne.
 Qed.
 Lemma insert_delete_subset {A} (m1 m2 : M A) i x :
@@ -734,7 +751,7 @@ Lemma insert_delete_subset {A} (m1 m2 : M A) i x :
 Proof.
   intros ? [Hm12 Hm21]; split; [eauto using insert_delete_subseteq|].
   contradict Hm21. apply delete_insert_subseteq; auto.
-  eapply lookup_weaken, Hm12. by rewrite lookup_insert.
+  eapply lookup_weaken, Hm12. by rewrite lookup_insert_eq.
 Qed.
 Lemma insert_subset_inv {A} (m1 m2 : M A) i x :
   m1 !! i = None → <[i:=x]> m1 ⊂ m2 →
@@ -742,12 +759,33 @@ Lemma insert_subset_inv {A} (m1 m2 : M A) i x :
 Proof.
   intros Hi Hm1m2. exists (delete i m2). split_and?.
   - rewrite insert_delete; [done|].
-    eapply lookup_weaken, strict_include; eauto. by rewrite lookup_insert.
+    eapply lookup_weaken, strict_include; eauto. by rewrite lookup_insert_eq.
   - eauto using insert_delete_subset.
-  - by rewrite lookup_delete.
+  - by rewrite lookup_delete_eq.
 Qed.
 
 (** ** Properties of the singleton maps *)
+Lemma lookup_singleton {A} i j (x : A) :
+  ({[i := x]} : M A) !! j = if decide (i = j) then Some x else None.
+Proof.
+  unfold singletonM, map_singleton. by rewrite lookup_insert, lookup_empty.
+Qed.
+Lemma lookup_singleton_eq {A} i (x : A) : ({[i := x]} : M A) !! i = Some x.
+Proof. apply lookup_partial_alter_eq. Qed.
+Lemma lookup_singleton_ne {A} i j (x : A) :
+  i ≠ j → ({[i := x]} : M A) !! j = None.
+Proof. intros. by rewrite lookup_singleton, decide_False. Qed.
+
+Lemma lookup_total_singleton `{!Inhabited A} i j (x : A) :
+  ({[i := x]} : M A) !!! j = if decide (i = j) then x else inhabitant.
+Proof. rewrite lookup_total_alt, lookup_singleton. by case_decide. Qed.
+Lemma lookup_total_singleton_eq `{!Inhabited A} i (x : A) :
+  ({[i := x]} : M A) !!! i = x.
+Proof. by rewrite lookup_total_alt, lookup_singleton_eq. Qed.
+Lemma lookup_total_singleton_ne `{!Inhabited A} i j (x : A) :
+  i ≠ j → ({[i := x]} : M A) !!! j = inhabitant.
+Proof. intros. by rewrite lookup_total_alt, lookup_singleton_ne. Qed.
+
 Lemma lookup_singleton_Some {A} i j (x y : A) :
   ({[i := x]} : M A) !! j = Some y ↔ i = j ∧ x = y.
 Proof.
@@ -756,30 +794,17 @@ Qed.
 Lemma lookup_singleton_None {A} i j (x : A) :
   ({[i := x]} : M A) !! j = None ↔ i ≠ j.
 Proof. rewrite <-insert_empty,lookup_insert_None, lookup_empty; tauto. Qed.
-Lemma lookup_singleton {A} i (x : A) : ({[i := x]} : M A) !! i = Some x.
-Proof. by rewrite lookup_singleton_Some. Qed.
-Lemma lookup_total_singleton `{!Inhabited A} i (x : A) :
-  ({[i := x]} : M A) !!! i = x.
-Proof. by rewrite lookup_total_alt, lookup_singleton. Qed.
-Lemma lookup_singleton_ne {A} i j (x : A) :
-  i ≠ j → ({[i := x]} : M A) !! j = None.
-Proof. by rewrite lookup_singleton_None. Qed.
-Lemma lookup_total_singleton_ne `{!Inhabited A} i j (x : A) :
-  i ≠ j → ({[i := x]} : M A) !!! j = inhabitant.
-Proof. intros. by rewrite lookup_total_alt, lookup_singleton_ne. Qed.
 
 Global Instance map_singleton_inj {A} : Inj2 (=) (=) (=) (singletonM (M:=M A)).
 Proof.
   intros i1 x1 i2 x2 Heq%(f_equal (lookup i1)).
-  rewrite lookup_singleton in Heq. destruct (decide (i1 = i2)) as [->|].
-  - rewrite lookup_singleton in Heq. naive_solver.
-  - rewrite lookup_singleton_ne in Heq by done. naive_solver.
+  rewrite !lookup_singleton in Heq. repeat case_decide; naive_solver.
 Qed.
 
 Lemma map_non_empty_singleton {A} i (x : A) : {[i := x]} ≠@{M A} ∅.
 Proof.
   intros Hix. apply (f_equal (.!! i)) in Hix.
-  by rewrite lookup_empty, lookup_singleton in Hix.
+  by rewrite lookup_empty, lookup_singleton_eq in Hix.
 Qed.
 Lemma insert_singleton {A} i (x y : A) : <[i:=y]> {[i := x]} =@{M A} {[i := y]}.
 Proof.
@@ -789,15 +814,14 @@ Qed.
 Lemma alter_singleton {A} (f : A → A) i x :
   alter f i {[i := x]} =@{M A} {[i := f x]}.
 Proof.
-  intros. apply map_eq. intros i'. destruct (decide (i = i')) as [->|?].
-  - by rewrite lookup_alter, !lookup_singleton.
-  - by rewrite lookup_alter_ne, !lookup_singleton_ne.
+  intros. apply map_eq. intros i'. rewrite lookup_alter, !lookup_singleton.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma alter_singleton_ne {A} (f : A → A) i j x :
   i ≠ j → alter f i {[j := x]}=@{M A} {[j := x]}.
 Proof.
-  intros. apply map_eq; intros i'. by destruct (decide (i = i')) as [->|?];
-    rewrite ?lookup_alter, ?lookup_singleton_ne, ?lookup_alter_ne by done.
+  intros. apply map_eq; intros i'. rewrite lookup_alter, !lookup_singleton.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma singleton_non_empty {A} i (x : A) : {[i:=x]} ≠@{M A} ∅.
 Proof. apply insert_non_empty. Qed.
@@ -862,24 +886,21 @@ Proof. apply fmap_empty_iff. Qed.
 Lemma fmap_delete {A B} (f: A → B) (m : M A) i :
   f <$> delete i m = delete i (f <$> m).
 Proof.
-  apply map_eq; intros i'; destruct (decide (i' = i)) as [->|].
-  - by rewrite lookup_fmap, !lookup_delete.
-  - by rewrite lookup_fmap, !lookup_delete_ne, lookup_fmap by done.
+  apply map_eq; intros i'. rewrite lookup_delete, !lookup_fmap, lookup_delete.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma omap_delete {A B} (f: A → option B) (m : M A) i :
   omap f (delete i m) = delete i (omap f m).
 Proof.
-  apply map_eq; intros i'; destruct (decide (i' = i)) as [->|].
-  - by rewrite lookup_omap, !lookup_delete.
-  - by rewrite lookup_omap, !lookup_delete_ne, lookup_omap by done.
+  apply map_eq; intros i'. rewrite lookup_delete, !lookup_omap, lookup_delete.
+  repeat case_decide; naive_solver.
 Qed.
 
 Lemma fmap_insert {A B} (f : A → B) (m : M A) i x :
   f <$> <[i:=x]> m = <[i:=f x]> (f <$> m).
 Proof.
-  apply map_eq; intros i'; destruct (decide (i' = i)) as [->|].
-  - by rewrite lookup_fmap, !lookup_insert.
-  - by rewrite lookup_fmap, !lookup_insert_ne, lookup_fmap by done.
+  apply map_eq; intros i'. rewrite !lookup_insert, !lookup_fmap, !lookup_insert.
+  repeat case_decide; naive_solver.
 Qed.
 Lemma fmap_insert_inv {A B} (f : A → B) (m1 : M A) (m2 : M B) i y :
   m2 !! i = None →
@@ -887,9 +908,9 @@ Lemma fmap_insert_inv {A B} (f : A → B) (m1 : M A) (m2 : M B) i y :
   ∃ x m1', y = f x ∧ m1' !! i = None ∧ m1 = <[i:=x]> m1' ∧ m2 = f <$> m1'.
 Proof.
   intros ? Hm. pose proof (f_equal (.!! i) Hm) as Hmi.
-  rewrite lookup_fmap, lookup_insert, fmap_Some in Hmi.
+  rewrite lookup_fmap, lookup_insert_eq, fmap_Some in Hmi.
   destruct Hmi as (x & ? & ->). exists x, (delete i m1). split; [done|].
-  split; [by rewrite lookup_delete|].
+  split; [by rewrite lookup_delete_eq|].
   split; [by rewrite insert_delete|].
   by rewrite fmap_delete, Hm, delete_insert by done.
 Qed.
@@ -898,14 +919,9 @@ Lemma omap_insert {A B} (f : A → option B) (m : M A) i x :
   omap f (<[i:=x]>m) =
     (match f x with Some y => <[i:=y]> | None => delete i end) (omap f m).
 Proof.
-  intros; apply map_eq; intros i'; destruct (decide (i' = i)) as [->|].
-  - rewrite lookup_omap, !lookup_insert. destruct (f x) as [y|] eqn:Hx; simpl.
-    + by rewrite lookup_insert.
-    + by rewrite lookup_delete, Hx.
-  - rewrite lookup_omap, !lookup_insert_ne by done.
-    destruct (f x) as [y|] eqn:Hx; simpl.
-    + by rewrite lookup_insert_ne, lookup_omap by done.
-    + by rewrite lookup_delete_ne, lookup_omap by done.
+  intros; apply map_eq; intros i'. destruct (f x) eqn:?;
+    rewrite !lookup_omap, !lookup_insert, ?lookup_delete, lookup_omap;
+    repeat case_decide; naive_solver.
 Qed.
 Lemma omap_insert_Some {A B} (f : A → option B) (m : M A) i x y :
   f x = Some y → omap f (<[i:=x]>m) = <[i:=y]>(omap f m).
@@ -1006,9 +1022,9 @@ Lemma elem_of_list_to_map_1' {A} (l : list (K * A)) i x :
 Proof.
   induction l as [|[j y] l IH]; csimpl; [by rewrite elem_of_nil|].
   setoid_rewrite elem_of_cons.
-  intros Hdup [?|?]; simplify_eq; [by rewrite lookup_insert|].
+  intros Hdup [?|?]; simplify_eq; [by rewrite lookup_insert_eq|].
   destruct (decide (i = j)) as [->|].
-  - rewrite lookup_insert; f_equal; eauto using eq_sym.
+  - rewrite lookup_insert_eq; f_equal; eauto using eq_sym.
   - rewrite lookup_insert_ne by done; eauto.
 Qed.
 Lemma elem_of_list_to_map_1 {A} (l : list (K * A)) i x :
@@ -1024,7 +1040,7 @@ Lemma elem_of_list_to_map_2 {A} (l : list (K * A)) i x :
 Proof.
   induction l as [|[j y] l IH]; simpl; [by rewrite lookup_empty|].
   rewrite elem_of_cons. destruct (decide (i = j)) as [->|];
-    rewrite ?lookup_insert, ?lookup_insert_ne; intuition congruence.
+    rewrite ?lookup_insert_eq, ?lookup_insert_ne; intuition congruence.
 Qed.
 Lemma elem_of_list_to_map' {A} (l : list (K * A)) i x :
   (∀ x', (i,x) ∈ l → (i,x') ∈ l → x = x') →
@@ -1044,9 +1060,7 @@ Lemma not_elem_of_list_to_map_2 {A} (l : list (K * A)) i :
   (list_to_map l : M A) !! i = None → i ∉ l.*1.
 Proof.
   induction l as [|[j y] l IH]; csimpl; [rewrite elem_of_nil; tauto|].
-  rewrite elem_of_cons. destruct (decide (i = j)); simplify_eq.
-  - by rewrite lookup_insert.
-  - by rewrite lookup_insert_ne; intuition.
+  rewrite elem_of_cons, lookup_insert. case_decide; naive_solver.
 Qed.
 Lemma not_elem_of_list_to_map {A} (l : list (K * A)) i :
   i ∉ l.*1 ↔ (list_to_map l : M A) !! i = None.
@@ -1129,7 +1143,7 @@ Qed.
 Lemma map_to_list_delete {A} (m : M A) i x :
   m !! i = Some x → (i,x) :: map_to_list (delete i m) ≡ₚ map_to_list m.
 Proof.
-  intros. rewrite <-map_to_list_insert by (by rewrite lookup_delete).
+  intros. rewrite <-map_to_list_insert by (by rewrite lookup_delete_eq).
   by rewrite insert_delete.
 Qed.
 
@@ -1202,12 +1216,12 @@ Proof.
   unfold map_imap.
   apply (map_fold_weak_ind (λ r m, r !! i = m !! i ≫= f i)); clear m.
   { by rewrite !lookup_empty. }
-  intros j y m m' Hj Hi. destruct (decide (i = j)) as [->|].
-  - rewrite lookup_insert; simpl. destruct (f j y).
-    + by rewrite lookup_insert.
+  intros j y m m' Hj Hi. rewrite lookup_insert.
+  destruct (decide (j = i)) as [->|]; simpl.
+  - destruct (f i y).
+    + by rewrite lookup_insert_eq.
     + by rewrite Hi, Hj.
-  - rewrite lookup_insert_ne by done.
-    destruct (f j y); by rewrite ?lookup_insert_ne by done.
+  - destruct (f j y); by rewrite ?lookup_insert_ne by done.
 Qed.
 
 Lemma map_imap_Some {A} (m : M A) : map_imap (λ _, Some) m = m.
@@ -1219,17 +1233,10 @@ Lemma map_imap_insert {A B} (f : K → A → option B) i x (m : M A) :
   map_imap f (<[i:=x]> m) =
     (match f i x with Some y => <[i:=y]> | None => delete i end) (map_imap f m).
 Proof.
-  destruct (f i x) as [y|] eqn:Hw; simpl.
-  - apply map_eq. intros k. rewrite map_lookup_imap.
-    destruct (decide (k = i)) as [->|Hk_not_i].
-    + by rewrite lookup_insert, lookup_insert.
-    + rewrite !lookup_insert_ne by done.
-      by rewrite map_lookup_imap.
-  - apply map_eq. intros k. rewrite map_lookup_imap.
-    destruct (decide (k = i)) as [->|Hk_not_i].
-    + by rewrite lookup_insert, lookup_delete.
-    + rewrite lookup_insert_ne, lookup_delete_ne by done.
-      by rewrite map_lookup_imap.
+  apply map_eq. intros k. rewrite map_lookup_imap, lookup_insert.
+  destruct (f i x) as [y|] eqn:Hw;
+    rewrite ?lookup_insert, ?lookup_delete, ?map_lookup_imap;
+    repeat case_decide; naive_solver.
 Qed.
 Lemma map_imap_insert_Some {A B} (f : K → A → option B) i x (m : M A) y :
   f i x = Some y → map_imap f (<[i:=x]> m) = <[i:=y]> (map_imap f m).
@@ -1241,11 +1248,9 @@ Proof. intros Hi. by rewrite map_imap_insert, Hi. Qed.
 Lemma map_imap_delete {A B} (f : K → A → option B) (m : M A) (i : K) :
   map_imap f (delete i m) = delete i (map_imap f m).
 Proof.
-  apply map_eq. intros k. rewrite map_lookup_imap.
-  destruct (decide (k = i)) as [->|Hk_not_i].
-  - by rewrite !lookup_delete.
-  - rewrite !lookup_delete_ne by done.
-    by rewrite map_lookup_imap.
+  apply map_eq. intros k.
+  rewrite map_lookup_imap, !lookup_delete, map_lookup_imap.
+  repeat case_decide; naive_solver.
 Qed.
 
 Lemma map_imap_ext {A1 A2 B} (f1 : K → A1 → option B)
@@ -1310,7 +1315,7 @@ Proof.
   destruct (m !! i) as [y|] eqn:?; simpl.
   - rewrite <-(insert_id m i y) at 2 by done. rewrite <-!(insert_delete_insert m).
     rewrite <-!length_map_to_list.
-    by rewrite !map_to_list_insert by (by rewrite lookup_delete).
+    by rewrite !map_to_list_insert by (by rewrite lookup_delete_eq).
   - by rewrite <-!length_map_to_list, map_to_list_insert.
 Qed.
 Lemma map_size_insert_Some {A} i x (m : M A) :
@@ -1380,7 +1385,7 @@ Proof.
   intros ? Hins m. induction (map_wf m) as [m _ IH].
   destruct (map_choose_or_empty m) as [(i&x&?)| ->]; [|done].
   rewrite <-(insert_delete m i x) by done.
-  apply Hins; [by rewrite lookup_delete|]. by apply IH, delete_subset.
+  apply Hins; [by rewrite lookup_delete_eq|]. by apply IH, delete_subset.
 Qed.
 
 (** ** Properties of conversion from sets *)
@@ -1479,8 +1484,8 @@ Proof.
   destruct m as [|j y m ? Hfold _] using map_fold_ind.
   { by rewrite map_to_list_empty in Hixs. }
   unfold map_to_list in Hixs. rewrite Hfold in Hixs. simplify_eq.
-  rewrite lookup_insert in Hi. simplify_eq.
-  by rewrite Hfold, delete_insert by done.
+  rewrite lookup_insert_eq in Hi. simplify_eq.
+  by rewrite Hfold, delete_insert.
 Qed.
 
 Lemma map_fold_insert_first_key {A B} (f : K → A → B → B) b (m : M A) i x :
@@ -1489,7 +1494,7 @@ Lemma map_fold_insert_first_key {A B} (f : K → A → B → B) b (m : M A) i x 
   map_fold f b (<[i:=x]> m) = f i x (map_fold f b m).
 Proof.
   intros. rewrite <-(delete_insert m i x) at 2 by done.
-  apply map_fold_delete_first_key; auto using lookup_insert.
+  apply map_fold_delete_first_key; auto using lookup_insert_eq.
 Qed.
 
 (** FIXME (Improve order): Move to [map_to_list] section. Moving requires a
@@ -1577,7 +1582,7 @@ Proof.
   rewrite <-map_fold_insert; [|done|done| |].
   - rewrite insert_delete; done.
   - intros j1 j2 z1 z2 y. rewrite insert_delete_insert, insert_id by done. auto.
-  - rewrite lookup_delete; done.
+  - rewrite lookup_delete_eq; done.
 Qed.
 
 Lemma map_fold_delete_L {A B} (f : K → A → B → B) (b : B) (i : K) (x : A) (m : M A) :
@@ -1597,7 +1602,7 @@ Proof.
   intros ? Hg. induction m as [|i x' m ? Hfold IH] using map_fold_ind.
   { by rewrite !map_fold_empty. }
   rewrite !Hfold.
-  rewrite <-Hg by (by rewrite lookup_insert). f_equiv. apply IH.
+  rewrite <-Hg by (by rewrite lookup_insert_eq). f_equiv. apply IH.
   intros j z y Hj. apply Hg. rewrite lookup_insert_ne by naive_solver. done.
 Qed.
 
@@ -1636,7 +1641,7 @@ Section map_Forall.
     map_Forall P m → (∀ i x, P i x → Q i x) → map_Forall Q m.
   Proof. unfold map_Forall; naive_solver. Qed.
   Lemma map_Forall_insert_1_1 m i x : map_Forall P (<[i:=x]>m) → P i x.
-  Proof. intros Hm. by apply Hm; rewrite lookup_insert. Qed.
+  Proof. intros Hm. by apply Hm; rewrite lookup_insert_eq. Qed.
   Lemma map_Forall_insert_1_2 m i x :
     m !! i = None → map_Forall P (<[i:=x]>m) → map_Forall P m.
   Proof.
@@ -1722,7 +1727,7 @@ Section map_Exists.
     map_Exists P (<[i:=x]>m) → P i x ∨ map_Exists P m.
   Proof. intros [j[y[?%lookup_insert_Some ?]]]. unfold map_Exists. naive_solver. Qed.
   Lemma map_Exists_insert_2_1 m i x : P i x → map_Exists P (<[i:=x]>m).
-  Proof. intros Hm. exists i, x. by rewrite lookup_insert. Qed.
+  Proof. intros Hm. exists i, x. by rewrite lookup_insert_eq. Qed.
   Lemma map_Exists_insert_2_2 m i x :
     m !! i = None → map_Exists P m → map_Exists P (<[i:=x]>m).
   Proof.
@@ -1798,8 +1803,8 @@ Section map_lookup_filter.
     { by rewrite lookup_empty. }
     intros y m m' Hm IH j. case (decide (j = i))as [->|?].
     - case_decide.
-      + rewrite !lookup_insert. simpl. by rewrite option_guard_True.
-      + rewrite lookup_insert. simpl. by rewrite option_guard_False, IH, Hm.
+      + rewrite !lookup_insert_eq. simpl. by rewrite option_guard_True.
+      + rewrite lookup_insert_eq. simpl. by rewrite option_guard_False, IH, Hm.
     - case_decide.
       + by rewrite !lookup_insert_ne by done.
       + by rewrite !lookup_insert_ne.
@@ -1909,7 +1914,7 @@ Section map_filter.
   Proof.
     apply map_eq. intros j. apply option_eq; intros y.
     destruct (decide (j = i)) as [->|?].
-    - rewrite map_lookup_filter_Some, !lookup_delete. naive_solver.
+    - rewrite map_lookup_filter_Some, !lookup_delete_eq. naive_solver.
     - rewrite lookup_delete_ne, !map_lookup_filter_Some, lookup_delete_ne by done.
       naive_solver.
   Qed.
@@ -2094,7 +2099,7 @@ Section more_merge.
       merge f (partial_alter g1 i m1) (partial_alter g2 i m2).
   Proof.
     intro. apply map_eq. intros j. destruct (decide (i = j)); subst.
-    - by rewrite lookup_merge, !lookup_partial_alter, !lookup_merge.
+    - by rewrite lookup_merge, !lookup_partial_alter_eq, !lookup_merge.
     - by rewrite lookup_merge, !lookup_partial_alter_ne, lookup_merge.
   Qed.
   Lemma partial_alter_merge_l g g1 (m1 : M A) (m2 : M B) i :
@@ -2102,7 +2107,7 @@ Section more_merge.
     partial_alter g i (merge f m1 m2) = merge f (partial_alter g1 i m1) m2.
   Proof.
     intro. apply map_eq. intros j. destruct (decide (i = j)); subst.
-    - by rewrite lookup_merge, !lookup_partial_alter, !lookup_merge.
+    - by rewrite lookup_merge, !lookup_partial_alter_eq, !lookup_merge.
     - by rewrite lookup_merge, !lookup_partial_alter_ne, lookup_merge.
   Qed.
   Lemma partial_alter_merge_r g g2 (m1 : M A) (m2 : M B) i :
@@ -2110,7 +2115,7 @@ Section more_merge.
     partial_alter g i (merge f m1 m2) = merge f m1 (partial_alter g2 i m2).
   Proof.
     intro. apply map_eq. intros j. destruct (decide (i = j)); subst.
-    - by rewrite lookup_merge, !lookup_partial_alter, !lookup_merge.
+    - by rewrite lookup_merge, !lookup_partial_alter_eq, !lookup_merge.
     - by rewrite lookup_merge, !lookup_partial_alter_ne, lookup_merge.
   Qed.
   Lemma insert_merge (m1 : M A) (m2 : M B) i x y z :
@@ -2391,17 +2396,15 @@ Section map_Forall2.
   Lemma map_Forall2_delete (m1 : M A) (m2 : M B) i :
     map_Forall2 R m1 m2 → map_Forall2 R (delete i m1) (delete i m2).
   Proof.
-    intros Hm j. destruct (decide (i = j)) as [->|].
-    - rewrite !lookup_delete. constructor.
-    - by rewrite !lookup_delete_ne by done.
+    intros Hm j. rewrite !lookup_delete.
+    destruct (decide (i = j)) as [->|]; [|done]. constructor.
   Qed.
 
   Lemma map_Forall2_insert_2 (m1 : M A) (m2 : M B) i x1 x2 :
     R i x1 x2 → map_Forall2 R m1 m2 → map_Forall2 R (<[i:=x1]> m1) (<[i:=x2]> m2).
   Proof.
-    intros Hx Hm j. destruct (decide (i = j)) as [->|].
-    - rewrite !lookup_insert. by constructor.
-    - by rewrite !lookup_insert_ne by done.
+    intros Hx Hm j. rewrite !lookup_insert.
+    destruct (decide (i = j)) as [->|]; [|done]. by constructor.
   Qed.
   Lemma map_Forall2_insert (m1 : M A) (m2 : M B) i x1 x2 :
     m1 !! i = None → m2 !! i = None →
@@ -2409,7 +2412,7 @@ Section map_Forall2.
   Proof.
     intros Hi1 Hi2. split; [|naive_solver eauto using map_Forall2_insert_2].
     intros Hm. split.
-    - specialize (Hm i). rewrite !lookup_insert in Hm. by inv Hm.
+    - specialize (Hm i). rewrite !lookup_insert_eq in Hm. by inv Hm.
     - intros j. destruct (decide (i = j)) as [->|].
       + rewrite Hi1, Hi2. constructor.
       + specialize (Hm j). by rewrite !lookup_insert_ne in Hm by done.
@@ -2420,10 +2423,10 @@ Section map_Forall2.
     map_Forall2 R (<[i:=x1]> m1) m2 →
     ∃ x2 m2', m2 = <[i:=x2]> m2' ∧ m2' !! i = None ∧ R i x1 x2 ∧ map_Forall2 R m1 m2'.
   Proof.
-    intros ? Hm. pose proof (Hm i) as Hi. rewrite lookup_insert in Hi.
+    intros ? Hm. pose proof (Hm i) as Hi. rewrite lookup_insert_eq in Hi.
     destruct (m2 !! i) as [x2|] eqn:?; inv Hi.
     exists x2, (delete i m2). split; [by rewrite insert_delete|].
-    split; [by rewrite lookup_delete|]. split; [done|].
+    split; [by rewrite lookup_delete_eq|]. split; [done|].
     rewrite <-(delete_insert m1 i x1) by done. by apply map_Forall2_delete.
   Qed.
   Lemma map_Forall2_insert_inv_r (m1 : M A) (m2 : M B) i x2 :
@@ -2431,10 +2434,10 @@ Section map_Forall2.
     map_Forall2 R m1 (<[i:=x2]> m2) →
     ∃ x1 m1', m1 = <[i:=x1]> m1' ∧ m1' !! i = None ∧ R i x1 x2 ∧ map_Forall2 R m1' m2.
   Proof.
-    intros ? Hm. pose proof (Hm i) as Hi. rewrite lookup_insert in Hi.
+    intros ? Hm. pose proof (Hm i) as Hi. rewrite lookup_insert_eq in Hi.
     destruct (m1 !! i) as [x1|] eqn:?; inv Hi.
     exists x1, (delete i m1). split; [by rewrite insert_delete|].
-    split; [by rewrite lookup_delete|]. split; [done|].
+    split; [by rewrite lookup_delete_eq|]. split; [done|].
     rewrite <-(delete_insert m2 i x2) by done. by apply map_Forall2_delete.
   Qed.
 
@@ -2877,10 +2880,8 @@ Proof. by rewrite map_disjoint_union_r. Qed.
 Lemma insert_union_singleton_l {A} (m : M A) i x : <[i:=x]>m = {[i := x]} ∪ m.
 Proof.
   apply map_eq. intros j. apply option_eq. intros y.
-  rewrite lookup_union_Some_raw.
-  destruct (decide (i = j)); subst.
-  - rewrite !lookup_singleton, lookup_insert. intuition congruence.
-  - rewrite !lookup_singleton_ne, lookup_insert_ne; intuition congruence.
+  rewrite lookup_union_Some_raw, lookup_singleton, lookup_insert.
+  case_decide; naive_solver.
 Qed.
 Lemma insert_union_singleton_r {A} (m : M A) i x :
   m !! i = None → <[i:=x]>m = m ∪ {[i := x]}.
@@ -2891,11 +2892,9 @@ Qed.
 Lemma union_singleton_r {A} (m : M A) i x y :
   m !! i = Some x → m ∪ {[i := y]} = m.
 Proof.
-  intro Hlkup. apply map_eq. intros j. rewrite lookup_union.
-  destruct (decide (i = j)); subst.
-  - by rewrite !lookup_singleton, Hlkup.
-  - rewrite lookup_singleton_ne by done.
-    by destruct (m !! j).
+  intro Hlkup. apply map_eq. intros j.
+  rewrite lookup_union, lookup_singleton.
+  case_decide; destruct (m !! j) eqn:?; naive_solver.
 Qed.
 Lemma map_disjoint_insert_l {A} (m1 m2 : M A) i x :
   <[i:=x]>m1 ##ₘ m2 ↔ m2 !! i = None ∧ m1 ##ₘ m2.
@@ -2938,7 +2937,7 @@ Lemma union_delete_insert {A} (m1 m2 : M A) i x :
   m1 !! i = Some x →
   delete i m1 ∪ <[i:=x]> m2 = m1 ∪ m2.
 Proof.
-  intros. rewrite <-insert_union_r by apply lookup_delete.
+  intros. rewrite <-insert_union_r by apply lookup_delete_eq.
   by rewrite insert_union_l, insert_delete by done.
 Qed.
 Lemma union_insert_delete {A} (m1 m2 : M A) i x :
@@ -3082,7 +3081,7 @@ Proof.
       apply Hf_assoc; [done|revert Hj1|revert Hj2];
         rewrite lookup_insert_Some, !lookup_union_Some_raw, lookup_delete_Some;
         naive_solver.
-    - by rewrite lookup_union, Hmj, lookup_delete. }
+    - by rewrite lookup_union, Hmj, lookup_delete_eq. }
   trans (f j x (map_fold f (map_fold f b (delete j m2)) m)).
   { apply Hf, IH.
     - intros j' z1 z2 y ? Hj'. apply Hf_idemp; revert Hj';
@@ -3240,11 +3239,7 @@ Qed.
 (** ** Properties of the folding the [delete] function *)
 Lemma lookup_foldr_delete {A} (m : M A) is j :
   j ∈ is → foldr delete m is !! j = None.
-Proof.
-  induction 1 as [|i j is]; simpl; [by rewrite lookup_delete|].
-  by destruct (decide (i = j)) as [->|?];
-    rewrite ?lookup_delete, ?lookup_delete_ne by done.
-Qed.
+Proof. induction 1; simpl; rewrite lookup_delete; case_decide; naive_solver. Qed.
 Lemma lookup_foldr_delete_not_elem_of {A} (m : M A) is j :
   j ∉ is → foldr delete m is !! j = m !! j.
 Proof.
@@ -3614,9 +3609,9 @@ Section setoid.
   Global Instance partial_alter_proper :
     Proper (((≡) ==> (≡)) ==> (=) ==> (≡) ==> (≡@{M A})) partial_alter.
   Proof.
-    by intros f1 f2 Hf i ? <- m1 m2 Hm j; destruct (decide (i = j)) as [->|];
-      rewrite ?lookup_partial_alter, ?lookup_partial_alter_ne by done;
-      try apply Hf; apply lookup_proper.
+    intros f1 f2 Hf i ? <- m1 m2 Hm j.
+    rewrite !lookup_partial_alter; case_decide;
+      try apply Hf; by apply lookup_proper.
   Qed.
   Global Instance insert_proper (i : K) :
     Proper ((≡) ==> (≡) ==> (≡@{M A})) (insert i).
@@ -3703,9 +3698,8 @@ Section setoid.
     Inj2 (=) (≡) (≡) (singletonM (M:=M A)).
   Proof.
     intros i1 x1 i2 x2 Heq. specialize (Heq i1).
-    rewrite lookup_singleton in Heq. destruct (decide (i1 = i2)) as [->|].
-    - rewrite lookup_singleton in Heq. apply (inj _) in Heq. naive_solver.
-    - rewrite lookup_singleton_ne in Heq by done. inv Heq.
+    rewrite !lookup_singleton in Heq.
+    repeat case_decide; try inversion Heq; naive_solver.
   Qed.
 
   Global Instance map_fmap_equiv_inj `{Equiv B} (f : A → B) :
@@ -3743,15 +3737,14 @@ Section setoid_inversion.
     intros ? Hf. split; [|by intros (?&->&<-)]. intros Hm.
     assert (∃ mx2', m1 !! i = f mx2' ∧ mx2' ≡ m2 !! i) as (mx2'&?&?).
     { destruct (m1 !! i) as [x1|] eqn:Hix1.
-      - apply (Hf x1 (m2 !! i)). by rewrite <-Hix1, Hm, lookup_partial_alter.
+      - apply (Hf x1 (m2 !! i)). by rewrite <-Hix1, Hm, lookup_partial_alter_eq.
       - exists (m2 !! i). split; [|done]. apply symmetry, None_equiv_eq.
-        by rewrite <-Hix1, Hm, lookup_partial_alter. }
+        by rewrite <-Hix1, Hm, lookup_partial_alter_eq. }
     exists (partial_alter (λ _, mx2') i m1). split.
-    - apply map_eq; intros j. destruct (decide (i = j)) as [->|?].
-      + by rewrite !lookup_partial_alter.
-      + by rewrite !lookup_partial_alter_ne.
+    - apply map_eq; intros j. rewrite !lookup_partial_alter.
+      repeat case_decide; naive_solver.
     - intros j. destruct (decide (i = j)) as [->|?].
-      + by rewrite lookup_partial_alter.
+      + by rewrite lookup_partial_alter_eq.
       + by rewrite Hm, !lookup_partial_alter_ne.
   Qed.
   Lemma alter_equiv_eq (f : A → A) (m1 m2 : M A) i :
@@ -3772,15 +3765,15 @@ Section setoid_inversion.
   Proof.
     split; [|by intros (?&?&->&<-&<-)]. intros Hm.
     assert (is_Some (m1 !! i)) as [x' Hix'].
-    { rewrite Hm, lookup_insert. eauto. }
+    { rewrite Hm, lookup_insert_eq. eauto. }
     destruct (m2 !! i) as [y|] eqn:?.
     - exists x', (<[i:=y]> m1). split_and!.
       + by rewrite insert_insert, insert_id by done.
-      + apply (inj Some). by rewrite <-Hix', Hm, lookup_insert.
+      + apply (inj Some). by rewrite <-Hix', Hm, lookup_insert_eq.
       + by rewrite Hm, insert_insert, insert_id by done.
     - exists x', (delete i m1). split_and!.
       + by rewrite insert_delete by done.
-      + apply (inj Some). by rewrite <-Hix', Hm, lookup_insert.
+      + apply (inj Some). by rewrite <-Hix', Hm, lookup_insert_eq.
       + by rewrite Hm, delete_insert by done.
   Qed.
   Lemma map_singleton_equiv_eq m i x :
@@ -3867,7 +3860,7 @@ Proof.
     exists (<[i:=x']> m2a'), (partial_alter (λ _, mx2) i m2b').
     split_and!; [by apply partial_alter_merge|by f_equiv|].
     intros j. destruct (decide (i = j)) as [->|?].
-    + by rewrite lookup_partial_alter.
+    + by rewrite lookup_partial_alter_eq.
     + by rewrite Hm2b, lookup_partial_alter_ne.
   - intros (m'&->&(m2a'&m2b'&->&Hm2a&Hm2b)%IH)%delete_equiv_eq.
     exists (<[i:=x]> m2a'), m2b'. split_and!; [|by f_equiv|done].
@@ -3953,7 +3946,7 @@ Section map_seq.
     revert start. induction xs as [|x' xs IH]; intros start; simpl.
     { rewrite lookup_empty; simplify_option_eq; by rewrite ?lookup_nil. }
     destruct (decide (start = i)) as [->|?].
-    - by rewrite lookup_insert, option_guard_True, Nat.sub_diag by lia.
+    - by rewrite lookup_insert_eq, option_guard_True, Nat.sub_diag by lia.
     - rewrite lookup_insert_ne, IH by done.
       simplify_option_eq; try done || lia.
       by replace (i - start) with (S (i - S start)) by lia.
@@ -4036,7 +4029,7 @@ Section map_seq.
     <[i:=x]> (map_seq start xs) =@{M A} map_seq start (<[i - start:=x]> xs).
   Proof.
     intros. apply map_eq. intros j. destruct (decide (i = j)) as [->|?].
-    - rewrite lookup_insert, lookup_map_seq, option_guard_True by lia.
+    - rewrite lookup_insert_eq, lookup_map_seq, option_guard_True by lia.
       by rewrite list_lookup_insert by lia.
     - rewrite lookup_insert_ne, !lookup_map_seq by done.
       case_guard; [|done]. by rewrite list_lookup_insert_ne by lia.
@@ -4105,7 +4098,7 @@ Section map_seqZ.
     revert start. induction xs as [|x' xs IH]; intros start; simpl.
     { rewrite lookup_empty; simplify_option_eq; by rewrite ?lookup_nil. }
     destruct (decide (start = i)) as [->|?].
-    - by rewrite lookup_insert, option_guard_True, Z.sub_diag by lia.
+    - by rewrite lookup_insert_eq, option_guard_True, Z.sub_diag by lia.
     - rewrite lookup_insert_ne, IH by done.
       simplify_option_eq; try done || lia.
       replace (i - start) with (Z.succ (i - Z.succ start)) by lia.
@@ -4198,7 +4191,7 @@ Section map_seqZ.
     =@{M A} map_seqZ start (<[Z.to_nat (i - start):=x]> xs).
   Proof.
     intros. apply map_eq. intros j. destruct (decide (i = j)) as [->|?].
-    - rewrite lookup_insert, lookup_map_seqZ, option_guard_True by lia.
+    - rewrite lookup_insert_eq, lookup_map_seqZ, option_guard_True by lia.
       by rewrite list_lookup_insert by lia.
     - rewrite lookup_insert_ne, !lookup_map_seqZ by done.
       case_guard; [|done]. by rewrite list_lookup_insert_ne by lia.
@@ -4310,7 +4303,7 @@ Section kmap.
   Proof.
     apply map_eq; intros j. apply option_eq; intros y.
     destruct (decide (j = f i)) as [->|?].
-    { by rewrite lookup_partial_alter, !lookup_kmap, lookup_partial_alter. }
+    { by rewrite lookup_partial_alter_eq, !lookup_kmap, lookup_partial_alter_eq. }
     rewrite lookup_partial_alter_ne, !lookup_kmap_Some by done. split.
     - intros [i' [? Hm]]; simplify_eq/=.
       rewrite lookup_partial_alter_ne in Hm by naive_solver. naive_solver.
@@ -4459,7 +4452,7 @@ Section preimg.
     induction m as [|i x' m ? IH] using map_ind.
     { by rewrite map_preimg_empty, lookup_empty. }
     rewrite map_preimg_insert by done. destruct (decide (x = x')) as [->|].
-    - rewrite lookup_partial_alter. intros [=]. set_solver.
+    - rewrite lookup_partial_alter_eq. intros [=]. set_solver.
     - rewrite lookup_partial_alter_ne by done. set_solver.
   Qed.
 
@@ -4468,7 +4461,7 @@ Section preimg.
   Proof.
     induction m as [|i' x' m ? IH] using map_ind; [by rewrite lookup_empty|].
     rewrite map_preimg_insert by done. destruct (decide (x = x')) as [->|].
-    - by rewrite lookup_partial_alter.
+    - by rewrite lookup_partial_alter_eq.
     - rewrite lookup_partial_alter_ne, lookup_insert_Some by done. naive_solver.
   Qed.
 
@@ -4479,7 +4472,7 @@ Section preimg.
     revert X. induction m as [|i' x' m ? IH] using map_ind; intros X.
     { by rewrite map_preimg_empty, lookup_empty. }
     rewrite map_preimg_insert by done. destruct (decide (x = x')) as [->|].
-    - rewrite lookup_partial_alter. intros [= <-].
+    - rewrite lookup_partial_alter_eq. intros [= <-].
       rewrite elem_of_union, elem_of_singleton, lookup_insert_Some.
       destruct (map_preimg m !! x') as [X'|] eqn:Hx'; simpl.
       + rewrite IH by done. naive_solver.
@@ -4595,7 +4588,7 @@ Section img.
     rewrite map_img_insert. apply union_mono_l, map_img_delete_subseteq.
   Qed.
   Lemma elem_of_map_img_insert m i x : x ∈ map_img (<[i:=x]> m).
-  Proof. apply elem_of_map_img. exists i. apply lookup_insert. Qed.
+  Proof. apply elem_of_map_img. exists i. apply lookup_insert_eq. Qed.
   Lemma elem_of_map_img_insert_ne m i x y :
     x ≠ y → x ∈ map_img (<[i:=y]> m) → x ∈ map_img m.
   Proof. intros ? ?%map_img_insert_subseteq. set_solver. Qed.
@@ -4895,7 +4888,7 @@ Section map_compose.
 
   Lemma map_compose_singletons a b c :
     ({[b := c]} : MB C) ∘ₘ {[a := b]} =@{MA C} {[a := c]}.
-  Proof. by apply map_compose_singleton_Some, lookup_insert. Qed.
+  Proof. by apply map_compose_singleton_Some, lookup_insert_eq. Qed.
 End map_compose.
 
 Lemma map_compose_assoc `{FinMap A MA, FinMap B MB, FinMap C MC} {D}
@@ -4935,13 +4928,13 @@ Section curry_uncurry.
     { by rewrite !lookup_empty. }
     clear m; intros i' m2 m m12 Hi' IH.
     apply (map_fold_weak_ind (λ m2r m2, m2r !! (i,j) = <[i':=m2]> m !! i ≫= (.!! j))).
-    { rewrite IH. destruct (decide (i' = i)) as [->|].
-      - rewrite lookup_insert, Hi'; simpl; by rewrite lookup_empty.
-      - by rewrite lookup_insert_ne by done. }
+    { rewrite IH. rewrite lookup_insert.
+      destruct (decide (i' = i)) as [->|]; [|done].
+      rewrite Hi'; simpl; by rewrite lookup_empty. }
     intros j' y m2' m12' Hj' IH'. destruct (decide (i = i')) as [->|].
-    - rewrite lookup_insert; simpl. destruct (decide (j = j')) as [->|].
-      + by rewrite !lookup_insert.
-      + by rewrite !lookup_insert_ne, IH', lookup_insert by congruence.
+    - rewrite lookup_insert_eq; simpl. destruct (decide (j = j')) as [->|].
+      + by rewrite !lookup_insert_eq.
+      + by rewrite !lookup_insert_ne, IH', lookup_insert_eq by congruence.
     - by rewrite !lookup_insert_ne, IH', lookup_insert_ne by congruence.
   Qed.
 
@@ -4952,8 +4945,8 @@ Section curry_uncurry.
     { by rewrite !lookup_empty. }
     clear m; intros [i' j'] x m12 mr Hij' IH.
     destruct (decide (i = i')) as [->|].
-    - rewrite lookup_partial_alter. destruct (decide (j = j')) as [->|].
-      + destruct (mr !! i'); simpl; by rewrite !lookup_insert.
+    - rewrite lookup_partial_alter_eq. destruct (decide (j = j')) as [->|].
+      + destruct (mr !! i'); simpl; by rewrite !lookup_insert_eq.
       + destruct (mr !! i'); simpl; rewrite !lookup_insert_ne by congruence; first done.
         by rewrite <-IH, lookup_empty.
     - by rewrite lookup_partial_alter_ne, lookup_insert_ne by congruence.
@@ -4967,8 +4960,8 @@ Section curry_uncurry.
     { split; intros; by rewrite !lookup_empty. }
     clear m; intros [i' j'] x m12 mr Hij' IH.
     destruct (decide (i = i')) as [->|].
-    - split; [by rewrite lookup_partial_alter|].
-      intros Hi. specialize (Hi j'). by rewrite lookup_insert in Hi.
+    - split; [by rewrite lookup_partial_alter_eq|].
+      intros Hi. specialize (Hi j'). by rewrite lookup_insert_eq in Hi.
     - rewrite lookup_partial_alter_ne, IH; [|done]. apply forall_proper.
       intros j. rewrite lookup_insert_ne; [done|congruence].
   Qed.
@@ -5075,13 +5068,13 @@ Tactic Notation "simpl_map" "by" tactic3(tac) := repeat
   match goal with
   | H : context[ ∅ !! _ ] |- _ => rewrite lookup_empty in H
   | H : context[ (<[_:=_]>_) !! _ ] |- _ =>
-    rewrite lookup_insert in H || rewrite lookup_insert_ne in H by tac
+    rewrite lookup_insert_eq in H || rewrite lookup_insert_ne in H by tac
   | H : context[ (alter _ _ _) !! _] |- _ =>
-    rewrite lookup_alter in H || rewrite lookup_alter_ne in H by tac
+    rewrite lookup_alter_eq in H || rewrite lookup_alter_ne in H by tac
   | H : context[ (delete _ _) !! _] |- _ =>
-    rewrite lookup_delete in H || rewrite lookup_delete_ne in H by tac
+    rewrite lookup_delete_eq in H || rewrite lookup_delete_ne in H by tac
   | H : context[ {[ _ := _ ]} !! _ ] |- _ =>
-    rewrite lookup_singleton in H || rewrite lookup_singleton_ne in H by tac
+    rewrite lookup_singleton_eq in H || rewrite lookup_singleton_ne in H by tac
   | H : context[ (_ <$> _) !! _ ] |- _ => rewrite lookup_fmap in H
   | H : context[ (omap _ _) !! _ ] |- _ => rewrite lookup_omap in H
   | H : context[ lookup (A:=?A) ?i (?m1 ∪ ?m2) ] |- _ =>
@@ -5091,13 +5084,13 @@ Tactic Notation "simpl_map" "by" tactic3(tac) := repeat
     rewrite E in H; clear E
   | |- context[ ∅ !! _ ] => rewrite lookup_empty
   | |- context[ (<[_:=_]>_) !! _ ] =>
-    rewrite lookup_insert || rewrite lookup_insert_ne by tac
+    rewrite lookup_insert_eq || rewrite lookup_insert_ne by tac
   | |- context[ (alter _ _ _) !! _ ] =>
-    rewrite lookup_alter || rewrite lookup_alter_ne by tac
+    rewrite lookup_alter_eq || rewrite lookup_alter_ne by tac
   | |- context[ (delete _ _) !! _ ] =>
-    rewrite lookup_delete || rewrite lookup_delete_ne by tac
+    rewrite lookup_delete_eq || rewrite lookup_delete_ne by tac
   | |- context[ {[ _ := _ ]} !! _ ] =>
-    rewrite lookup_singleton || rewrite lookup_singleton_ne by tac
+    rewrite lookup_singleton_eq || rewrite lookup_singleton_ne by tac
   | |- context[ (_ <$> _) !! _ ] => rewrite lookup_fmap
   | |- context[ (omap _ _) !! _ ] => rewrite lookup_omap
   | |- context [ lookup (A:=?A) ?i ?m ] =>

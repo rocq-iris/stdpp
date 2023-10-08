@@ -51,7 +51,7 @@ Proof.
   - intros ? [??] [??] H. f_equal; [apply (H 0)|].
     apply map_eq. intros i. apply (H (N.pos i)).
   - by intros ? [|?].
-  - intros ? f [? t] [|i]; simpl; [done |]. apply lookup_partial_alter.
+  - intros ? f [? t] [|i]; simpl; [done |]. apply lookup_partial_alter_eq.
   - intros ? f [? t] [|i] [|j]; simpl; try intuition congruence.
     intros. apply lookup_partial_alter_ne. congruence.
   - intros ??? [??] []; simpl; [done|]. apply lookup_fmap.

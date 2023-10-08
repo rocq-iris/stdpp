@@ -229,7 +229,7 @@ Proof.
       by rewrite !Pmap_lookup_PNode.
 Qed.
 
-Local Lemma Pmap_ne_lookup_singleton {A} i (x : A) :
+Local Lemma Pmap_ne_lookup_singleton_eq {A} i (x : A) :
   Pmap_ne_singleton i x !! i = Some x.
 Proof. by induction i. Qed.
 Local Lemma Pmap_ne_lookup_singleton_ne {A} i j (x : A) :
@@ -245,13 +245,13 @@ Local Lemma Pmap_partial_alter_PNode {A} (f : option A → option A) i ml mx mr 
     | i~1 => PNode ml mx (partial_alter f i mr)
     end.
 Proof. by destruct ml, mx, mr. Qed.
-Local Lemma Pmap_lookup_partial_alter {A} (f : option A → option A)
+Local Lemma Pmap_lookup_partial_alter_eq {A} (f : option A → option A)
     (mt : Pmap A) i :
   partial_alter f i mt !! i = f (mt !! i).
 Proof.
   revert i. induction mt using Pmap_ind.
   { intros i. unfold partial_alter; simpl. destruct (f None); simpl; [|done].
-    by rewrite Pmap_ne_lookup_singleton. }
+    by rewrite Pmap_ne_lookup_singleton_eq. }
   intros []; by rewrite Pmap_partial_alter_PNode, !Pmap_lookup_PNode by done.
 Qed.
 Local Lemma Pmap_lookup_partial_alter_ne {A} (f : option A → option A)
@@ -384,7 +384,7 @@ Proof.
   split.
   - intros. by apply Pmap_eq.
   - done.
-  - intros. apply Pmap_lookup_partial_alter.
+  - intros. apply Pmap_lookup_partial_alter_eq.
   - intros. by apply Pmap_lookup_partial_alter_ne.
   - intros. apply Pmap_lookup_fmap.
   - intros. apply Pmap_lookup_omap.
