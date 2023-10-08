@@ -95,15 +95,15 @@ Section basic_lemmas.
   (* Multiplicity *)
   Lemma multiplicity_empty x : multiplicity x ∅ = 0.
   Proof. done. Qed.
-  Lemma multiplicity_singleton x : multiplicity x {[+ x +]} = 1.
+  Lemma multiplicity_singleton_eq x : multiplicity x {[+ x +]} = 1.
   Proof. unfold multiplicity; simpl. by rewrite lookup_singleton_eq. Qed.
   Lemma multiplicity_singleton_ne x y : x ≠ y → multiplicity x {[+ y +]} = 0.
   Proof. intros. unfold multiplicity; simpl. by rewrite lookup_singleton_ne. Qed.
-  Lemma multiplicity_singleton' x y :
+  Lemma multiplicity_singleton x y :
     multiplicity x {[+ y +]} = if decide (x = y) then 1 else 0.
   Proof.
     destruct (decide _) as [->|].
-    - by rewrite multiplicity_singleton.
+    - by rewrite multiplicity_singleton_eq.
     - by rewrite multiplicity_singleton_ne.
   Qed.
   Lemma multiplicity_union X Y x :
@@ -145,7 +145,7 @@ Section basic_lemmas.
   Proof. rewrite elem_of_multiplicity, multiplicity_empty. lia. Qed.
   Lemma gmultiset_elem_of_singleton x y : x ∈@{gmultiset A} {[+ y +]} ↔ x = y.
   Proof.
-    rewrite elem_of_multiplicity, multiplicity_singleton'.
+    rewrite elem_of_multiplicity, multiplicity_singleton.
     case_decide; naive_solver lia.
   Qed.
   Lemma gmultiset_elem_of_union X Y x : x ∈ X ∪ Y ↔ x ∈ X ∨ x ∈ Y.
@@ -226,7 +226,7 @@ Section multiset_unfold.
   Proof. constructor. by rewrite multiplicity_empty. Qed.
   Global Instance multiset_unfold_singleton x :
     MultisetUnfold x {[+ x +]} 1.
-  Proof. constructor. by rewrite multiplicity_singleton. Qed.
+  Proof. constructor. by rewrite multiplicity_singleton_eq. Qed.
   Global Instance multiset_unfold_union x X Y n m :
     MultisetUnfold x X n → MultisetUnfold x Y m →
     MultisetUnfold x (X ∪ Y) (n `max` m).
@@ -335,25 +335,27 @@ Ltac multiset_instantiate :=
 to ensure we do not use the lemma if it leads to information loss. *)
 Local Lemma multiplicity_singleton_forget `{Countable A} x y :
   ∃ n, multiplicity (A:=A) x {[+ y +]} = n ∧ n ≤ 1.
-Proof. rewrite multiplicity_singleton'. case_decide; eauto with lia. Qed.
+Proof. rewrite multiplicity_singleton. case_decide; eauto with lia. Qed.
 
 Ltac multiset_simplify_singletons :=
   repeat match goal with
   | H : context [multiplicity ?x {[+ ?y +]}] |- _ =>
      first
-       [progress rewrite ?multiplicity_singleton ?multiplicity_singleton_ne in H; [|done..]
+       [progress rewrite ?multiplicity_singleton_eq
+                         ?multiplicity_singleton_ne in H; [|done..]
        (* This second case does *not* use ssreflect matching (due to [destruct]
        and the [->] pattern). If the default Coq matching goes wrong it will
        fail and fall back to the third case, which is strictly more general,
        just slower. *)
        |destruct (multiplicity_singleton_forget x y) as (?&->&?); clear y
-       |rewrite multiplicity_singleton' in H; destruct (decide (x = y)); simplify_eq/=]
+       |rewrite multiplicity_singleton in H; destruct (decide (x = y)); simplify_eq/=]
   | |- context [multiplicity ?x {[+ ?y +]}] =>
      first
-       [progress rewrite ?multiplicity_singleton ?multiplicity_singleton_ne; [|done..]
+       [progress rewrite ?multiplicity_singleton_eq
+                         ?multiplicity_singleton_ne; [|done..]
        (* Similar to above, this second case does *not* use ssreflect matching. *)
        |destruct (multiplicity_singleton_forget x y) as (?&->&?); clear y
-       |rewrite multiplicity_singleton'; destruct (decide (x = y)); simplify_eq/=]
+       |rewrite multiplicity_singleton; destruct (decide (x = y)); simplify_eq/=]
   end.
 End tactics.
 
@@ -447,8 +449,7 @@ Section more_lemmas.
   Global Instance gmultiset_singleton_inj : Inj (=) (=@{gmultiset A}) singletonMS.
   Proof.
     intros x1 x2 Hx. rewrite gmultiset_eq in Hx. specialize (Hx x1).
-    rewrite multiplicity_singleton, multiplicity_singleton' in Hx.
-    case_decide; [done|lia].
+    rewrite !multiplicity_singleton in Hx. repeat case_decide; done || lia.
   Qed.
   Lemma gmultiset_non_empty_singleton x : {[+ x +]} ≠@{gmultiset A} ∅.
   Proof. multiset_solver. Qed.
@@ -805,7 +806,7 @@ Section map.
     csimpl. rewrite fmap_app, fmap_replicate, list_to_set_disj_app, <-IH.
     apply gmultiset_eq; intros y.
     rewrite multiplicity_disj_union, list_to_set_disj_replicate.
-    rewrite multiplicity_scalar_mul, multiplicity_singleton'.
+    rewrite multiplicity_scalar_mul, multiplicity_singleton.
     unfold multiplicity; simpl. destruct (decide (y = f x)) as [->|].
     - rewrite lookup_partial_alter_eq; simpl. destruct (_ !! f x); simpl; lia.
     - rewrite lookup_partial_alter_ne by done. lia.
