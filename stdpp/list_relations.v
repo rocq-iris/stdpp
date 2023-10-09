@@ -323,9 +323,9 @@ Proof.
       repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try lia.
       apply (inj S), (inj f); lia.
     + intros i. unfold g. destruct (lt_eq_lt_dec _ _) as [[?|?]|?].
-      * by rewrite lookup_delete_lt, <-Hl.
+      * by rewrite list_lookup_delete_lt, <-Hl.
       * simplify_eq.
-      * rewrite lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
+      * rewrite list_lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
         by rewrite Nat.sub_0_r, <-Hl.
 Qed.
 

@@ -4199,7 +4199,7 @@ Section map_seq.
   Proof.
     intros. apply map_eq. intros j. destruct (decide (i = j)) as [->|?].
     - rewrite lookup_insert_eq, lookup_map_seq, option_guard_True by lia.
-      by rewrite list_lookup_insert by lia.
+      by rewrite list_lookup_insert_eq by lia.
     - rewrite lookup_insert_ne, !lookup_map_seq by done.
       case_guard; [|done]. by rewrite list_lookup_insert_ne by lia.
   Qed.
@@ -4361,7 +4361,7 @@ Section map_seqZ.
   Proof.
     intros. apply map_eq. intros j. destruct (decide (i = j)) as [->|?].
     - rewrite lookup_insert_eq, lookup_map_seqZ, option_guard_True by lia.
-      by rewrite list_lookup_insert by lia.
+      by rewrite list_lookup_insert_eq by lia.
     - rewrite lookup_insert_ne, !lookup_map_seqZ by done.
       case_guard; [|done]. by rewrite list_lookup_insert_ne by lia.
   Qed.
