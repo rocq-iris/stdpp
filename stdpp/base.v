@@ -486,6 +486,11 @@ Proof. repeat intro; edestruct (inj2 f); eauto. Qed.
 Global Instance inj2_inj_2 `{Inj2 A B C R1 R2 R3 f} x : Inj R2 R3 (f x).
 Proof. repeat intro; edestruct (inj2 f); eauto. Qed.
 
+(** Smart constructors for [Inj] and [Surj] based on [Cancel]. These are not
+instances because they will blow-up the search space due to diamonds: in every
+node of the search tree for [Inj] or [Surj] of composed functions these
+instances could be applied. Note that [f] and [g] do not need to be given,
+these are infered using [Cancel]. *)
 Lemma cancel_inj `{Cancel A B R1 f g, !Equivalence R1, !Proper (R2 ==> R1) f} :
   Inj R1 R2 g.
 Proof.
