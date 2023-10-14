@@ -1164,7 +1164,7 @@ Section little.
     intros ->. apply (inj (fmap bv_unsigned)).
     rewrite bv_to_litte_endian_unsigned; [|lia].
     apply Z_to_little_endian_to_Z; [by rewrite length_fmap | lia |].
-    apply Forall_forall. intros ? [?[->?]]%elem_of_list_fmap_2. apply bv_unsigned_in_range.
+    apply Forall_forall. intros ? [?[->?]]%elem_of_list_fmap. apply bv_unsigned_in_range.
   Qed.
 
   Lemma little_endian_to_bv_to_little_endian m n z:

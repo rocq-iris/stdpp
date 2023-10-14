@@ -173,23 +173,26 @@ Section fmap.
   Lemma const_fmap (l : list A) (y : B) :
     (∀ x, f x = y) → f <$> l = replicate (length l) y.
   Proof. intros; induction l; f_equal/=; auto. Qed.
+
   Lemma list_lookup_fmap l i : (f <$> l) !! i = f <$> (l !! i).
   Proof. revert i. induction l; intros [|n]; by try revert n. Qed.
-  Lemma list_lookup_fmap_Some l i x :
-    (f <$> l) !! i =  Some x ↔ ∃ y, l !! i = Some y ∧ x = f y.
-  Proof. by rewrite list_lookup_fmap, fmap_Some. Qed.
   Lemma list_lookup_total_fmap `{!Inhabited A, !Inhabited B} l i :
     i < length l → (f <$> l) !!! i = f (l !!! i).
   Proof.
     intros [x Hx]%lookup_lt_is_Some_2.
     by rewrite !list_lookup_total_alt, list_lookup_fmap, Hx.
   Qed.
-  Lemma list_lookup_fmap_inv l i x :
-    (f <$> l) !! i = Some x → ∃ y, x = f y ∧ l !! i = Some y.
-  Proof.
-    intros Hi. rewrite list_lookup_fmap in Hi.
-    destruct (l !! i) eqn:?; simplify_eq/=; eauto.
-  Qed.
+
+  Lemma list_lookup_fmap_Some l i y :
+    (f <$> l) !! i = Some y ↔ ∃ x, y = f x ∧ l !! i = Some x.
+  Proof. rewrite list_lookup_fmap, fmap_Some. naive_solver. Qed.
+  Lemma list_lookup_fmap_Some_1 l i y :
+    (f <$> l) !! i = Some y → ∃ x, y = f x ∧ l !! i = Some x.
+  Proof. by rewrite list_lookup_fmap_Some. Qed.
+  Lemma list_lookup_fmap_Some_2 l i x :
+    l !! i = Some x → (f <$> l) !! i = Some (f x).
+  Proof. rewrite list_lookup_fmap_Some. naive_solver. Qed.
+
   Lemma list_fmap_insert l i x: f <$> <[i:=x]>l = <[i:=f x]>(f <$> l).
   Proof. revert i. by induction l; intros [|i]; f_equal/=. Qed.
   Lemma list_alter_fmap (g : A → A) (h : B → B) l i :
@@ -201,28 +204,22 @@ Section fmap.
     naive_solver congruence.
   Qed.
 
-  Lemma elem_of_list_fmap_1 l x : x ∈ l → f x ∈ f <$> l.
-  Proof. induction 1; csimpl; rewrite elem_of_cons; intuition. Qed.
-  Lemma elem_of_list_fmap_1_alt l x y : x ∈ l → y = f x → y ∈ f <$> l.
-  Proof. intros. subst. by apply elem_of_list_fmap_1. Qed.
-  Lemma elem_of_list_fmap_2 l x : x ∈ f <$> l → ∃ y, x = f y ∧ y ∈ l.
+  Lemma elem_of_list_fmap l y : y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l.
   Proof.
-    induction l as [|y l IH]; simpl; inv 1.
-    - exists y. split; [done | by left].
-    - destruct IH as [z [??]]; [done|]. exists z. split; [done | by right].
+    setoid_rewrite elem_of_list_lookup. setoid_rewrite list_lookup_fmap_Some.
+    naive_solver.
   Qed.
-  Lemma elem_of_list_fmap l x : x ∈ f <$> l ↔ ∃ y, x = f y ∧ y ∈ l.
-  Proof.
-    naive_solver eauto using elem_of_list_fmap_1_alt, elem_of_list_fmap_2.
-  Qed.
-  Lemma elem_of_list_fmap_2_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l → x ∈ l.
-  Proof.
-    intros (y, (E, I))%elem_of_list_fmap_2. by rewrite (inj f) in I.
-  Qed.
+  Lemma elem_of_list_fmap_1 l x : x ∈ f <$> l → ∃ y, x = f y ∧ y ∈ l.
+  Proof. by rewrite elem_of_list_fmap. Qed.
+  Lemma elem_of_list_fmap_2 l x : x ∈ l → f x ∈ f <$> l.
+  Proof. rewrite elem_of_list_fmap. naive_solver. Qed.
+  Lemma elem_of_list_fmap_2_alt l x y : x ∈ l → y = f x → y ∈ f <$> l.
+  Proof. intros ? ->. by apply elem_of_list_fmap_2. Qed.
+
   Lemma elem_of_list_fmap_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l ↔ x ∈ l.
-  Proof.
-    naive_solver eauto using elem_of_list_fmap_1, elem_of_list_fmap_2_inj.
-  Qed.
+  Proof. rewrite elem_of_list_fmap. naive_solver. Qed.
+  Lemma elem_of_list_fmap_inj_2 `{!Inj (=) (=) f} l x : f x ∈ f <$> l → x ∈ l.
+  Proof. by rewrite elem_of_list_fmap_inj. Qed.
 
   Lemma list_fmap_inj R1 R2 :
     Inj R1 R2 f → Inj (Forall2 R1) (Forall2 R2) (fmap f).

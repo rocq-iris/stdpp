@@ -125,7 +125,7 @@ Qed.
 Lemma finite_inj_surj `{Finite A} `{Finite B} (f : A → B)
   `{!Inj (=) (=) f} : card A = card B → Surj (=) f.
 Proof.
-  intros HAB y. destruct (elem_of_list_fmap_2 f (enum A) y) as (x&?&?); eauto.
+  intros HAB y. destruct (elem_of_list_fmap_1 f (enum A) y) as (x&?&?); eauto.
   rewrite finite_inj_Permutation; auto using elem_of_enum.
 Qed.
 
@@ -310,7 +310,7 @@ Next Obligation.
 Qed.
 Next Obligation.
   intros ?????? [a b]. apply elem_of_list_bind.
-  exists a. eauto using elem_of_enum, elem_of_list_fmap_1.
+  exists a. eauto using elem_of_enum, elem_of_list_fmap_2.
 Qed.
 Lemma prod_card `{Finite A} `{Finite B} : card (A * B) = card A * card B.
 Proof.
@@ -336,7 +336,7 @@ Next Obligation.
 Qed.
 Next Obligation.
   intros A ?? n v. induction v as [|x n v IH]; csimpl; [apply elem_of_list_here|].
-  apply elem_of_list_bind. eauto using elem_of_enum, elem_of_list_fmap_1.
+  apply elem_of_list_bind. eauto using elem_of_enum, elem_of_list_fmap_2.
 Qed.
 Lemma vec_card `{Finite A} n : card (vec A n) = card A ^ n.
 Proof.
@@ -377,7 +377,7 @@ Lemma finite_sig_dec `{!EqDecision A} (P : A → Prop) `{Finite (sig P)} x :
 Proof.
   assert {xs : list A | ∀ x, P x ↔ x ∈ xs} as [xs ?].
   { clear x. exists (proj1_sig <$> enum _). intros x. split; intros Hx.
-    - apply elem_of_list_fmap_1_alt with (x ↾ Hx); [apply elem_of_enum|]; done.
+    - apply elem_of_list_fmap_2_alt with (x ↾ Hx); [apply elem_of_enum|]; done.
     - apply elem_of_list_fmap in Hx as [[x' Hx'] [-> _]]; done. }
   destruct (decide (x ∈ xs)); [left | right]; naive_solver.
 Qed. (* <- could be Defined but this lemma will probably not be used for computing *)
@@ -410,7 +410,7 @@ Section sig_finite.
     apply NoDup_filter, NoDup_enum.
   Qed.
   Next Obligation.
-    intros p. apply (elem_of_list_fmap_2_inj proj1_sig).
+    intros p. apply (elem_of_list_fmap_inj proj1_sig).
     rewrite list_filter_sig_filter, elem_of_list_filter.
     split; [by destruct p | apply elem_of_enum].
   Qed.

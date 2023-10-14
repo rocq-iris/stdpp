@@ -127,7 +127,7 @@ Proof.
            simplify_eq/=. lia.
         -- rewrite -fmap_cons in Hin. move: Hin => /elem_of_list_fmap[?[??]]; subst. naive_solver lia.
   - move => p IH n. case_match; subst.
-    + split; [done|] => -[[l h][/elem_of_cons[?|/(elem_of_list_fmap_2 _ _ _)[[??][??]]]?]]; simplify_eq/=; lia.
+    + split; [done|] => -[[l h][/elem_of_cons[?|/(elem_of_list_fmap _ _ _)[[??][??]]]?]]; simplify_eq/=; lia.
     + rewrite IH. split; move => [r[/elem_of_cons[Heq|Hin] ?]]; simplify_eq/=.
       * eexists _. split; [by apply elem_of_list_here|] => /=; lia.
       * eexists _. split. { apply elem_of_list_further. apply elem_of_list_fmap. by eexists _. }
