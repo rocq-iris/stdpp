@@ -111,6 +111,14 @@ API-breaking change is listed.
   `take` lemmas.
 - Add lemmas `lookup_singleton_is_Some`, `list_lookup_insert_is_Some`,
   `list_lookup_insert_None`.
+- Change the order of the conjunction in `elem_of_list_fmap`. The new version is
+  `y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l`, which makes it consistent with the
+  corresponding lemmas for sets and maps.
+- Rename `elem_of_list_fmap_1` → `elem_of_list_fmap_2`,
+  `elem_of_list_fmap_1_alt` → `elem_of_list_fmap_2_alt`,
+  `elem_of_list_fmap_2` → `elem_of_list_fmap_1`,
+  `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
+  `elem_of_list_fmap_2_inj` → `elem_of_list_fmap_inj_2`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -192,6 +200,13 @@ s/\btake_alter\b/take_alter_ge/g
 s/\bdrop_alter\b/drop_alter_lt/g
 s/\bdrop_insert_le\b/drop_insert_gt/g # make inequality consistent with take lemma
 s/\bdrop_insert_gt\b/drop_insert_lt/g # make inequality consistent with take lemma
+
+# list fmap lemmas
+s/\belem_of_list_fmap_1\b/elem_of_list_fmap_2/g
+s/\belem_of_list_fmap_1_alt\b/elem_of_list_fmap_2_alt/g
+s/\belem_of_list_fmap_2\b/elem_of_list_fmap_1/g
+s/\blist_lookup_fmap_inv\b/list_lookup_fmap_Some_1/g
+s/\belem_of_list_fmap_2_inj\b/elem_of_list_fmap_inj_2/g
 EOF
 ```
 
