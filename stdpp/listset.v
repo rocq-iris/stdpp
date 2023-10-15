@@ -21,7 +21,7 @@ Global Instance listset_simple_set : SemiSet A (listset A).
 Proof.
   split.
   - by apply not_elem_of_nil.
-  - by apply elem_of_list_singleton.
+  - by apply list_elem_of_singleton.
   - intros [?] [?]. apply elem_of_app.
 Qed.
 Lemma listset_empty_alt X : X ≡ ∅ ↔ listset_car X = [].
@@ -52,8 +52,8 @@ Local Instance listset_set: Set_ A (listset A).
 Proof.
   split.
   - apply _.
-  - intros [?] [?]. apply elem_of_list_intersection.
-  - intros [?] [?]. apply elem_of_list_difference.
+  - intros [?] [?]. apply list_elem_of_intersection.
+  - intros [?] [?]. apply list_elem_of_difference.
 Qed.
 Global Instance listset_elements: Elements A (listset A) :=
   remove_dups ∘ listset_car.
@@ -77,9 +77,9 @@ Global Instance listset_set_monad : MonadSet listset.
 Proof.
   split.
   - intros. apply _.
-  - intros ??? [?] ?. apply elem_of_list_bind.
-  - intros. apply elem_of_list_ret.
-  - intros ??? [?]. apply elem_of_list_fmap.
+  - intros ??? [?] ?. apply list_elem_of_bind.
+  - intros. apply list_elem_of_ret.
+  - intros ??? [?]. apply list_elem_of_fmap.
   - intros ? [?] ?. unfold mjoin, listset_join, elem_of, listset_elem_of.
-    simpl. by rewrite elem_of_list_bind.
+    simpl. by rewrite list_elem_of_bind.
 Qed.

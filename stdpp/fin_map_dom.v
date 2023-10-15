@@ -218,7 +218,7 @@ Proof.
     { eapply map_first_key_dom; last done. by rewrite !dom_insert. }
     by rewrite insert_insert_eq, !map_to_list_insert_first_key by done.
   - assert (m !! i' = Some x1) as Hi'.
-    { by apply elem_of_list_lookup_2, elem_of_map_to_list in Hj. }
+    { by apply list_elem_of_lookup_2, elem_of_map_to_list in Hj. }
     rewrite insert_insert_ne by naive_solver. rewrite <-IH by done.
     apply map_to_list_insert_first_key.
     { rewrite lookup_insert_ne; naive_solver. }

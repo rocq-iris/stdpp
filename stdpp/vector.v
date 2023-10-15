@@ -197,7 +197,7 @@ Qed.
 Lemma elem_of_vlookup {A n} (v : vec A n) x :
   x ∈ vec_to_list v ↔ ∃ i, v !!! i = x.
 Proof.
-  rewrite elem_of_list_lookup. setoid_rewrite <-vlookup_lookup'.
+  rewrite list_elem_of_lookup. setoid_rewrite <-vlookup_lookup'.
   split; [by intros (?&?&?); eauto|]. intros [i Hx].
   exists i, (fin_to_nat_lt _). by rewrite nat_to_fin_to_nat.
 Qed.

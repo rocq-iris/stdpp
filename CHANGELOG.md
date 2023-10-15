@@ -111,14 +111,17 @@ API-breaking change is listed.
   `take` lemmas.
 - Add lemmas `lookup_singleton_is_Some`, `list_lookup_insert_is_Some`,
   `list_lookup_insert_None`.
-- Change the order of the conjunction in `elem_of_list_fmap`. The new version is
+- Rename lemmas `elem_of_list_X` into `list_elem_of_X` to be consistent with
+  the `list_lookup_X` lemmas. The `sed` script contains all renames, the
+  following renames were special since they fix other inconsistencies:
+  `list_elem_of_fmap_1` → `list_elem_of_fmap_2`,
+  `list_elem_of_fmap_1_alt` → `list_elem_of_fmap_2_alt`,
+  `list_elem_of_fmap_2` → `list_elem_of_fmap_1`,
+  `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
+  `list_elem_of_fmap_2_inj` → `list_elem_of_fmap_inj_2`.
+- Change the order of the conjunction in `list_elem_of_fmap`. The new version is
   `y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l`, which makes it consistent with the
   corresponding lemmas for sets and maps.
-- Rename `elem_of_list_fmap_1` → `elem_of_list_fmap_2`,
-  `elem_of_list_fmap_1_alt` → `elem_of_list_fmap_2_alt`,
-  `elem_of_list_fmap_2` → `elem_of_list_fmap_1`,
-  `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
-  `elem_of_list_fmap_2_inj` → `elem_of_list_fmap_inj_2`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -201,12 +204,42 @@ s/\bdrop_alter\b/drop_alter_lt/g
 s/\bdrop_insert_le\b/drop_insert_gt/g # make inequality consistent with take lemma
 s/\bdrop_insert_gt\b/drop_insert_lt/g # make inequality consistent with take lemma
 
+# list_elem_of
+s/\bdecompose_elem_of_list\b/decompose_list_elem_of/g
+s/\belem_of_list\b/list_elem_of/g
+s/\belem_of_list_here\b/list_elem_of_here/g
+s/\belem_of_list_further\b/list_elem_of_further/g
+s/\belem_of_list_In\b/list_elem_of_In/g
+s/\belem_of_list_singleton\b/list_elem_of_singleton/g
+s/\belem_of_list_lookup_1\b/list_elem_of_lookup_1/g
+s/\belem_of_list_lookup_total_1\b/list_elem_of_lookup_total_1/g
+s/\belem_of_list_lookup_2\b/list_elem_of_lookup_2/g
+s/\belem_of_list_lookup_total_2\b/list_elem_of_lookup_total_2/g
+s/\belem_of_list_lookup\b/list_elem_of_lookup/g
+s/\belem_of_list_lookup_total\b/list_elem_of_lookup_total/g
+s/\belem_of_list_split_length\b/list_elem_of_split_length/g
+s/\belem_of_list_split\b/list_elem_of_split/g
+s/\belem_of_list_split_l\b/list_elem_of_split_l/g
+s/\belem_of_list_split_r\b/list_elem_of_split_r/g
+s/\belem_of_list_intersection_with\b/list_elem_of_intersection_with/g
+s/\belem_of_list_difference\b/list_elem_of_difference/g
+s/\belem_of_list_union\b/list_elem_of_union/g
+s/\belem_of_list_intersection\b/list_elem_of_intersection/g
+s/\belem_of_list_filter\b/list_elem_of_filter/g
+s/\belem_of_list_fmap\b/list_elem_of_fmap/g
+s/\belem_of_list_fmap_1\b/list_elem_of_fmap_2/g
+s/\belem_of_list_fmap_2\b/list_elem_of_fmap_1/g
+s/\belem_of_list_fmap_1_alt\b/list_elem_of_fmap_2_alt/g
+s/\belem_of_list_fmap_inj\b/list_elem_of_fmap_inj/g
+s/\belem_of_list_fmap_2_inj\b/list_elem_of_fmap_inj_2/g
+s/\belem_of_list_omap\b/list_elem_of_omap/g
+s/\belem_of_list_bind\b/list_elem_of_bind/g
+s/\belem_of_list_ret\b/list_elem_of_ret/g
+s/\belem_of_list_join\b/list_elem_of_join/g
+s/\belem_of_list_dec\b/list_elem_of_dec/g
+
 # list fmap lemmas
-s/\belem_of_list_fmap_1\b/elem_of_list_fmap_2/g
-s/\belem_of_list_fmap_1_alt\b/elem_of_list_fmap_2_alt/g
-s/\belem_of_list_fmap_2\b/elem_of_list_fmap_1/g
 s/\blist_lookup_fmap_inv\b/list_lookup_fmap_Some_1/g
-s/\belem_of_list_fmap_2_inj\b/elem_of_list_fmap_inj_2/g
 EOF
 ```
 

@@ -125,7 +125,7 @@ Qed.
 Lemma finite_inj_surj `{Finite A} `{Finite B} (f : A → B)
   `{!Inj (=) (=) f} : card A = card B → Surj (=) f.
 Proof.
-  intros HAB y. destruct (elem_of_list_fmap_1 f (enum A) y) as (x&?&?); eauto.
+  intros HAB y. destruct (list_elem_of_fmap_1 f (enum A) y) as (x&?&?); eauto.
   rewrite finite_inj_Permutation; auto using elem_of_enum.
 Qed.
 
@@ -212,8 +212,8 @@ Section enc_finite.
     rewrite <-(to_of_nat i), <-(to_of_nat j) by done. by f_equal.
   Qed.
   Next Obligation.
-    intros x. rewrite elem_of_list_fmap. exists (to_nat x).
-    split; auto. by apply elem_of_list_lookup_2 with (to_nat x), lookup_seq.
+    intros x. rewrite list_elem_of_fmap. exists (to_nat x).
+    split; auto. by apply list_elem_of_lookup_2 with (to_nat x), lookup_seq.
   Qed.
   Lemma enc_finite_card : card A = c.
   Proof. unfold card. simpl. by rewrite length_fmap, length_seq. Qed.
@@ -232,7 +232,7 @@ Section surjective_finite.
     {| enum := remove_dups (f <$> enum A) |}.
   Next Obligation. apply NoDup_remove_dups. Qed.
   Next Obligation.
-    intros y. rewrite elem_of_remove_dups, elem_of_list_fmap.
+    intros y. rewrite elem_of_remove_dups, list_elem_of_fmap.
     destruct (surj f y). eauto using elem_of_enum.
   Qed.
 End surjective_finite.
@@ -245,7 +245,7 @@ Section bijective_finite.
     {| enum := f <$> enum A |}.
   Next Obligation. apply (NoDup_fmap f), NoDup_enum. Qed.
   Next Obligation.
-    intros b. rewrite elem_of_list_fmap. destruct (surj f b).
+    intros b. rewrite list_elem_of_fmap. destruct (surj f b).
     eauto using elem_of_enum.
   Qed.
 End bijective_finite.
@@ -254,12 +254,12 @@ Global Program Instance option_finite `{Finite A} : Finite (option A) :=
   {| enum := None :: (Some <$> enum A) |}.
 Next Obligation.
   constructor.
-  - rewrite elem_of_list_fmap. by intros (?&?&?).
+  - rewrite list_elem_of_fmap. by intros (?&?&?).
   - apply (NoDup_fmap_2 _); auto using NoDup_enum.
 Qed.
 Next Obligation.
   intros ??? [x|]; [right|left]; auto.
-  apply elem_of_list_fmap. eauto using elem_of_enum.
+  apply list_elem_of_fmap. eauto using elem_of_enum.
 Qed.
 Lemma option_cardinality `{Finite A} : card (option A) = S (card A).
 Proof. unfold card. simpl. by rewrite length_fmap. Qed.
@@ -272,13 +272,13 @@ Proof. done. Qed.
 
 Global Program Instance unit_finite : Finite () := {| enum := [tt] |}.
 Next Obligation. apply NoDup_singleton. Qed.
-Next Obligation. intros []. by apply elem_of_list_singleton. Qed.
+Next Obligation. intros []. by apply list_elem_of_singleton. Qed.
 Lemma unit_card : card unit = 1.
 Proof. done. Qed.
 
 Global Program Instance bool_finite : Finite bool := {| enum := [true; false] |}.
 Next Obligation.
-  constructor; [ by rewrite elem_of_list_singleton | apply NoDup_singleton ].
+  constructor; [ by rewrite list_elem_of_singleton | apply NoDup_singleton ].
 Qed.
 Next Obligation. intros [|]; [ left | right; left ]. Qed.
 Lemma bool_card : card bool = 2.
@@ -289,11 +289,11 @@ Global Program Instance sum_finite `{Finite A, Finite B} : Finite (A + B)%type :
 Next Obligation.
   intros. apply NoDup_app; split_and?.
   - apply (NoDup_fmap_2 _). by apply NoDup_enum.
-  - intro. rewrite !elem_of_list_fmap. intros (?&?&?) (?&?&?); congruence.
+  - intro. rewrite !list_elem_of_fmap. intros (?&?&?) (?&?&?); congruence.
   - apply (NoDup_fmap_2 _). by apply NoDup_enum.
 Qed.
 Next Obligation.
-  intros ?????? [x|y]; rewrite elem_of_app, !elem_of_list_fmap;
+  intros ?????? [x|y]; rewrite elem_of_app, !list_elem_of_fmap;
     [left|right]; (eexists; split; [done|apply elem_of_enum]).
 Qed.
 Lemma sum_card `{Finite A, Finite B} : card (A + B) = card A + card B.
@@ -303,14 +303,14 @@ Global Program Instance prod_finite `{Finite A, Finite B} : Finite (A * B)%type 
   {| enum := a ← enum A; (a,.) <$> enum B |}.
 Next Obligation.
   intros A ?????. apply NoDup_bind.
-  - intros a1 a2 [a b] ?? (?&?&_)%elem_of_list_fmap (?&?&_)%elem_of_list_fmap.
+  - intros a1 a2 [a b] ?? (?&?&_)%list_elem_of_fmap (?&?&_)%list_elem_of_fmap.
     naive_solver.
   - intros a ?. rewrite (NoDup_fmap _). apply NoDup_enum.
   - apply NoDup_enum.
 Qed.
 Next Obligation.
-  intros ?????? [a b]. apply elem_of_list_bind.
-  exists a. eauto using elem_of_enum, elem_of_list_fmap_2.
+  intros ?????? [a b]. apply list_elem_of_bind.
+  exists a. eauto using elem_of_enum, list_elem_of_fmap_2.
 Qed.
 Lemma prod_card `{Finite A} `{Finite B} : card (A * B) = card A * card B.
 Proof.
@@ -329,14 +329,14 @@ Global Program Instance vec_finite `{Finite A} n : Finite (vec A n) :=
 Next Obligation.
   intros A ?? n. induction n as [|n IH]; csimpl; [apply NoDup_singleton|].
   apply NoDup_bind.
-  - intros x1 x2 y ?? (?&?&_)%elem_of_list_fmap (?&?&_)%elem_of_list_fmap.
+  - intros x1 x2 y ?? (?&?&_)%list_elem_of_fmap (?&?&_)%list_elem_of_fmap.
     congruence.
   - intros x ?. rewrite NoDup_fmap by (intros ?; apply vcons_inj_2). done.
   - apply NoDup_enum.
 Qed.
 Next Obligation.
-  intros A ?? n v. induction v as [|x n v IH]; csimpl; [apply elem_of_list_here|].
-  apply elem_of_list_bind. eauto using elem_of_enum, elem_of_list_fmap_2.
+  intros A ?? n v. induction v as [|x n v IH]; csimpl; [apply list_elem_of_here|].
+  apply list_elem_of_bind. eauto using elem_of_enum, list_elem_of_fmap_2.
 Qed.
 Lemma vec_card `{Finite A} n : card (vec A n) = card A ^ n.
 Proof.
@@ -361,12 +361,12 @@ Fixpoint fin_enum (n : nat) : list (fin n) :=
 Global Program Instance fin_finite n : Finite (fin n) := {| enum := fin_enum n |}.
 Next Obligation.
   intros n. induction n; simpl; constructor.
-  - rewrite elem_of_list_fmap. by intros (?&?&?).
+  - rewrite list_elem_of_fmap. by intros (?&?&?).
   - by apply (NoDup_fmap _).
 Qed.
 Next Obligation.
   intros n i. induction i as [|n i IH]; simpl;
-    rewrite elem_of_cons, ?elem_of_list_fmap; eauto.
+    rewrite elem_of_cons, ?list_elem_of_fmap; eauto.
 Qed.
 Lemma fin_card n : card (fin n) = n.
 Proof. unfold card; simpl. induction n; simpl; rewrite ?length_fmap; auto. Qed.
@@ -377,8 +377,8 @@ Lemma finite_sig_dec `{!EqDecision A} (P : A → Prop) `{Finite (sig P)} x :
 Proof.
   assert {xs : list A | ∀ x, P x ↔ x ∈ xs} as [xs ?].
   { clear x. exists (proj1_sig <$> enum _). intros x. split; intros Hx.
-    - apply elem_of_list_fmap_2_alt with (x ↾ Hx); [apply elem_of_enum|]; done.
-    - apply elem_of_list_fmap in Hx as [[x' Hx'] [-> _]]; done. }
+    - apply list_elem_of_fmap_2_alt with (x ↾ Hx); [apply elem_of_enum|]; done.
+    - apply list_elem_of_fmap in Hx as [[x' Hx'] [-> _]]; done. }
   destruct (decide (x ∈ xs)); [left | right]; naive_solver.
 Qed. (* <- could be Defined but this lemma will probably not be used for computing *)
 
@@ -410,8 +410,8 @@ Section sig_finite.
     apply NoDup_filter, NoDup_enum.
   Qed.
   Next Obligation.
-    intros p. apply (elem_of_list_fmap_inj proj1_sig).
-    rewrite list_filter_sig_filter, elem_of_list_filter.
+    intros p. apply (list_elem_of_fmap_inj proj1_sig).
+    rewrite list_filter_sig_filter, list_elem_of_filter.
     split; [by destruct p | apply elem_of_enum].
   Qed.
   Lemma sig_card : card (sig P) = length (filter P (enum A)).
@@ -450,8 +450,8 @@ Proof.
     l2 !! (fin_to_nat j) = Some x) as [f Hf]%fin_choice.
   { intros i. destruct (lookup_lt_is_Some_2 l1 i)
       as [x Hix]; [apply fin_to_nat_lt|].
-    assert (x ∈ l2) as [j Hjx]%elem_of_list_lookup_1
-      by (by eapply Hl, elem_of_list_lookup_2).
+    assert (x ∈ l2) as [j Hjx]%list_elem_of_lookup_1
+      by (by eapply Hl, list_elem_of_lookup_2).
     exists (nat_to_fin (lookup_lt_Some _ _ _ Hjx)), x.
     by rewrite fin_to_nat_to_fin. }
   destruct (finite_pigeonhole f) as (i1&i2&Hi&Hf'); [by rewrite !fin_card|].

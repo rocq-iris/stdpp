@@ -138,7 +138,7 @@ Section find.
   Proof.
     rewrite eq_None_not_Some, Forall_forall. split.
     - intros Hl x Hx HP. destruct Hl. eauto using list_find_elem_of.
-    - intros HP [[i x] (?%elem_of_list_lookup_2&?&?)%list_find_Some]; naive_solver.
+    - intros HP [[i x] (?%list_elem_of_lookup_2&?&?)%list_find_Some]; naive_solver.
   Qed.
 
   Lemma list_find_app_None l1 l2 :

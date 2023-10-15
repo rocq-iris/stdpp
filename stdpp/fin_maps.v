@@ -1189,7 +1189,7 @@ Lemma elem_of_list_to_map_1 {A} (l : list (K * A)) i x :
   NoDup (l.*1) → (i,x) ∈ l → (list_to_map l : M A) !! i = Some x.
 Proof.
   intros ? Hx; apply elem_of_list_to_map_1'; eauto using NoDup_fmap_fst.
-  intros y; revert Hx. rewrite !elem_of_list_lookup; intros [i' Hi'] [j' Hj'].
+  intros y; revert Hx. rewrite !list_elem_of_lookup; intros [i' Hi'] [j' Hj'].
   cut (i' = j'); [naive_solver|]. apply NoDup_lookup with (l.*1) i;
     by rewrite ?list_lookup_fmap, ?Hi', ?Hj'.
 Qed.
@@ -1211,7 +1211,7 @@ Proof. split; auto using elem_of_list_to_map_1, elem_of_list_to_map_2. Qed.
 Lemma not_elem_of_list_to_map_1 {A} (l : list (K * A)) i :
   i ∉ l.*1 → (list_to_map l : M A) !! i = None.
 Proof.
-  rewrite elem_of_list_fmap, eq_None_not_Some. intros Hi [x ?]; destruct Hi.
+  rewrite list_elem_of_fmap, eq_None_not_Some. intros Hi [x ?]; destruct Hi.
   exists (i,x); simpl; auto using elem_of_list_to_map_2.
 Qed.
 Lemma not_elem_of_list_to_map_2 {A} (l : list (K * A)) i :
@@ -1288,7 +1288,7 @@ Proof.
   intros. apply list_to_map_inj; csimpl.
   - apply NoDup_fst_map_to_list.
   - constructor; [|by auto using NoDup_fst_map_to_list].
-    rewrite elem_of_list_fmap. intros [[??] [? Hlookup]]; subst; simpl in *.
+    rewrite list_elem_of_fmap. intros [[??] [? Hlookup]]; subst; simpl in *.
     rewrite elem_of_map_to_list in Hlookup. congruence.
   - by rewrite !list_to_map_to_list.
 Qed.
@@ -1556,11 +1556,11 @@ Section set_to_map.
   Proof.
     intros Hinj. assert (∀ x',
       (i, x) ∈ f <$> elements Y → (i, x') ∈ f <$> elements Y → x = x').
-    { intros x'. intros (y&Hx&Hy)%elem_of_list_fmap (y'&Hx'&Hy')%elem_of_list_fmap.
+    { intros x'. intros (y&Hx&Hy)%list_elem_of_fmap (y'&Hx'&Hy')%list_elem_of_fmap.
       rewrite elem_of_elements in Hy, Hy'.
       cut (y = y'); [congruence|]. apply Hinj; auto. by rewrite <-Hx, <-Hx'. }
     unfold set_to_map; rewrite <-elem_of_list_to_map' by done.
-    rewrite elem_of_list_fmap. setoid_rewrite elem_of_elements; naive_solver.
+    rewrite list_elem_of_fmap. setoid_rewrite elem_of_elements; naive_solver.
   Qed.
 End set_to_map.
 
@@ -1579,7 +1579,7 @@ Section map_to_set.
     y ∈ map_to_set (C:=C) f m ↔ ∃ i x, m !! i = Some x ∧ f i x = y.
   Proof.
     unfold map_to_set; simpl.
-    rewrite elem_of_list_to_set, elem_of_list_fmap. split.
+    rewrite elem_of_list_to_set, list_elem_of_fmap. split.
     - intros ([i x] & ? & ?%elem_of_map_to_list); eauto.
     - intros (i&x&?&?). exists (i,x). by rewrite elem_of_map_to_list.
   Qed.
@@ -1638,7 +1638,7 @@ Lemma map_fold_delete_first_key {A B} (f : K → A → B → B) b (m : M A) i x 
   map_first_key m i →
   map_fold f b m = f i x (map_fold f b (delete i m)).
 Proof.
-  intros Hi [x' ([] & ixs & Hixs & ?)%elem_of_list_split_length]; simplify_eq/=.
+  intros Hi [x' ([] & ixs & Hixs & ?)%list_elem_of_split_length]; simplify_eq/=.
   destruct m as [|j y m ? Hfold _] using map_fold_ind.
   { by rewrite map_to_list_empty in Hixs. }
   unfold map_to_list in Hixs. rewrite Hfold in Hixs. simplify_eq.
@@ -1715,8 +1715,8 @@ Proof.
     eapply Hj, NoDup_lookup; [apply (NoDup_fst_map_to_list (<[i:=x]> m))| | ].
     + by rewrite list_lookup_fmap, Hj1.
     + by rewrite list_lookup_fmap, Hj2.
-  - by eapply elem_of_map_to_list, elem_of_list_lookup_2.
-  - by eapply elem_of_map_to_list, elem_of_list_lookup_2.
+  - by eapply elem_of_map_to_list, list_elem_of_lookup_2.
+  - by eapply elem_of_map_to_list, list_elem_of_lookup_2.
 Qed.
 
 Lemma map_fold_insert_L {A B} (f : K → A → B → B) (b : B) (i : K) (x : A) (m : M A) :
@@ -4229,7 +4229,7 @@ Section map_seq.
     assert (NoDup (zip (seq start (length xs)) xs).*1).
     { rewrite fst_zip by (rewrite length_seq; lia). apply NoDup_seq. }
     rewrite lookup_map_seq_Some, <-elem_of_list_to_map by done.
-    rewrite elem_of_list_lookup.
+    rewrite list_elem_of_lookup.
     setoid_rewrite lookup_zip_Some. setoid_rewrite lookup_seq. split.
     - intros (i' & [-> ?] & <-). auto with f_equal lia.
     - intros [??]. assert (i - start < length xs) by eauto using lookup_lt_Some.
@@ -4397,7 +4397,7 @@ Section map_seqZ.
     assert (NoDup (zip (seqZ start (Z.of_nat (length xs))) xs).*1).
     { rewrite fst_zip by (rewrite length_seqZ; lia). apply NoDup_seqZ. }
     rewrite lookup_map_seqZ_Some, <-elem_of_list_to_map by done.
-    rewrite elem_of_list_lookup.
+    rewrite list_elem_of_lookup.
     setoid_rewrite lookup_zip_Some. setoid_rewrite lookup_seqZ. split.
     - intros (i' & [-> ?] & <-). auto with f_equal lia.
     - intros [??]. assert (Z.to_nat (i - start) < length xs)%nat
@@ -4427,10 +4427,10 @@ Section kmap.
     assert (∀ x',
       (j, x) ∈ prod_map f id <$> map_to_list m →
       (j, x') ∈ prod_map f id <$> map_to_list m → x = x').
-    { intros x'. rewrite !elem_of_list_fmap.
+    { intros x'. rewrite !list_elem_of_fmap.
       intros [[j' y1] [??]] [[? y2] [??]]; simplify_eq/=.
       by apply (map_to_list_unique m j'). }
-    unfold kmap. rewrite <-elem_of_list_to_map', elem_of_list_fmap by done.
+    unfold kmap. rewrite <-elem_of_list_to_map', list_elem_of_fmap by done.
     setoid_rewrite elem_of_map_to_list'. split.
     - intros [[??] [??]]; naive_solver.
     - intros [? [??]]. eexists (_, _); naive_solver.

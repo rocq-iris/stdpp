@@ -559,7 +559,7 @@ Section more_lemmas.
     destruct X as [X]. unfold elements, gmultiset_elements.
     set (f xn := let '(x, n) := xn in replicate (Pos.to_nat n) x); simpl.
     unfold elem_of at 2, gmultiset_elem_of, multiplicity; simpl.
-    rewrite elem_of_list_bind. split.
+    rewrite list_elem_of_bind. split.
     - intros [[??] [[<- ?]%elem_of_replicate ->%elem_of_map_to_list]]; lia.
     - intros. destruct (X !! x) as [n|] eqn:Hx; [|lia].
       exists (x,n); split; [|by apply elem_of_map_to_list].
@@ -581,7 +581,7 @@ Section more_lemmas.
   Proof.
     intros ? Hf. unfold set_fold; simpl.
     rewrite <-foldr_app. apply (foldr_permutation R f b).
-    - intros j1 a1 j2 a2 c ? Ha1%elem_of_list_lookup_2 Ha2%elem_of_list_lookup_2.
+    - intros j1 a1 j2 a2 c ? Ha1%list_elem_of_lookup_2 Ha2%list_elem_of_lookup_2.
       rewrite gmultiset_elem_of_elements in Ha1, Ha2. eauto.
     - rewrite (comm (++)). apply gmultiset_elements_disj_union.
   Qed.
@@ -833,7 +833,7 @@ Section map.
   Lemma elem_of_gmultiset_map X y :
     y ∈ gmultiset_map f X ↔ ∃ x, y = f x ∧ x ∈ X.
   Proof.
-    rewrite gmultiset_map_alt, elem_of_list_to_set_disj, elem_of_list_fmap.
+    rewrite gmultiset_map_alt, elem_of_list_to_set_disj, list_elem_of_fmap.
     by setoid_rewrite gmultiset_elem_of_elements.
   Qed.
 

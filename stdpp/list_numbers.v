@@ -98,7 +98,7 @@ Section seq.
 
   Lemma elem_of_seq j n k :
     k ∈ seq j n ↔ j ≤ k < j + n.
-  Proof. rewrite elem_of_list_In, in_seq. done. Qed.
+  Proof. rewrite list_elem_of_In, in_seq. done. Qed.
 
   Lemma seq_nil n m : seq n m = [] ↔ m = 0.
   Proof. by destruct m. Qed.
@@ -203,7 +203,7 @@ Section seqZ.
   Lemma elem_of_seqZ m n k :
     k ∈ seqZ m n ↔ m ≤ k < m + n.
   Proof.
-    rewrite elem_of_list_lookup.
+    rewrite list_elem_of_lookup.
     setoid_rewrite lookup_seqZ. split; [naive_solver lia|].
     exists (Z.to_nat (k - m)). rewrite Z2Nat.id by lia. lia.
   Qed.
@@ -311,8 +311,8 @@ Section max_list.
     destruct (Nat.max_spec n (max_list ns)) as [[? ->]|[? ->]].
     - destruct ns.
       + simpl in *. lia.
-      + by apply elem_of_list_further, IHns.
-    - apply elem_of_list_here.
+      + by apply list_elem_of_further, IHns.
+    - apply list_elem_of_here.
   Qed.
 End max_list.
 

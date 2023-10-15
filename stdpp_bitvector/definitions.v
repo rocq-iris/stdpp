@@ -446,7 +446,7 @@ Next Obligation.
   apply bv_eq in Hz. rewrite !Z_to_bv_small in Hz; lia.
 Qed.
 Next Obligation.
-  intros n x. apply elem_of_list_lookup. eexists (Z.to_nat (bv_unsigned x)).
+  intros n x. apply list_elem_of_lookup. eexists (Z.to_nat (bv_unsigned x)).
   rewrite list_lookup_fmap. apply fmap_Some. eexists _.
   pose proof (bv_unsigned_in_range _ x). split.
   - apply lookup_seqZ. split; [done|]. rewrite Z2Nat.id; lia.
@@ -1153,7 +1153,7 @@ Section little.
     rewrite list_lookup_fmap, list_lookup_fmap.
     destruct (Z_to_little_endian m (Z.of_N n) z !! i) eqn: Heq; [simpl |done].
     rewrite Z_to_bv_small; [done|].
-    eapply (Forall_forall (λ z, _ ≤ z < _)); [ |by eapply elem_of_list_lookup_2].
+    eapply (Forall_forall (λ z, _ ≤ z < _)); [ |by eapply list_elem_of_lookup_2].
     eapply Z_to_little_endian_bound; lia.
   Qed.
 
@@ -1164,7 +1164,7 @@ Section little.
     intros ->. apply (inj (fmap bv_unsigned)).
     rewrite bv_to_litte_endian_unsigned; [|lia].
     apply Z_to_little_endian_to_Z; [by rewrite length_fmap | lia |].
-    apply Forall_forall. intros ? [?[->?]]%elem_of_list_fmap. apply bv_unsigned_in_range.
+    apply Forall_forall. intros ? [?[->?]]%list_elem_of_fmap. apply bv_unsigned_in_range.
   Qed.
 
   Lemma little_endian_to_bv_to_little_endian m n z:
@@ -1189,7 +1189,7 @@ Section little.
   Proof.
     unfold little_endian_to_bv. rewrite <-(length_fmap bv_unsigned bs).
     apply little_endian_to_Z_bound; [lia|].
-    apply Forall_forall. intros ? [? [-> ?]]%elem_of_list_fmap.
+    apply Forall_forall. intros ? [? [-> ?]]%list_elem_of_fmap.
     apply bv_unsigned_in_range.
   Qed.
 
