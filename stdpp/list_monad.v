@@ -195,7 +195,7 @@ Section fmap.
 
   Lemma list_fmap_insert l i x: f <$> <[i:=x]>l = <[i:=f x]>(f <$> l).
   Proof. revert i. by induction l; intros [|i]; f_equal/=. Qed.
-  Lemma list_alter_fmap (g : A → A) (h : B → B) l i :
+  Lemma list_fmap_alter (g : A → A) (h : B → B) l i :
     Forall (λ x, f (g x) = h (f x)) l → f <$> alter g i l = alter h i (f <$> l).
   Proof. intros Hl. revert i. by induction Hl; intros [|i]; f_equal/=. Qed.
   Lemma list_fmap_delete l i : f <$> (delete i l) = delete i (f <$> l).
@@ -324,9 +324,6 @@ Section ext.
   Qed.
 End ext.
 
-Lemma list_alter_fmap_mono {A} (f : A → A) (g : A → A) l i :
-  Forall (λ x, f (g x) = g (f x)) l → f <$> alter g i l = alter g i (f <$> l).
-Proof. auto using list_alter_fmap. Qed.
 Lemma NoDup_fmap_fst {A B} (l : list (A * B)) :
   (∀ x y1 y2, (x,y1) ∈ l → (x,y2) ∈ l → y1 = y2) → NoDup l → NoDup (l.*1).
 Proof.

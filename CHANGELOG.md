@@ -122,6 +122,8 @@ API-breaking change is listed.
 - Change the order of the conjunction in `list_elem_of_fmap`. The new version is
   `y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l`, which makes it consistent with the
   corresponding lemmas for sets and maps.
+- Rename `list_alter_fmap` → `list_fmap_alter`.
+- Remove `list_alter_fmap_mono`, use `list_fmap_alter` instead.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -240,6 +242,8 @@ s/\belem_of_list_dec\b/list_elem_of_dec/g
 
 # list fmap lemmas
 s/\blist_lookup_fmap_inv\b/list_lookup_fmap_Some_1/g
+s/\blist_alter_fmap\b/list_fmap_alter/g
+s/\blist_alter_fmap_mono\b/list_fmap_alter/g
 EOF
 ```
 
