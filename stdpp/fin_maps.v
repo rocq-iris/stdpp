@@ -796,6 +796,15 @@ Proof.
 Qed.
 
 (** ** Properties of the map operations *)
+Lemma lookup_total_fmap `{!Inhabited A, !Inhabited B} (f : A → B) (m : M A) i :
+  (f <$> m) !!! i =
+    match m !! i with Some _ => f (m !!! i) | None => inhabitant end.
+Proof. rewrite !lookup_total_alt, lookup_fmap. by destruct (m !! i). Qed.
+Lemma lookup_total_fmap' `{!Inhabited A, !Inhabited B}
+    (f : A → B) (m : M A) i :
+  is_Some (m !! i) → (f <$> m) !!! i = f (m !!! i).
+Proof. intros [x Hi]. by rewrite lookup_total_fmap, Hi. Qed.
+
 Global Instance map_fmap_inj {A B} (f : A → B) :
   Inj (=) (=) f → Inj (=@{M A}) (=@{M B}) (fmap f).
 Proof.
