@@ -119,9 +119,10 @@ API-breaking change is listed.
   `list_elem_of_fmap_2` → `list_elem_of_fmap_1`,
   `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
   `list_elem_of_fmap_2_inj` → `list_elem_of_fmap_inj_2`.
-- Change the order of the conjunction in `list_elem_of_fmap`. The new version is
-  `y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l`, which makes it consistent with the
-  corresponding lemmas for sets and maps.
+- Change the order of the conjunction in `list_lookup_fmap_Some`. The new
+  version is `(f <$> l) !! i = Some y ↔ ∃ x, y = f x ∧ l !! i = Some x`, which
+  makes it consistent with `list_elem_of_fmap` and the corresponding lemmas for
+  sets and maps.
 - Rename `list_alter_fmap` → `list_fmap_alter`.
 - Remove `list_alter_fmap_mono`, use `list_fmap_alter` instead.
 
