@@ -1274,21 +1274,21 @@ Lemma finite_sig_pred_finite {A} (P : A → Prop) `{Finite (sig P)} :
   pred_finite P.
 Proof.
   exists (proj1_sig <$> enum _). intros x px.
-  apply list_elem_of_fmap_2_alt with (x ↾ px); [apply elem_of_enum|]; done.
+  apply list_elem_of_fmap_2' with (x ↾ px); [apply elem_of_enum|]; done.
 Qed.
 
 Lemma pred_finite_arg2 {A B} (P : A → B → Prop) x :
   pred_finite (uncurry P) → pred_finite (P x).
 Proof.
   intros [xys ?]. exists (xys.*2). intros y ?.
-  apply list_elem_of_fmap_2_alt with (x, y); by auto.
+  apply list_elem_of_fmap_2' with (x, y); by auto.
 Qed.
 
 Lemma pred_finite_arg1 {A B} (P : A → B → Prop) y :
   pred_finite (uncurry P) → pred_finite (flip P y).
 Proof.
   intros [xys ?]. exists (xys.*1). intros x ?.
-  apply list_elem_of_fmap_2_alt with (x, y); by auto.
+  apply list_elem_of_fmap_2' with (x, y); by auto.
 Qed.
 
 (** Sets of sequences of natural numbers *)

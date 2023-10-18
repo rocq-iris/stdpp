@@ -65,6 +65,7 @@ API-breaking change is listed.
     `delete_commute` → `delete_delete` (no `_ne` suffix because the lemmas holds
     without `≠` premise),
     `delete_idemp` → `delete_delete_eq`,
+    `insert_insert` → `insert_insert_eq`,
     `insert_commute` → `insert_insert_ne`,
     `alter_insert` → `alter_insert_eq`,
     `delete_insert_delete` → `delete_insert_eq`,
@@ -115,7 +116,7 @@ API-breaking change is listed.
   the `list_lookup_X` lemmas. The `sed` script contains all renames, the
   following renames were special since they fix other inconsistencies:
   `list_elem_of_fmap_1` → `list_elem_of_fmap_2`,
-  `list_elem_of_fmap_1_alt` → `list_elem_of_fmap_2_alt`,
+  `list_elem_of_fmap_1_alt` → `list_elem_of_fmap_2'`,
   `list_elem_of_fmap_2` → `list_elem_of_fmap_1`,
   `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
   `list_elem_of_fmap_2_inj` → `list_elem_of_fmap_inj_2`.
@@ -232,7 +233,7 @@ s/\belem_of_list_filter\b/list_elem_of_filter/g
 s/\belem_of_list_fmap\b/list_elem_of_fmap/g
 s/\belem_of_list_fmap_1\b/list_elem_of_fmap_2/g
 s/\belem_of_list_fmap_2\b/list_elem_of_fmap_1/g
-s/\belem_of_list_fmap_1_alt\b/list_elem_of_fmap_2_alt/g
+s/\belem_of_list_fmap_1_alt\b/list_elem_of_fmap_2'/g
 s/\belem_of_list_fmap_inj\b/list_elem_of_fmap_inj/g
 s/\belem_of_list_fmap_2_inj\b/list_elem_of_fmap_inj_2/g
 s/\belem_of_list_omap\b/list_elem_of_omap/g

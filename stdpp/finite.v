@@ -377,7 +377,7 @@ Lemma finite_sig_dec `{!EqDecision A} (P : A → Prop) `{Finite (sig P)} x :
 Proof.
   assert {xs : list A | ∀ x, P x ↔ x ∈ xs} as [xs ?].
   { clear x. exists (proj1_sig <$> enum _). intros x. split; intros Hx.
-    - apply list_elem_of_fmap_2_alt with (x ↾ Hx); [apply elem_of_enum|]; done.
+    - apply list_elem_of_fmap_2' with (x ↾ Hx); [apply elem_of_enum|]; done.
     - apply list_elem_of_fmap in Hx as [[x' Hx'] [-> _]]; done. }
   destruct (decide (x ∈ xs)); [left | right]; naive_solver.
 Qed. (* <- could be Defined but this lemma will probably not be used for computing *)

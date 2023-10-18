@@ -213,7 +213,7 @@ Section fmap.
   Proof. by rewrite list_elem_of_fmap. Qed.
   Lemma list_elem_of_fmap_2 l x : x ∈ l → f x ∈ f <$> l.
   Proof. rewrite list_elem_of_fmap. naive_solver. Qed.
-  Lemma list_elem_of_fmap_2_alt l x y : x ∈ l → y = f x → y ∈ f <$> l.
+  Lemma list_elem_of_fmap_2' l x y : x ∈ l → y = f x → y ∈ f <$> l.
   Proof. intros ? ->. by apply list_elem_of_fmap_2. Qed.
 
   Lemma list_elem_of_fmap_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l ↔ x ∈ l.
