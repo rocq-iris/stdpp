@@ -17,6 +17,7 @@ Léo Stefanesco, Marijn van Wezel, Paolo G. Giarrusso, Pierre Roux,
 Ralf Jung, Robbert Krebbers, Rodolphe Lepigre, Sanjit Bhat, Yannick Zakowski, 
 and Yiyun Liu. Thanks a lot to everyone involved!
 
+
 **Detailed list of changes:**
 
 - Generalize `foldr_comm_acc`, `map_fold_comm_acc`, `set_fold_comm_acc`, and
@@ -153,6 +154,7 @@ s/\bis_space\b/Ascii.is_space/g
 s/\bwords\b/String.words/g
 EOF
 ```
+
 
 ## std++ 1.10.0 (2024-04-12)
 
