@@ -1,7 +1,23 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ master
+## 1.11.0 (2024-10-29)
+
+The highlights of this release include:
+* dune compilation support
+* stronger versions of the induction principles for `map_fold`, exposing the order in
+  which elements are processed
+
+std++ 1.11 supports Coq 8.18, 8.19 and 8.20.
+Coq 8.16 and 8.17 are no longer supported.
+
+This release of std++ was managed by Jesper Bengtson, Ralf Jung, 
+and Robbert Krebbers, with contributions from Andres Erbsen, Lennard Gäher, 
+Léo Stefanesco, Marijn van Wezel, Paolo G. Giarrusso, Pierre Roux,
+Ralf Jung, Robbert Krebbers, Rodolphe Lepigre, Sanjit Bhat, Yannick Zakowski, 
+and Yiyun Liu. Thanks a lot to everyone involved!
+
+**Detailed list of changes:**
 
 - Generalize `foldr_comm_acc`, `map_fold_comm_acc`, `set_fold_comm_acc`, and
   `gmultiset_set_fold_comm_acc` to have more general type. (by Yannick Zakowski)
