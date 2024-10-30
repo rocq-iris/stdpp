@@ -1050,6 +1050,15 @@ Notation "(.∖ x )" := (λ y, difference y x) (only parsing) : stdpp_scope.
 Infix "∖*" := (zip_with (∖)) (at level 40, left associativity) : stdpp_scope.
 Notation "(∖*)" := (zip_with (∖)) (only parsing) : stdpp_scope.
 
+(** The operation [cprod X Y] gives the Cartesian product of set-like structures
+[X] and [Y], i.e., [cprod X Y := { (x,y) | x ∈ X, y ∈ Y }]. The implementation/
+instance depends on the representation of the set. *)
+Class CProd A B C := cprod : A → B → C.
+Global Hint Mode CProd ! ! - : typeclass_instances.
+Global Instance: Params (@cprod) 4 := {}.
+(** We do not have a notation for [cprod] (yet) since this operation seems
+not commonly enough used. *)
+
 Class Singleton A B := singleton: A → B.
 Global Hint Mode Singleton - ! : typeclass_instances.
 Global Instance: Params (@singleton) 3 := {}.
