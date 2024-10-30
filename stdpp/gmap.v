@@ -823,4 +823,25 @@ Section gset.
   Qed.
 End gset.
 
+Section gset_cprod.
+  Context `{Countable A, Countable B}.
+
+  Global Instance gset_cprod : CProd (gset A) (gset B) (gset (A * B)) :=
+    λ X Y, set_bind (λ e1, set_map (e1,.) Y) X.
+
+  Lemma elem_of_gset_cprod (X : gset A) (Y : gset B) x :
+    x ∈ cprod X Y ↔ x.1 ∈ X ∧ x.2 ∈ Y.
+  Proof. unfold cprod, gset_cprod. destruct x. set_solver. Qed.
+
+  Global Instance set_unfold_gset_cprod (X : gset A) (Y : gset B) x (P : Prop) Q :
+    SetUnfoldElemOf x.1 X P → SetUnfoldElemOf x.2 Y Q →
+    SetUnfoldElemOf x (cprod X Y) (P ∧ Q).
+  Proof using.
+    intros ??; constructor.
+    by rewrite elem_of_gset_cprod, (set_unfold_elem_of x.1 X P),
+      (set_unfold_elem_of x.2 Y Q).
+  Qed.
+
+End gset_cprod.
+
 Global Typeclasses Opaque gset.

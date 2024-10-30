@@ -224,6 +224,17 @@ Global Instance list_join: MJoin list :=
   fix go A (ls : list (list A)) : list A :=
   match ls with [] => [] | l :: ls => l ++ @mjoin _ go _ ls end.
 
+(** The Cartesian product on lists satisfies (lemma [elem_of_list_cprod]):
+
+  x ∈ cprod l k ↔ x.1 ∈ l ∧ x.2 ∈ k
+
+There are little meaningful things to say about the order of the elements in
+[cprod] (so there are no lemmas for that). It thus only makes sense to use
+[cprod] when treating the lists as a set-like structure (i.e., up to duplicates
+and permutations). *)
+Global Instance list_cprod {A B} : CProd (list A) (list B) (list (A * B)) :=
+  λ l k, x ← l; (x,.) <$> k.
+
 Definition mapM `{MBind M, MRet M} {A B} (f : A → M B) : list A → M (list B) :=
   fix go l :=
   match l with [] => mret [] | x :: l => y ← f x; k ← go l; mret (y :: k) end.
@@ -1033,6 +1044,19 @@ Proof.
   - by rewrite elem_of_reverse.
   - by rewrite elem_of_reverse.
   - rewrite <-!reverse_snoc, <-!reverse_app, <-!(assoc_L (++)). by f_equal.
+Qed.
+
+(** The Cartesian product *)
+(** Correspondence to [list_prod] from the stdlib, a version that does not use
+the [CProd] class for the interface, nor the monad classes for the definition *)
+Lemma list_cprod_list_prod {B} l (k : list B) : cprod l k = list_prod l k.
+Proof. unfold cprod, list_cprod. induction l; f_equal/=; auto. Qed.
+
+Lemma elem_of_list_cprod {B} l (k : list B) (x : A * B) :
+  x ∈ cprod l k ↔ x.1 ∈ l ∧ x.2 ∈ k.
+Proof.
+  rewrite list_cprod_list_prod, !elem_of_list_In.
+  destruct x. apply in_prod_iff.
 Qed.
 
 (** ** Properties of the [NoDup] predicate *)

@@ -287,6 +287,15 @@ Section set_unfold_list.
     intros ??; constructor.
     by rewrite elem_of_app, (set_unfold_elem_of x l P), (set_unfold_elem_of x k Q).
   Qed.
+  Global Instance set_unfold_list_cprod {B} (x : A * B) l (k : list B) P Q :
+    SetUnfoldElemOf x.1 l P → SetUnfoldElemOf x.2 k Q →
+    SetUnfoldElemOf x (cprod l k) (P ∧ Q).
+  Proof.
+    intros ??; constructor.
+    by rewrite elem_of_list_cprod, (set_unfold_elem_of x.1 l P),
+      (set_unfold_elem_of x.2 k Q).
+  Qed.
+
   Global Instance set_unfold_included l k (P Q : A → Prop) :
     (∀ x, SetUnfoldElemOf x l (P x)) → (∀ x, SetUnfoldElemOf x k (Q x)) →
     SetUnfold (l ⊆ k) (∀ x, P x → Q x).
@@ -1105,6 +1114,24 @@ Section set_monad.
     rewrite elem_of_mapM. intros Hl1. revert l2.
     induction Hl1; inv 1; constructor; auto.
   Qed.
+
+  Global Instance monadset_cprod {A B} : CProd (M A) (M B) (M (A * B)) := λ X Y,
+    x ← X; fmap (x,.) Y.
+
+  Lemma elem_of_monadset_cprod {A B} (X : M A) (Y : M B) (x : A * B) :
+    x ∈ cprod X Y ↔ x.1 ∈ X ∧ x.2 ∈ Y.
+  Proof. unfold cprod, monadset_cprod. destruct x; set_solver. Qed.
+
+  Global Instance set_unfold_monadset_cprod {A B} (X : M A) (Y : M B) P Q x :
+    SetUnfoldElemOf x.1 X P →
+    SetUnfoldElemOf x.2 Y Q →
+    SetUnfoldElemOf x (cprod X Y) (P ∧ Q).
+  Proof.
+    constructor.
+    by rewrite elem_of_monadset_cprod, (set_unfold_elem_of x.1 X P),
+      (set_unfold_elem_of x.2 Y Q).
+  Qed.
+
 End set_monad.
 
 (** Finite sets *)

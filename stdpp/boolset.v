@@ -17,6 +17,10 @@ Global Instance boolset_intersection {A} : Intersection (boolset A) := λ X1 X2,
   BoolSet (λ x, boolset_car X1 x && boolset_car X2 x).
 Global Instance boolset_difference {A} : Difference (boolset A) := λ X1 X2,
   BoolSet (λ x, boolset_car X1 x && negb (boolset_car X2 x)).
+Global Instance boolset_cprod {A B} :
+  CProd (boolset A) (boolset B) (boolset (A * B)) := λ X1 X2,
+  BoolSet (λ x, boolset_car X1 x.1 && boolset_car X2 x.2).
+
 Global Instance boolset_top_set `{EqDecision A} : TopSet A (boolset A).
 Proof.
   split; [split; [split| |]|].
@@ -31,6 +35,19 @@ Qed.
 Global Instance boolset_elem_of_dec {A} : RelDecision (∈@{boolset A}).
 Proof. refine (λ x X, cast_if (decide (boolset_car X x))); done. Defined.
 
+Lemma elem_of_boolset_cprod {A B} (X1 : boolset A) (X2 : boolset B) (x : A * B) :
+  x ∈ cprod X1 X2 ↔ x.1 ∈ X1 ∧ x.2 ∈ X2.
+Proof. apply andb_True. Qed.
+
+Global Instance set_unfold_boolset_cprod {A B} (X1 : boolset A) (X2 : boolset B) x P Q :
+  SetUnfoldElemOf x.1 X1 P → SetUnfoldElemOf x.2 X2 Q →
+  SetUnfoldElemOf x (cprod X1 X2) (P ∧ Q).
+Proof.
+  intros ??; constructor.
+  by rewrite elem_of_boolset_cprod, (set_unfold_elem_of x.1 X1 P),
+    (set_unfold_elem_of x.2 X2 Q).
+Qed.
+
 Global Typeclasses Opaque boolset_elem_of.
 Global Opaque boolset_empty boolset_singleton boolset_union
-  boolset_intersection boolset_difference.
+  boolset_intersection boolset_difference boolset_cprod.
