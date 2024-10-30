@@ -1,10 +1,10 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## 1.11.0 (2024-10-29)
+## 1.11.0 (2024-10-30)
 
 The highlights of this release include:
-* dune compilation support
+* support for building with dune
 * stronger versions of the induction principles for `map_fold`, exposing the order in
   which elements are processed
 
