@@ -1,7 +1,11 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## 1.11.0 (2024-10-30)
+## std++ master
+
+- Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
+
+## std++ 1.11.0 (2024-10-30)
 
 The highlights of this release include:
 * support for building with dune

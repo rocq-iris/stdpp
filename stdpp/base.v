@@ -1122,6 +1122,11 @@ Notation "(⊎)" := disj_union (only parsing) : stdpp_scope.
 Notation "( x ⊎.)" := (disj_union x) (only parsing) : stdpp_scope.
 Notation "(.⊎ x )" := (λ y, disj_union y x) (only parsing) : stdpp_scope.
 
+Definition disj_union_list `{Empty A} `{DisjUnion A} : list A → A := fold_right (⊎) ∅.
+Global Arguments disj_union_list _ _ _ !_ / : assert.
+(* There is no "big" version of [⊎] in unicode, we thus use [⋃+]. *)
+Notation "⋃+ l" := (disj_union_list l) (at level 20, format "⋃+  l") : stdpp_scope.
+
 Class SingletonMS A B := singletonMS: A → B.
 Global Hint Mode SingletonMS - ! : typeclass_instances.
 Global Instance: Params (@singletonMS) 3 := {}.
