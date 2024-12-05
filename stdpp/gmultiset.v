@@ -862,3 +862,44 @@ Section map.
     intros ? [HX]; constructor. by rewrite multiplicity_gmultiset_map, HX.
   Qed.
 End map.
+
+(** * Big disjoint unions *)
+Section disj_union_list.
+  Context `{Countable A}.
+  Implicit Types X Y : gmultiset A.
+  Implicit Types Xs Ys : list (gmultiset A).
+
+  Lemma gmultiset_disj_union_list_nil :
+    ⋃+ (@nil (gmultiset A)) = ∅.
+  Proof. done. Qed.
+
+  Lemma gmultiset_disj_union_list_cons X Xs :
+    ⋃+ (X :: Xs) = X ⊎ ⋃+ Xs.
+  Proof. done. Qed.
+
+  Lemma gmultiset_disj_union_list_singleton X :
+    ⋃+ [X] = X.
+  Proof. simpl. by rewrite (right_id_L ∅ _). Qed.
+
+  Lemma gmultiset_disj_union_list_app Xs1 Xs2 :
+    ⋃+ (Xs1 ++ Xs2) = ⋃+ Xs1 ⊎ ⋃+ Xs2.
+  Proof.
+    induction Xs1 as [|X Xs1 IH]; simpl; [by rewrite (left_id_L ∅ _)|].
+    by rewrite IH, (assoc_L _).
+  Qed.
+
+  Lemma elem_of_gmultiset_disj_union_list Xs x :
+    x ∈ ⋃+ Xs ↔ ∃ X, X ∈ Xs ∧ x ∈ X.
+  Proof. induction Xs; multiset_solver. Qed.
+
+  Lemma multiplicity_gmultiset_disj_union_list x Xs :
+    multiplicity x (⋃+ Xs) = sum_list (multiplicity x <$> Xs).
+  Proof.
+    induction Xs as [|X Xs IH]; [done|]; simpl.
+    by rewrite multiplicity_disj_union, IH.
+  Qed.
+
+  Global Instance gmultiset_disj_union_list_proper :
+    Proper ((≡ₚ) ==> (=)) (@disj_union_list (gmultiset A) _ _).
+  Proof. induction 1; multiset_solver. Qed.
+End disj_union_list.
