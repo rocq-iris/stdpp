@@ -234,6 +234,22 @@ Proof.
   done.
 Qed.
 
+Check "notypeclasses_apply_test".
+Lemma notypeclasses_apply_test n : {n = 0} + {¬ n = 0}.
+Proof.
+  (* Partially applied lemma with typeclass in one of the trailing [_]. *)
+  notypeclasses apply (@decide (n = 0)). Show.
+Restart. Proof.
+  (* Partially applied lemma with typeclass in one of the explicit [_]. *)
+  notypeclasses apply (@decide (n = 0) _). Show.
+Abort.
+
+Check "notypeclasses_apply_error".
+Lemma notypeclasses_apply_error (P Q : Prop) : (P → Q) → Q → P.
+Proof.
+  intros H HQ. Fail notypeclasses apply H.
+Abort.
+
 (** Some tests for f_equiv. *)
 (* Similar to [f_equal], it should solve goals by [reflexivity]. *)
 Lemma test_f_equiv_refl {A} (R : relation A) `{!Equivalence R} x :
