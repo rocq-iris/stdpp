@@ -1858,7 +1858,7 @@ Section map_filter.
 
   Lemma map_filter_empty : filter P ∅ =@{M A} ∅.
   Proof. apply map_fold_empty. Qed.
-  Lemma map_filter_empty_iff m :
+  Lemma map_empty_filter m :
     filter P m = ∅ ↔ map_Forall (λ i x, ¬P (i,x)) m.
   Proof.
     rewrite map_empty. setoid_rewrite map_lookup_filter_None. split.
@@ -1866,6 +1866,14 @@ Section map_filter.
     - intros Hm i. destruct (m !! i) as [x|] eqn:?; [|by auto].
       right; intros ? [= <-]. by apply Hm.
   Qed.
+  Lemma map_empty_filter_1 m :
+    filter P m = ∅ →
+    map_Forall (λ i x, ¬P (i,x)) m.
+  Proof. apply map_empty_filter. Qed.
+  Lemma map_empty_filter_2 m :
+    map_Forall (λ i x, ¬P (i,x)) m →
+    filter P m = ∅.
+  Proof. apply map_empty_filter. Qed.
 
   Lemma map_filter_delete m i : filter P (delete i m) = delete i (filter P m).
   Proof.

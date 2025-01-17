@@ -9,6 +9,18 @@ API-breaking change is listed.
   `head_app_Some`, `head_app_None` and `head_app`. (by Marijn van Wezel)
 - Add tactic `notypeclasses apply` that works like `notypeclasses refine` but
   automatically adds `_` until the given lemma takes no more arguments.
+- Rename `map_filter_empty_iff` to `map_empty_filter` and add
+  `map_empty_filter_1` and `map_empty_filter_2`. (by Michael Sammler)
+
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
+Note that the script is not idempotent, do not run it twice.
+```
+sed -i -E -f- $(find theories -name "*.v") <<EOF
+# length
+s/\bmap_filter_empty_iff\b/map_empty_filter/g
+EOF
+```
 
 ## std++ 1.11.0 (2024-10-30)
 
