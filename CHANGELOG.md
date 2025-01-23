@@ -4,6 +4,7 @@ API-breaking change is listed.
 ## std++ master
 
 - Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
+- Add lemma `lookup_total_fmap`.
 
 ## std++ 1.11.0 (2024-10-30)
 
@@ -210,7 +211,6 @@ Pierre Roux, and Thibaut Pérami. Thanks a lot to everyone involved!
   `stdpp.unstable.bitvector_tactics` to `stdpp.bitvector.tactics`. The
   complete library can be imported with `stdpp.bitvector.bitvector`.
   (by Michael Sammler)
-- Add lemma `lookup_total_fmap`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
