@@ -45,10 +45,10 @@ variables:
 ## Build jobs
 
 # The newest version runs with timing.
-build-coq.8.20.0:
+build-coq.8.20.1:
   <<: *template
   variables:
-    OPAM_PINS: "coq version 8.20.0"
+    OPAM_PINS: "coq version 8.20.1"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
     CI_COQCHK: "1"
@@ -59,19 +59,19 @@ build-coq.8.20.0:
   interruptible: false
 
 # The newest version also runs in MRs, without timing.
-build-coq.8.20.0-mr:
+build-coq.8.20.1-mr:
   <<: *template
   <<: *only_mr
   variables:
-    OPAM_PINS: "coq version 8.20.0"
+    OPAM_PINS: "coq version 8.20.1"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
 
 # Also ensure Dune works.
-build-coq.8.20.0-dune:
+build-coq.8.20.1-dune:
   <<: *template
   variables:
-    OPAM_PINS: "coq version 8.20.0   dune version 3.15.2"
+    OPAM_PINS: "coq version 8.20.1   dune version 3.15.2"
     MAKE_TARGET: "dune"
 
 build-coq.8.19.1:
