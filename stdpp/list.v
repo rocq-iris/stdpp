@@ -1220,6 +1220,12 @@ Proof.
   - by rewrite (right_id_L _ (++)).
   - by rewrite (assoc_L (++)), !last_snoc.
 Qed.
+Lemma last_app_Some l1 l2 x :
+  last (l1 ++ l2) = Some x ↔ last l2 = Some x ∨ last l2 = None ∧ last l1 = Some x.
+Proof. rewrite last_app. destruct (last l2); naive_solver. Qed.
+Lemma last_app_None l1 l2 :
+  last (l1 ++ l2) = None ↔ last l1 = None ∧ last l2 = None.
+Proof. rewrite last_app. destruct (last l2); naive_solver. Qed.
 Lemma last_cons x l :
   last (x :: l) = match last l with Some y => Some y | None => Some x end.
 Proof. by apply (last_app [x]). Qed.
@@ -1259,6 +1265,15 @@ Proof. by destruct l. Qed.
 Lemma head_lookup l : head l = l !! 0.
 Proof. by destruct l. Qed.
 
+Lemma head_app l1 l2 :
+  head (l1 ++ l2) = match head l1 with Some y => Some y | None => head l2 end.
+Proof. by destruct l1. Qed.
+Lemma head_app_Some l1 l2 x :
+  head (l1 ++ l2) = Some x ↔ head l1 = Some x ∨ head l1 = None ∧ head l2 = Some x.
+Proof. rewrite head_app. destruct (head l1); naive_solver. Qed.
+Lemma head_app_None l1 l2 :
+  head (l1 ++ l2) = None ↔ head l1 = None ∧ head l2 = None.
+Proof. rewrite head_app. destruct (head l1); naive_solver. Qed.
 Lemma head_reverse l : head (reverse l) = last l.
 Proof. by rewrite <-last_reverse, reverse_involutive. Qed.
 Lemma head_Some_elem_of l x :

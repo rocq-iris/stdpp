@@ -5,6 +5,8 @@ API-breaking change is listed.
 
 - Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
 - Add lemma `lookup_total_fmap`.
+- Add lemmas about `last` and `head`: `last_app_Some`, `last_app_None`,
+  `head_app_Some`, `head_app_None` and `head_app`. (by Marijn van Wezel)
 
 ## std++ 1.11.0 (2024-10-30)
 
