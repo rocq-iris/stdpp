@@ -14,6 +14,10 @@ API-breaking change is listed.
 - Add lemma about `zip_with`: `lookup_zip_with_None` and add lemmas for `zip`:
  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
 - Add `elem_of_seq` and `seq_nil`. (by Kimaya Bedarkar)
+  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
+- Add lemma `StronglySorted_app`. (by Marijn van Wezel)
+- Add lemmas `StronglySorted_app_iff` and `StronglySorted_app`. (by Marijn van
+  Wezel)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

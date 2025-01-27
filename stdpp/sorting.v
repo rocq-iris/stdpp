@@ -48,25 +48,48 @@ Inductive TlRel {A} (R : relation A) (a : A) : list A → Prop :=
 Section sorted.
   Context {A} (R : relation A).
 
+  Lemma StronglySorted_app_iff l1 l2 :
+    StronglySorted R (l1 ++ l2) ↔ 
+      (∀ x1 x2, x1 ∈ l1 → x2 ∈ l2 → R x1 x2) ∧
+      StronglySorted R l1 ∧
+      StronglySorted R l2.
+  Proof.
+    induction l1 as [|x1' l1 IH]; simpl; split.
+    - intros Hs. repeat split; [|constructor|naive_solver].
+      by setoid_rewrite elem_of_nil.
+    - naive_solver.
+    - intros [Hs Hall]%StronglySorted_inv. split.
+      * intros ? ? Hinl1 Hinl2.
+        apply elem_of_cons in Hinl1 as [Hinl1|Hinl1].
+        + subst. apply Forall_app in Hall as [_ Hall].
+          rewrite Forall_forall in Hall. by apply Hall.
+        + apply IH in Hs as (HR & ? & ?). by apply HR.
+      * repeat split; [apply SSorted_cons|]; apply IH in Hs.
+        + naive_solver.
+        + apply Forall_app in Hall; naive_solver.
+        + naive_solver.
+    - intros (HR & [? ?]%StronglySorted_inv & ?). apply SSorted_cons.
+      * apply IH; [|done..]. repeat split; [|done..].
+        intros; apply HR; [|done]. apply elem_of_cons. naive_solver.
+      * rewrite Forall_app; split; [done|].
+        rewrite Forall_forall. intros; apply HR; [|done].
+        apply elem_of_cons. naive_solver.
+  Qed.
+  Lemma StronglySorted_app l1 l2 :
+    (∀ x1 x2, x1 ∈ l1 → x2 ∈ l2 → R x1 x2) →
+    StronglySorted R l1 →
+    StronglySorted R l2 →
+    StronglySorted R (l1 ++ l2).
+  Proof. by rewrite StronglySorted_app_iff. Qed.
   Lemma elem_of_StronglySorted_app l1 l2 x1 x2 :
     StronglySorted R (l1 ++ l2) → x1 ∈ l1 → x2 ∈ l2 → R x1 x2.
-  Proof.
-    induction l1 as [|x1' l1 IH]; simpl; [by rewrite elem_of_nil|].
-    intros [? Hall]%StronglySorted_inv [->|?]%elem_of_cons ?; [|by auto].
-    rewrite Forall_app, !Forall_forall in Hall. naive_solver.
-  Qed.
+  Proof. rewrite StronglySorted_app_iff. naive_solver. Qed.
   Lemma StronglySorted_app_inv_l l1 l2 :
     StronglySorted R (l1 ++ l2) → StronglySorted R l1.
-  Proof.
-    induction l1 as [|x1' l1 IH]; simpl;
-      [|inv 1]; decompose_Forall; constructor; auto.
-  Qed.
+  Proof. rewrite StronglySorted_app_iff. naive_solver. Qed. 
   Lemma StronglySorted_app_inv_r l1 l2 :
     StronglySorted R (l1 ++ l2) → StronglySorted R l2.
-  Proof.
-    induction l1 as [|x1' l1 IH]; simpl;
-      [|inv 1]; decompose_Forall; auto.
-  Qed.
+  Proof. rewrite StronglySorted_app_iff. naive_solver. Qed.
 
   Lemma Sorted_StronglySorted `{!Transitive R} l :
     Sorted R l → StronglySorted R l.
