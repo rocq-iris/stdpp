@@ -7,6 +7,8 @@ API-breaking change is listed.
 - Add lemma `lookup_total_fmap`.
 - Add lemmas about `last` and `head`: `last_app_Some`, `last_app_None`,
   `head_app_Some`, `head_app_None` and `head_app`. (by Marijn van Wezel)
+- Add tactic `notypeclasses apply` that works like `notypeclasses refine` but
+  automatically adds `_` until the given lemma takes no more arguments.
 
 ## std++ 1.11.0 (2024-10-30)
 

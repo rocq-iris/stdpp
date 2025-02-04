@@ -736,6 +736,12 @@ Tactic Notation "ospecialize" "*" uconstr(p) :=
       pose proof p as H'; clear H; rename H' into H
   )).
 
+(** Tactic that works like [notypeclasses refine] but automatically determines
+the right number of [_]. This is *not* goal-directed, it will add [_] until the
+given term no longer has a function type (determined via syntactic matching). *)
+Tactic Notation "notypeclasses" "apply" uconstr(p) :=
+  opose_specialize_foralls_core p () ltac:(fun p => notypeclasses refine p).
+
 (** The block definitions are taken from [Coq.Program.Equality] and can be used
 by tactics to separate their goal from hypotheses they generalize over. *)
 Definition block {A : Type} (a : A) := a.
