@@ -738,7 +738,7 @@ Tactic Notation "ospecialize" "*" uconstr(p) :=
 
 (** Tactic that works like [notypeclasses refine] but automatically determines
 the right number of [_]. This is *not* goal-directed, it will add [_] until the
-given term no longer has a function type (determined via syntactic matching). *)
+given term no longer has a function type (determined via [eval hnf]). *)
 Tactic Notation "notypeclasses" "apply" uconstr(p) :=
   opose_specialize_foralls_core p () ltac:(fun p => notypeclasses refine p).
 
