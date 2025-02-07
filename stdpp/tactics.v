@@ -628,28 +628,30 @@ Ltac opose_core p tac :=
 (** Turn all leading ∀ and → of [p] into evars (∀-evars will be shelved), and
 call [tac] with the term applied with those evars. This fill unfold definitions
 to find leading ∀/→.
+The type of [p] will be normalized by calling the [normalizer] function.
 
 [_name_guard] is an unused argument where you can pass anything you want. If the
 argument is an intro pattern, those will be taken into account by the [fresh]
 that is inside this tactic, avoiding name collisions that can otherwise arise.
 This is a work-around for https://github.com/coq/coq/issues/18109. *)
-Ltac ospecialize_foralls p _name_guard tac :=
+Ltac evar_foralls p _name_guard normalizer tac :=
   let T := type of p in
-  lazymatch eval hnf in T with
+  lazymatch normalizer T with
   | ?T1 → ?T2 =>
     (* This is the [fresh] where the presence of [_name_guard] matters.
     Note that the "opose_internal" is nice but not sufficient because
     it gets ignored when name mangling is enabled. *)
-    let pT1 := fresh "opose_internal" in
-    assert T1 as pT1; [| ospecialize_foralls (p pT1) _name_guard tac; clear pT1]
+    let pT1 := fresh "__evar_foralls_internal" in
+    assert T1 as pT1; [| evar_foralls (p pT1) _name_guard normalizer tac; clear pT1]
   | ∀ x : ?T1, _ =>
     let e := mk_evar T1 in
-    ospecialize_foralls (p e) _name_guard tac
+    evar_foralls (p e) _name_guard normalizer tac
   | ?T1 => tac p
   end.
 
 Ltac opose_specialize_foralls_core p _name_guard tac :=
-  opose_core p ltac:(fun p => ospecialize_foralls p _name_guard tac).
+  opose_core p ltac:(fun p =>
+    evar_foralls p _name_guard ltac:(fun t => eval hnf in t) tac).
 
 Tactic Notation "opose" "proof" uconstr(p) "as" simple_intropattern(pat) :=
   opose_core p ltac:(fun p => pose proof p as pat).
@@ -738,9 +740,16 @@ Tactic Notation "ospecialize" "*" uconstr(p) :=
 
 (** Tactic that works like [notypeclasses refine] but automatically determines
 the right number of [_]. This is *not* goal-directed, it will add [_] until the
-given term no longer has a function type (determined via [eval hnf]). *)
+given term no longer has a function type (determined without any unfolding). *)
 Tactic Notation "notypeclasses" "apply" uconstr(p) :=
-  opose_specialize_foralls_core p () ltac:(fun p => notypeclasses refine p).
+  opose_core p ltac:(fun p => evar_foralls p () ltac:(fun t => t)
+    ltac:(fun p => notypeclasses refine p ||
+      let T := type of p in
+      lazymatch goal with |- ?G =>
+        fail "the given term has type" T "while it is expected to have type" G
+      end
+    )
+  ).
 
 (** The block definitions are taken from [Coq.Program.Equality] and can be used
 by tactics to separate their goal from hypotheses they generalize over. *)
