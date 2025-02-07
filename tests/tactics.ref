@@ -80,12 +80,7 @@ use opose proof instead.
 "notypeclasses_apply_error"
      : string
 The command has indeed failed with message:
-In environment
-P, Q : Prop
-H : P → Q
-HQ : Q
-opose_internal : P
-The term "H opose_internal" has type "Q" while it is expected to have type
- "P".
+Tactic failure: the given term has type Q while it is expected to have type
+P.
 The command has indeed failed with message:
 No such assumption.
