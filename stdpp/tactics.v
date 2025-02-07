@@ -636,7 +636,7 @@ that is inside this tactic, avoiding name collisions that can otherwise arise.
 This is a work-around for https://github.com/coq/coq/issues/18109. *)
 Ltac evar_foralls p _name_guard normalizer tac :=
   let T := type of p in
-  lazymatch (normalizer T) with
+  lazymatch normalizer T with
   | ?T1 → ?T2 =>
     (* This is the [fresh] where the presence of [_name_guard] matters.
     Note that the "opose_internal" is nice but not sufficient because
@@ -650,7 +650,8 @@ Ltac evar_foralls p _name_guard normalizer tac :=
   end.
 
 Ltac opose_specialize_foralls_core p _name_guard tac :=
-  opose_core p ltac:(fun p => evar_foralls p _name_guard ltac:(fun t => eval hnf in t) tac).
+  opose_core p ltac:(fun p =>
+    evar_foralls p _name_guard ltac:(fun t => eval hnf in t) tac).
 
 Tactic Notation "opose" "proof" uconstr(p) "as" simple_intropattern(pat) :=
   opose_core p ltac:(fun p => pose proof p as pat).
@@ -744,7 +745,7 @@ Tactic Notation "notypeclasses" "apply" uconstr(p) :=
   opose_core p ltac:(fun p => evar_foralls p () ltac:(fun t => t)
     ltac:(fun p => notypeclasses refine p ||
       let T := type of p in
-      match goal with |- ?G =>
+      lazymatch goal with |- ?G =>
         fail "the given term has type" T "while it is expected to have type" G
       end
     )
