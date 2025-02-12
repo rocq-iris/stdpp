@@ -45,7 +45,7 @@ tests/.coqdeps.d: $(TESTFILES)
 # - Cleanup, and mark as done for make.
 $(TESTFILES:.v=.vo): %.vo: %.v $(if $(MAKE_REF),,%.ref) $(NORMALIZER)
 	$(HIDE)REF=$*".ref" && \
-	  echo "COQTEST$(if $(COQ_REF),$(if $(MAKE_REF), [make ref],), [ref diff ignored]) $< (ref: $$REF)" && \
+	  echo "COQTEST$(if $(COQ_REF),$(if $(MAKE_REF), [make ref],), [ref ignored]) $< (ref: $$REF)" && \
 	  TMPFILE="$$(mktemp)" && \
 	  unset OCAMLRUNPARAM && \
 	  $(TIMER) $(COQ_TEST) $(COQFLAGS) $(COQLIBS) -load-vernac-source $< > "$$TMPFILE" && \
@@ -53,7 +53,7 @@ $(TESTFILES:.v=.vo): %.vo: %.v $(if $(MAKE_REF),,%.ref) $(NORMALIZER)
 	  mv "$$TMPFILE".new "$$TMPFILE" && \
 	  $(if $(COQ_REF),\
 	    $(if $(MAKE_REF),mv "$$TMPFILE" "$$REF",diff --strip-trailing-cr -u "$$REF" "$$TMPFILE"), \
-	    (diff --strip-trailing-cr -u "$$REF" "$$TMPFILE" || true) \
+	    true \
 	  ) && \
 	  rm -f "$$TMPFILE" && \
 	  touch $@
