@@ -11,6 +11,8 @@ API-breaking change is listed.
   automatically adds `_` until the given lemma takes no more arguments.
 - Rename `map_filter_empty_iff` to `map_empty_filter` and add
   `map_empty_filter_1` and `map_empty_filter_2`. (by Michael Sammler)
+- Add lemma about `zip_with`: `lookup_zip_with_None` and add lemmas for `zip`:
+  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
