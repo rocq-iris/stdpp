@@ -313,6 +313,15 @@ Qed.
 (** ** Generic trees *)
 Local Close Scope positive.
 
+(** This type can help you construct a [Countable] instance for an arbitrary
+(even recursive) inductive datatype. The idea is tht you make [T] something like
+`T1 + T2 + ...`, covering all the data types that can be contained inside your
+type.
+- Each non-recursive constructor to a [GenLeaf]. Different constructors must use
+  different variants of [T] to ensure they remain distinguishable!
+- Each recursive constructor to a [GenNode] where the [nat] is a (typically
+  small) constant representing the constructor itself, and then all the data in
+  the constructor (recursive or otherwise) is put into child nodes. *)
 Inductive gen_tree (T : Type) : Type :=
   | GenLeaf : T → gen_tree T
   | GenNode : nat → list (gen_tree T) → gen_tree T.
