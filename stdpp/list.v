@@ -4915,6 +4915,10 @@ Section zip_with.
     zip_with f l k !! i = Some z
     ↔ ∃ x y, z = f x y ∧ l !! i = Some x ∧ k !! i = Some y.
   Proof. rewrite lookup_zip_with. destruct (l !! i), (k !! i); naive_solver. Qed.
+  Lemma lookup_zip_with_None l k i  :
+    zip_with f l k !! i = None
+    ↔ l !! i = None ∨ k !! i = None.
+  Proof. rewrite lookup_zip_with. destruct (l !! i), (k !! i); naive_solver. Qed.
   Lemma insert_zip_with l k i x y :
     <[i:=f x y]>(zip_with f l k) = zip_with f (<[i:=x]>l) (<[i:=y]>k).
   Proof. revert i k. induction l; intros [|?] [|??]; f_equal/=; auto. Qed.
@@ -5054,10 +5058,21 @@ Section zip.
   Lemma elem_of_zip_l x1 x2 l k :
     (x1, x2) ∈ zip l k → x1 ∈ l.
   Proof. intros ?%elem_of_zip_with. naive_solver. Qed.
-
   Lemma elem_of_zip_r x1 x2 l k :
     (x1, x2) ∈ zip l k → x2 ∈ k.
   Proof. intros ?%elem_of_zip_with. naive_solver. Qed.
+  Lemma length_zip l k :
+    length (zip l k) = min (length l) (length k).
+  Proof. by rewrite length_zip_with. Qed.
+  Lemma zip_nil_inv l k :
+    zip l k = [] → l = [] ∨ k = [].
+  Proof. intros. by eapply zip_with_nil_inv. Qed.
+  Lemma lookup_zip_Some l k i x y :
+    zip l k !! i = Some (x, y) ↔ l !! i = Some x ∧ k !! i = Some y.
+  Proof. rewrite lookup_zip_with_Some. naive_solver. Qed.
+  Lemma lookup_zip_None l k i :
+    zip l k !! i = None ↔ l !! i = None ∨ k !! i = None.
+  Proof. by rewrite lookup_zip_with_None. Qed.
 End zip.
 
 Lemma zip_diag {A} (l : list A) :
