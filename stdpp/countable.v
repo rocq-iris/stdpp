@@ -323,7 +323,7 @@ type.
   small) constant representing the constructor itself, and then all the data in
   the constructor (recursive or otherwise) is put into child nodes.
 
-This data type is the same as `GenTree.tree` in mathcomp, see
+This data type is the same as [GenTree.tree] in mathcomp, see
 https://github.com/math-comp/math-comp/blob/master/ssreflect/choice.v *)
 Inductive gen_tree (T : Type) : Type :=
   | GenLeaf : T → gen_tree T
