@@ -211,6 +211,11 @@ Proof. intro. apply app_nil_r. Qed.
 
 Lemma app_nil l1 l2 : l1 ++ l2 = [] ↔ l1 = [] ∧ l2 = [].
 Proof. split; [apply app_eq_nil|]. by intros [-> ->]. Qed.
+Lemma app_nil_l_inv l1 l2 : l1 ++ l2 = [] → l1 = [].
+Proof. by rewrite app_nil; intros [-> _]. Qed.
+Lemma app_nil_r_inv l1 l2 : l1 ++ l2 = [] → l2 = [].
+Proof. by rewrite app_nil; intros [_ ->]. Qed.
+
 Lemma app_singleton l1 l2 x :
   l1 ++ l2 = [x] ↔ l1 = [] ∧ l2 = [x] ∨ l1 = [x] ∧ l2 = [].
 Proof. split; [apply app_eq_unit|]. by intros [[-> ->]|[-> ->]]. Qed.
