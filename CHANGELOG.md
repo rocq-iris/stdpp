@@ -12,7 +12,8 @@ API-breaking change is listed.
 - Rename `map_filter_empty_iff` to `map_empty_filter` and add
   `map_empty_filter_1` and `map_empty_filter_2`. (by Michael Sammler)
 - Add lemma about `zip_with`: `lookup_zip_with_None` and add lemmas for `zip`:
-  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
+ `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
+- Add `elem_of_seq` and `seq_nil`. (by Kimaya Bedarkar)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
