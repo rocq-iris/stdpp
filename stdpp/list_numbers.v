@@ -98,10 +98,8 @@ Section seq.
     k ∈ seq j n ↔ j ≤ k < j + n.
   Proof. rewrite elem_of_list_In, in_seq. done. Qed.
 
-  Lemma seq_nil n m:
-  seq n m = [] ↔
-  m = 0.
-  Proof. by induction n; induction m. Qed.
+  Lemma seq_nil n m : seq n m = [] ↔ m = 0.
+  Proof. by destruct m. Qed.
 
   Lemma seq_subseteq m n1 n2 :
     n1 ≤ n2 →
