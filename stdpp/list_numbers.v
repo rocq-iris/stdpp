@@ -101,9 +101,7 @@ Section seq.
   Lemma seq_nil n m : seq n m = [] ↔ m = 0.
   Proof. by destruct m. Qed.
 
-  Lemma seq_subseteq m n1 n2 :
-    n1 ≤ n2 →
-    seq m n1 ⊆ seq m n2.
+  Lemma seq_subseteq_mono m n1 n2 : n1 ≤ n2 → seq m n1 ⊆ seq m n2.
   Proof. by intros Hle i Hi%elem_of_seq; apply elem_of_seq; lia. Qed.
 
   Lemma Forall_seq (P : nat → Prop) i n :
