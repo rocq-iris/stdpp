@@ -15,9 +15,11 @@ API-breaking change is listed.
  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
 - Add `elem_of_seq` and `seq_nil`. (by Kimaya Bedarkar)
   `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
-- Add lemma `StronglySorted_app`. (by Marijn van Wezel)
-- Add lemmas `StronglySorted_app_iff` and `StronglySorted_app`. (by Marijn van
-  Wezel)
+- Add lemmas `StronglySorted_app`, `StronglySorted_cons` and
+  `StronglySorted_app_2`. Rename lemmas
+  `elem_of_StronglySorted_app` → `StronglySorted_app_1_elem_of`,
+  `StronglySorted_app_inv_l` → `StronglySorted_app_1_l`
+  `StronglySorted_app_inv_r` → `StronglySorted_app_1_r`. (by Marijn van Wezel)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -26,6 +28,8 @@ Note that the script is not idempotent, do not run it twice.
 sed -i -E -f- $(find theories -name "*.v") <<EOF
 # length
 s/\bmap_filter_empty_iff\b/map_empty_filter/g
+s/\belem_of_StronglySorted_app\b/StronglySorted_app_1_elem_of/g
+s/\bStronglySorted_app_inv_(l|r)\b/StronglySorted_app_1_\1/g
 EOF
 ```
 
