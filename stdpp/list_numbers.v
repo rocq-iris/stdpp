@@ -98,6 +98,12 @@ Section seq.
     k ∈ seq j n ↔ j ≤ k < j + n.
   Proof. rewrite elem_of_list_In, in_seq. done. Qed.
 
+  Lemma seq_nil n m : seq n m = [] ↔ m = 0.
+  Proof. by destruct m. Qed.
+
+  Lemma seq_subseteq_mono m n1 n2 : n1 ≤ n2 → seq m n1 ⊆ seq m n2.
+  Proof. by intros Hle i Hi%elem_of_seq; apply elem_of_seq; lia. Qed.
+
   Lemma Forall_seq (P : nat → Prop) i n :
     Forall P (seq i n) ↔ ∀ j, i ≤ j < i + n → P j.
   Proof. rewrite Forall_forall. setoid_rewrite elem_of_seq. auto with lia. Qed.
@@ -118,6 +124,7 @@ Section seq.
     - rewrite take_nil. replace (m `min` 0) with 0 by lia. done.
     - destruct m; simpl; auto with f_equal.
   Qed.
+
 End seq.
 
 (** ** Properties of the [seqZ] function *)
