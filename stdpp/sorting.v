@@ -1,7 +1,8 @@
 (** Merge sort. Adapted from the implementation of Hugo Herbelin in the Coq
 standard library, but without using the module system. *)
 From Coq Require Export Sorted.
-From stdpp Require Export orders list sets.
+From stdpp Require Export orders list.
+From stdpp Require Import sets.
 From stdpp Require Import options.
 
 Section merge_sort.

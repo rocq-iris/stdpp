@@ -14,7 +14,6 @@ API-breaking change is listed.
 - Add lemma about `zip_with`: `lookup_zip_with_None` and add lemmas for `zip`:
  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
 - Add `elem_of_seq` and `seq_nil`. (by Kimaya Bedarkar)
-  `length_zip`, `zip_nil_inv`, `lookup_zip_Some`,`lookup_zip_None`. (by Kimaya Bedarkar)
 - Add lemmas `StronglySorted_app`, `StronglySorted_cons` and
   `StronglySorted_app_2`. Rename lemmas
   `elem_of_StronglySorted_app` → `StronglySorted_app_1_elem_of`,
@@ -28,6 +27,7 @@ Note that the script is not idempotent, do not run it twice.
 sed -i -E -f- $(find theories -name "*.v") <<EOF
 # length
 s/\bmap_filter_empty_iff\b/map_empty_filter/g
+# StronglySorted
 s/\belem_of_StronglySorted_app\b/StronglySorted_app_1_elem_of/g
 s/\bStronglySorted_app_inv_(l|r)\b/StronglySorted_app_1_\1/g
 EOF
