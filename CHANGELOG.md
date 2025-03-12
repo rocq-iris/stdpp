@@ -19,6 +19,7 @@ API-breaking change is listed.
   `elem_of_StronglySorted_app` → `StronglySorted_app_1_elem_of`,
   `StronglySorted_app_inv_l` → `StronglySorted_app_1_l`
   `StronglySorted_app_inv_r` → `StronglySorted_app_1_r`. (by Marijn van Wezel)
+- Add `SetUnfoldElemOf` instance for `dom` on `gmultiset`. (by Marijn van Wezel)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
