@@ -159,6 +159,13 @@ Section basic_lemmas.
 
   Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
   Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
+
+  Lemma gmultiset_elem_of_dom x X : x ∈ dom X ↔ x ∈ X.
+  Proof.
+    unfold dom, gmultiset_dom, elem_of at 2, gmultiset_elem_of, multiplicity.
+    destruct X as [X]; simpl; rewrite elem_of_dom, <-not_eq_None_Some.
+    destruct (X !! x); naive_solver lia.
+  Qed.
 End basic_lemmas.
 
 (** * A solver for multisets *)
@@ -299,6 +306,9 @@ Section multiset_unfold.
     intros ??; constructor. rewrite gmultiset_elem_of_intersection.
     by rewrite (set_unfold_elem_of x X P), (set_unfold_elem_of x Y Q).
   Qed.
+  Global Instance set_unfold_gmultiset_dom x X :
+    SetUnfoldElemOf x (dom X) (x ∈ X).
+  Proof. constructor. apply gmultiset_elem_of_dom. Qed.
 End multiset_unfold.
 
 (** Step 3: instantiate hypotheses *)
@@ -553,12 +563,6 @@ Section more_lemmas.
     - intros. destruct (X !! x) as [n|] eqn:Hx; [|lia].
       exists (x,n); split; [|by apply elem_of_map_to_list].
       apply elem_of_replicate; auto with lia.
-  Qed.
-  Lemma gmultiset_elem_of_dom x X : x ∈ dom X ↔ x ∈ X.
-  Proof.
-    unfold dom, gmultiset_dom, elem_of at 2, gmultiset_elem_of, multiplicity.
-    destruct X as [X]; simpl; rewrite elem_of_dom, <-not_eq_None_Some.
-    destruct (X !! x); naive_solver lia.
   Qed.
 
   (** Properties of the set_fold operation *)
