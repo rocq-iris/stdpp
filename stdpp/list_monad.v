@@ -76,6 +76,13 @@ Fixpoint interleave {A} (x : A) (l : list A) : list (list A) :=
 Fixpoint permutations {A} (l : list A) : list (list A) :=
   match l with [] => [[]] | x :: l => permutations l ≫= interleave x end.
 
+(** The function [submsetseq l] yields all lists [l'] such that [l' ⊆+ l]. *)
+Fixpoint submsetseq {A} (l : list A) : list (list A) :=
+  match l with
+  | [] => [[]]
+  | x :: l => (submsetseq l ≫= interleave x) ++ submsetseq l
+  end.
+
 Section general_properties.
 Context {A : Type}.
 Implicit Types x y z : A.
@@ -639,6 +646,20 @@ Section permutations.
 
   Lemma interleave_cons x l : x :: l ∈ interleave x l.
   Proof. destruct l; simpl; rewrite elem_of_cons; auto. Qed.
+  Lemma elem_of_interleave l1 l2 x :
+    l1 ∈ interleave x l2 ↔ ∃ l l', l1 = l ++ x :: l' ∧ l2 = l ++ l'.
+  Proof.
+    split; revert l1.
+    - induction l2 as [|y l IH]; intros l1; simpl.
+      * simpl. rewrite elem_of_list_singleton. intros ->. by exists [], [].
+      * intros H. apply elem_of_cons in H as [->|H]; [by exists [], (y :: l)|].
+        apply elem_of_list_fmap in H as [? [-> H]].
+        apply IH in H as (l' & l'' & -> & ->).
+        exists (y :: l'), l''. eauto.
+    - intros ? H. destruct H as (l & l' & -> & ->).
+      induction l as [|y l IH]; [apply interleave_cons|].
+      simpl. apply elem_of_list_further. by apply elem_of_list_fmap_1.
+  Qed.
   Lemma interleave_Permutation x l l' : l' ∈ interleave x l → l' ≡ₚ x :: l.
   Proof.
     revert l'. induction l as [|y l IH]; intros l'; simpl.
@@ -722,6 +743,47 @@ Section permutations.
         permutations_skip, permutations_swap, permutations_trans.
   Qed.
 End permutations.
+
+(** ** Properties of the [submsetseq] function. *)
+Section submsetseq.
+  Context {A : Type}.
+  Implicit Types x y z : A.
+  Implicit Types l : list A.
+
+  Lemma submsetseq_submseteq l l' :
+    l ∈ submsetseq l' ↔ l ⊆+ l'.
+  Proof.
+    split; revert l; induction l' as [|x l' IH]; simpl; intros l H.
+    - by apply elem_of_list_singleton in H as ->.
+    - apply elem_of_app in H as [H|H].
+      * apply elem_of_list_bind in H as (l'' & Hl & Hl'').
+        apply IH in Hl''. apply interleave_Permutation in Hl.
+        rewrite Hl. by apply submseteq_skip.
+      * apply IH in H. by constructor.
+    - apply submseteq_nil_r in H; subst. apply elem_of_list_here.
+    - apply elem_of_app. rewrite elem_of_list_bind.
+      apply submseteq_cons_r in H as [H|(l'' & Hperm & Hsub)]; [eauto|left].
+      apply Permutation_cons_inv_r in Hperm as (ll & lr & -> & Hperm).
+      exists (ll ++ lr). split.
+      * subst. apply elem_of_interleave. by exists ll, lr.
+      * apply IH. by rewrite Hperm in Hsub.
+  Qed.
+  Lemma submsetseq_refl l :
+    l ∈ submsetseq l.
+  Proof. rewrite submsetseq_submseteq. eauto. Qed.
+  Lemma submsetseq_nil l :
+    l ∈ submsetseq [] ↔ l = [].
+  Proof. simpl. by rewrite elem_of_list_singleton. Qed.
+  Lemma submsetseq_permutations l l' :
+    l ∈ permutations l' → l ∈ submsetseq l'.
+  Proof.
+    rewrite submsetseq_submseteq, permutations_Permutation.
+    intros H. apply Permutation_sym in H. by apply Permutation_submseteq.
+  Qed.
+  Lemma submsetseq_trans l1 l2 l3 :
+    l1 ∈ submsetseq l2 → l2 ∈ submsetseq l3 → l1 ∈ submsetseq l3.
+  Proof. rewrite !submsetseq_submseteq. apply submseteq_trans. Qed.
+End submsetseq.
 
 (** ** Properties of the folding functions *)
 (** Note that [foldr] has much better support, so when in doubt, it should be
