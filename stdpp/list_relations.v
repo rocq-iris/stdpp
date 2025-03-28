@@ -120,6 +120,93 @@ Context {A : Type}.
 Implicit Types x y z : A.
 Implicit Types l k : list A.
 
+(** ** Properties of the [NoDup] predicate *)
+Lemma NoDup_nil : NoDup (@nil A) ↔ True.
+Proof. split; constructor. Qed.
+Lemma NoDup_cons x l : NoDup (x :: l) ↔ x ∉ l ∧ NoDup l.
+Proof. split; [by inv 1|]. intros [??]. by constructor. Qed.
+Lemma NoDup_cons_1_1 x l : NoDup (x :: l) → x ∉ l.
+Proof. rewrite NoDup_cons. by intros [??]. Qed.
+Lemma NoDup_cons_1_2 x l : NoDup (x :: l) → NoDup l.
+Proof. rewrite NoDup_cons. by intros [??]. Qed.
+Lemma NoDup_singleton x : NoDup [x].
+Proof. constructor; [apply not_elem_of_nil | constructor]. Qed.
+Lemma NoDup_app l k : NoDup (l ++ k) ↔ NoDup l ∧ (∀ x, x ∈ l → x ∉ k) ∧ NoDup k.
+Proof.
+  induction l; simpl.
+  - rewrite NoDup_nil. setoid_rewrite elem_of_nil. naive_solver.
+  - rewrite !NoDup_cons.
+    setoid_rewrite elem_of_cons. setoid_rewrite elem_of_app. naive_solver.
+Qed.
+Lemma NoDup_lookup l i j x :
+  NoDup l → l !! i = Some x → l !! j = Some x → i = j.
+Proof.
+  intros Hl. revert i j. induction Hl as [|x' l Hx Hl IH].
+  { intros; simplify_eq. }
+  intros [|i] [|j] ??; simplify_eq/=; eauto with f_equal;
+    exfalso; eauto using elem_of_list_lookup_2.
+Qed.
+Lemma NoDup_alt l :
+  NoDup l ↔ ∀ i j x, l !! i = Some x → l !! j = Some x → i = j.
+Proof.
+  split; eauto using NoDup_lookup.
+  induction l as [|x l IH]; intros Hl; constructor.
+  - rewrite elem_of_list_lookup. intros [i ?].
+    opose proof* (Hl (S i) 0); by auto.
+  - apply IH. intros i j x' ??. by apply (inj S), (Hl (S i) (S j) x').
+Qed.
+
+Section no_dup_dec.
+  Context `{!EqDecision A}.
+  Global Instance NoDup_dec: ∀ l, Decision (NoDup l) :=
+    fix NoDup_dec l :=
+    match l return Decision (NoDup l) with
+    | [] => left NoDup_nil_2
+    | x :: l =>
+      match decide_rel (∈) x l with
+      | left Hin => right (λ H, NoDup_cons_1_1 _ _ H Hin)
+      | right Hin =>
+        match NoDup_dec l with
+        | left H => left (NoDup_cons_2 _ _ Hin H)
+        | right H => right (H ∘ NoDup_cons_1_2 _ _)
+        end
+      end
+    end.
+  Lemma elem_of_remove_dups l x : x ∈ remove_dups l ↔ x ∈ l.
+  Proof.
+    split; induction l; simpl; repeat case_decide;
+      rewrite ?elem_of_cons; intuition (simplify_eq; auto).
+  Qed.
+  Lemma NoDup_remove_dups l : NoDup (remove_dups l).
+  Proof.
+    induction l; simpl; repeat case_decide; try constructor; auto.
+    by rewrite elem_of_remove_dups.
+  Qed.
+
+  Lemma NoDup_list_difference l k : NoDup l → NoDup (list_difference l k).
+  Proof.
+    induction 1; simpl; try case_decide.
+    - constructor.
+    - done.
+    - constructor; [|done]. rewrite elem_of_list_difference; intuition.
+  Qed.
+  Lemma NoDup_list_union l k : NoDup l → NoDup k → NoDup (list_union l k).
+  Proof.
+    intros. apply NoDup_app. repeat split.
+    - by apply NoDup_list_difference.
+    - intro. rewrite elem_of_list_difference. intuition.
+    - done.
+  Qed.
+  Lemma NoDup_list_intersection l k : NoDup l → NoDup (list_intersection l k).
+  Proof.
+    induction 1; simpl; try case_decide.
+    - constructor.
+    - constructor; [|done]. rewrite elem_of_list_intersection; intuition.
+    - done.
+  Qed.
+
+End no_dup_dec.
+
 (** ** Properties of the [Permutation] predicate *)
 Lemma Permutation_nil_r l : l ≡ₚ [] ↔ l = [].
 Proof. split; [by intro; apply Permutation_nil | by intros ->]. Qed.
