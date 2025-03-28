@@ -7,8 +7,6 @@ API-breaking change is listed.
 - Add lemma `lookup_total_fmap`.
 - Add lemmas about `last` and `head`: `last_app_Some`, `last_app_None`,
   `head_app_Some`, `head_app_None` and `head_app`. (by Marijn van Wezel)
-- Add tactic `notypeclasses apply` that works like `notypeclasses refine` but
-  automatically adds `_` until the given lemma takes no more arguments.
 - Rename `map_filter_empty_iff` to `map_empty_filter` and add
   `map_empty_filter_1` and `map_empty_filter_2`. (by Michael Sammler)
 - Add lemma about `zip_with`: `lookup_zip_with_None` and add lemmas for `zip`:

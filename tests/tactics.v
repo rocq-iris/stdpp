@@ -234,16 +234,6 @@ Proof.
   done.
 Qed.
 
-Check "notypeclasses_apply_test".
-Lemma notypeclasses_apply_test n : {n = 0} + {¬ n = 0}.
-Proof.
-  (* Partially applied lemma with typeclass in one of the trailing [_]. *)
-  notypeclasses apply (@decide (n = 0)). Show.
-Restart. Proof.
-  (* Partially applied lemma with typeclass in one of the explicit [_]. *)
-  notypeclasses apply (@decide (n = 0) _). Show.
-Abort.
-
 Check "notypeclasses_apply_error".
 Lemma notypeclasses_apply_error (P Q : Prop) : (P → Q) → Q → P.
 Proof.

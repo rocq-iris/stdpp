@@ -755,7 +755,7 @@ Global Hint Resolve bv_wrap_simplify_mul | 10 : bv_wrap_simplify_db.
  tries to simplify them by removing any [bv_wrap] inside z1. *)
 Ltac bv_wrap_simplify_left :=
   lazymatch goal with |- bv_wrap _ _ = _ => idtac end;
-  etrans; [ notypeclasses apply bv_wrap_simplify_proof;
+  etrans; [ notypeclasses refine (bv_wrap_simplify_proof _ _ _);
             typeclasses eauto with bv_wrap_simplify_db | ]
 .
 
