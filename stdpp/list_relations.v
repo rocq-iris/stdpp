@@ -156,6 +156,13 @@ Proof.
   - apply IH. intros i j x' ??. by apply (inj S), (Hl (S i) (S j) x').
 Qed.
 
+Lemma NoDup_filter (P : A → Prop) `{∀ x, Decision (P x)} l :
+  NoDup l → NoDup (filter P l).
+Proof.
+  induction 1; rewrite ?filter_cons; repeat case_decide;
+    rewrite ?NoDup_nil, ?NoDup_cons, ?elem_of_list_filter; tauto.
+Qed.
+
 Section no_dup_dec.
   Context `{!EqDecision A}.
   Global Instance NoDup_dec: ∀ l, Decision (NoDup l) :=
@@ -348,103 +355,11 @@ Proof.
         by rewrite Nat.sub_0_r, <-Hl.
 Qed.
 
-(** ** Properties of the [filter] function *)
-Section filter.
-  Context (P : A → Prop) `{∀ x, Decision (P x)}.
-  Local Arguments filter {_ _ _} _ {_} !_ /.
-
-  Lemma filter_nil : filter P [] = [].
-  Proof. done. Qed.
-  Lemma filter_cons x l :
-    filter P (x :: l) = if decide (P x) then x :: filter P l else filter P l.
-  Proof. done. Qed.
-  Lemma filter_cons_True x l : P x → filter P (x :: l) = x :: filter P l.
-  Proof. intros. by rewrite filter_cons, decide_True. Qed.
-  Lemma filter_cons_False x l : ¬P x → filter P (x :: l) = filter P l.
-  Proof. intros. by rewrite filter_cons, decide_False. Qed.
-
-  Lemma filter_app l1 l2 : filter P (l1 ++ l2) = filter P l1 ++ filter P l2.
-  Proof.
-    induction l1 as [|x l1 IH]; simpl; [done| ].
-    case_decide; [|done].
-    by rewrite IH.
-  Qed.
-
-  Lemma elem_of_list_filter l x : x ∈ filter P l ↔ P x ∧ x ∈ l.
-  Proof.
-    induction l; simpl; repeat case_decide;
-      rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
-  Qed.
-  Lemma NoDup_filter l : NoDup l → NoDup (filter P l).
-  Proof.
-    induction 1; simpl; repeat case_decide;
-      rewrite ?NoDup_nil, ?NoDup_cons, ?elem_of_list_filter; tauto.
-  Qed.
-
-  Global Instance filter_Permutation : Proper ((≡ₚ) ==> (≡ₚ)) (filter P).
-  Proof. induction 1; repeat (simpl; repeat case_decide); by econstructor. Qed.
-
-  Lemma length_filter l : length (filter P l) ≤ length l.
-  Proof. induction l; simpl; repeat case_decide; simpl; lia. Qed.
-  Lemma length_filter_lt l x : x ∈ l → ¬P x → length (filter P l) < length l.
-  Proof.
-    intros [k ->]%elem_of_Permutation ?; simpl.
-    rewrite decide_False, Nat.lt_succ_r by done. apply length_filter.
-  Qed.
-  Lemma filter_nil_not_elem_of l x : filter P l = [] → P x → x ∉ l.
-  Proof. induction 3; simplify_eq/=; case_decide; naive_solver. Qed.
-  Lemma filter_reverse l : filter P (reverse l) = reverse (filter P l).
-  Proof.
-    induction l as [|x l IHl]; [done|].
-    rewrite reverse_cons, filter_app, IHl, !filter_cons.
-    case_decide; [by rewrite reverse_cons|by rewrite filter_nil, app_nil_r].
-  Qed.
-
-  Lemma filter_app_complement l : filter P l ++ filter (λ x, ¬P x) l ≡ₚ l.
-  Proof.
-    induction l as [|x l IH]; simpl; [done|]. case_decide.
-    - rewrite decide_False by naive_solver. simpl. by rewrite IH.
-    - rewrite decide_True by done. by rewrite <-Permutation_middle, IH.
-  Qed.
-End filter.
-
-Lemma list_filter_iff (P1 P2 : A → Prop)
-    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
-  (∀ x, P1 x ↔ P2 x) →
-  filter P1 l = filter P2 l.
+Global Instance filter_Permutation (P : A → Prop) `{∀ x, Decision (P x)} :
+  Proper ((≡ₚ) ==> (≡ₚ)) (filter P).
 Proof.
-  intros HPiff. induction l as [|a l IH]; [done|].
-  destruct (decide (P1 a)).
-  - rewrite !filter_cons_True by naive_solver. by rewrite IH.
-  - rewrite !filter_cons_False by naive_solver. by rewrite IH.
-Qed.
-
-Lemma list_filter_filter (P1 P2 : A → Prop)
-    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
-  filter P1 (filter P2 l) = filter (λ a, P1 a ∧ P2 a) l.
-Proof.
-  induction l as [|x l IH]; [done|].
-  rewrite !filter_cons. case (decide (P2 x)) as [HP2|HP2].
-  - rewrite filter_cons, IH. apply decide_ext. naive_solver.
-  - rewrite IH. symmetry. apply decide_False. by intros [_ ?].
-Qed.
-
-Lemma list_filter_filter_l (P1 P2 : A → Prop)
-    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
-  (∀ x, P1 x → P2 x) →
-  filter P1 (filter P2 l) = filter P1 l.
-Proof.
-  intros HPimp. rewrite list_filter_filter.
-  apply list_filter_iff. naive_solver.
-Qed.
-
-Lemma list_filter_filter_r (P1 P2 : A → Prop)
-    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
-  (∀ x, P2 x → P1 x) →
-  filter P1 (filter P2 l) = filter P2 l.
-Proof.
-  intros HPimp. rewrite list_filter_filter.
-  apply list_filter_iff. naive_solver.
+  induction 1; rewrite ?filter_cons;
+    repeat (simpl; repeat case_decide); by econstructor.
 Qed.
 
 (** ** Properties of the [prefix] and [suffix] predicates *)

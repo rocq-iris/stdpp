@@ -1194,4 +1194,89 @@ Proof. by destruct n. Qed.
 Lemma head_replicate_Some x n : head (replicate n x) = Some x ↔ 0 < n.
 Proof. destruct n; naive_solver lia. Qed.
 
+(** ** Properties of the [filter] function *)
+Section filter.
+  Context (P : A → Prop) `{∀ x, Decision (P x)}.
+  Local Arguments filter {_ _ _} _ {_} !_ /.
+
+  Lemma filter_nil : filter P [] = [].
+  Proof. done. Qed.
+  Lemma filter_cons x l :
+    filter P (x :: l) = if decide (P x) then x :: filter P l else filter P l.
+  Proof. done. Qed.
+  Lemma filter_cons_True x l : P x → filter P (x :: l) = x :: filter P l.
+  Proof. intros. by rewrite filter_cons, decide_True. Qed.
+  Lemma filter_cons_False x l : ¬P x → filter P (x :: l) = filter P l.
+  Proof. intros. by rewrite filter_cons, decide_False. Qed.
+
+  Lemma filter_app l1 l2 : filter P (l1 ++ l2) = filter P l1 ++ filter P l2.
+  Proof.
+    induction l1 as [|x l1 IH]; simpl; [done| ].
+    case_decide; [|done].
+    by rewrite IH.
+  Qed.
+
+  Lemma elem_of_list_filter l x : x ∈ filter P l ↔ P x ∧ x ∈ l.
+  Proof.
+    induction l; simpl; repeat case_decide;
+      rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
+  Qed.
+
+  Lemma length_filter l : length (filter P l) ≤ length l.
+  Proof. induction l; simpl; repeat case_decide; simpl; lia. Qed.
+  Lemma length_filter_lt l x : x ∈ l → ¬P x → length (filter P l) < length l.
+  Proof.
+    intros (l1 & l2 & ->)%elem_of_list_split ?.
+    rewrite filter_app, !length_app, filter_cons, decide_False by done.
+    pose proof (length_filter l1); pose proof (length_filter l2). simpl. lia.
+  Qed.
+
+  Lemma filter_nil_not_elem_of l x : filter P l = [] → P x → x ∉ l.
+  Proof. induction 3; simplify_eq/=; case_decide; naive_solver. Qed.
+  Lemma filter_reverse l : filter P (reverse l) = reverse (filter P l).
+  Proof.
+    induction l as [|x l IHl]; [done|].
+    rewrite reverse_cons, filter_app, IHl, !filter_cons.
+    case_decide; [by rewrite reverse_cons|by rewrite filter_nil, app_nil_r].
+  Qed.
+End filter.
+
+Lemma list_filter_iff (P1 P2 : A → Prop)
+    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
+  (∀ x, P1 x ↔ P2 x) →
+  filter P1 l = filter P2 l.
+Proof.
+  intros HPiff. induction l as [|a l IH]; [done|].
+  destruct (decide (P1 a)).
+  - rewrite !filter_cons_True by naive_solver. by rewrite IH.
+  - rewrite !filter_cons_False by naive_solver. by rewrite IH.
+Qed.
+
+Lemma list_filter_filter (P1 P2 : A → Prop)
+    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
+  filter P1 (filter P2 l) = filter (λ a, P1 a ∧ P2 a) l.
+Proof.
+  induction l as [|x l IH]; [done|].
+  rewrite !filter_cons. case (decide (P2 x)) as [HP2|HP2].
+  - rewrite filter_cons, IH. apply decide_ext. naive_solver.
+  - rewrite IH. symmetry. apply decide_False. by intros [_ ?].
+Qed.
+
+Lemma list_filter_filter_l (P1 P2 : A → Prop)
+    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
+  (∀ x, P1 x → P2 x) →
+  filter P1 (filter P2 l) = filter P1 l.
+Proof.
+  intros HPimp. rewrite list_filter_filter.
+  apply list_filter_iff. naive_solver.
+Qed.
+
+Lemma list_filter_filter_r (P1 P2 : A → Prop)
+    `{!∀ x, Decision (P1 x), !∀ x, Decision (P2 x)} (l : list A) :
+  (∀ x, P2 x → P1 x) →
+  filter P1 (filter P2 l) = filter P2 l.
+Proof.
+  intros HPimp. rewrite list_filter_filter.
+  apply list_filter_iff. naive_solver.
+Qed.
 End general_properties.
