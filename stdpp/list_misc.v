@@ -50,27 +50,6 @@ Fixpoint mask {A} (f : A → A) (βs : list bool) (l : list A) : list A :=
   | _, _ => l
   end.
 
-(** Removes [x] from the list [l]. The function returns a [Some] when the
-removal succeeds and [None] when [x] is not in [l].
-
-NOTE: there are no lemmas about this function; it exists solely to facilitate
-the proof if decidability of [submseteq] and [≡ₚ]. *)
-Fixpoint list_remove `{EqDecision A} (x : A) (l : list A) : option (list A) :=
-  match l with
-  | [] => None
-  | y :: l => if decide (x = y) then Some l else (y ::.) <$> list_remove x l
-  end.
-
-(** Removes all elements in the list [k] from the list [l]. The function returns
-a [Some] when the removal succeeds and [None] some element of [k] is not in [l].
-
-NOTE: there are no lemmas about this function; it exists solely to facilitate
-the proof if decidability of [submseteq] and [≡ₚ]. *)
-Fixpoint list_remove_list `{EqDecision A} (k : list A) (l : list A) : option (list A) :=
-  match k with
-  | [] => Some l | x :: k => list_remove x l ≫= list_remove_list k
-  end.
-
 (** These next functions allow to efficiently encode lists of positives (bit
 strings) into a single positive and go in the other direction as well. This is
 for example used for the countable instance of lists and in namespaces.
@@ -657,69 +636,6 @@ Lemma lookup_mask_notin f βs l i :
 Proof.
   revert i βs. induction l; intros [] [|[]] ?; simplify_eq/=; auto.
 Qed.
-
-(* The proof of decidability of [⊆+] and [≡ₚ] needs the monadic operations, so
-it cannot be in [list_relations]. It is found here instead. *)
-Section submseteq_dec.
-  Context `{!EqDecision A}.
-
-  Lemma list_remove_Permutation l1 l2 k1 x :
-    l1 ≡ₚ l2 → list_remove x l1 = Some k1 →
-    ∃ k2, list_remove x l2 = Some k2 ∧ k1 ≡ₚ k2.
-  Proof.
-    intros Hl. revert k1. induction Hl
-      as [|y l1 l2 ? IH|y1 y2 l|l1 l2 l3 ? IH1 ? IH2]; simpl; intros k1 Hk1.
-    - done.
-    - case_decide; simplify_eq; eauto.
-      destruct (list_remove x l1) as [l|] eqn:?; simplify_eq.
-      destruct (IH l) as (?&?&?); simplify_option_eq; eauto.
-    - simplify_option_eq; eauto using Permutation_swap.
-    - destruct (IH1 k1) as (k2&?&?); trivial.
-      destruct (IH2 k2) as (k3&?&?); trivial.
-      exists k3. split; eauto. by trans k2.
-  Qed.
-  Lemma list_remove_Some l k x : list_remove x l = Some k → l ≡ₚ x :: k.
-  Proof.
-    revert k. induction l as [|y l IH]; simpl; intros k ?; [done |].
-    simplify_option_eq; auto. by rewrite Permutation_swap, <-IH.
-  Qed.
-  Lemma list_remove_Some_inv l k x :
-    l ≡ₚ x :: k → ∃ k', list_remove x l = Some k' ∧ k ≡ₚ k'.
-  Proof.
-    intros. destruct (list_remove_Permutation (x :: k) l k x) as (k'&?&?).
-    - done.
-    - simpl; by case_decide.
-    - by exists k'.
-  Qed.
-  Lemma list_remove_list_submseteq l1 l2 :
-    l1 ⊆+ l2 ↔ is_Some (list_remove_list l1 l2).
-  Proof.
-    split.
-    - revert l2. induction l1 as [|x l1 IH]; simpl.
-      { intros l2 _. by exists l2. }
-      intros l2. rewrite submseteq_cons_l. intros (k&Hk&?).
-      destruct (list_remove_Some_inv l2 k x) as (k2&?&Hk2); trivial.
-      simplify_option_eq. apply IH. by rewrite <-Hk2.
-    - intros [k Hk]. revert l2 k Hk.
-      induction l1 as [|x l1 IH]; simpl; intros l2 k.
-      { intros. apply submseteq_nil_l. }
-      destruct (list_remove x l2) as [k'|] eqn:?; intros; simplify_eq.
-      rewrite submseteq_cons_l. eauto using list_remove_Some.
-  Qed.
-  Global Instance submseteq_dec : RelDecision (submseteq : relation (list A)).
-  Proof using Type*.
-   refine (λ l1 l2, cast_if (decide (is_Some (list_remove_list l1 l2))));
-    abstract (rewrite list_remove_list_submseteq; tauto).
-  Defined.
-  Global Instance Permutation_dec : RelDecision (≡ₚ@{A}).
-  Proof using Type*.
-    refine (λ l1 l2, cast_if_and
-      (decide (l1 ⊆+ l2)) (decide (length l2 ≤ length l1)));
-      [by apply submseteq_length_Permutation
-      |abstract (intros He; by rewrite He in *)..].
-  Defined.
-End submseteq_dec.
-
 End more_general_properties.
 
 (** Lemmas about [positives_flatten] and [positives_unflatten]. *)

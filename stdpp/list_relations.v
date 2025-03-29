@@ -1052,8 +1052,55 @@ Lemma singleton_submseteq x y :
   [x] ⊆+ [y] ↔ x = y.
 Proof. rewrite singleton_submseteq_l. apply elem_of_list_singleton. Qed.
 
-(* The proof of decidability of [⊆+] and [≡ₚ] needs the monadic operations, so
-it cannot be in this file. It is found in [list_misc] instead. *)
+Section submseteq_dec.
+  Context `{!EqDecision A}.
+
+  Local Program Fixpoint elem_of_or_Permutation x l :
+      (x ∉ l) + { k | l ≡ₚ x :: k } :=
+    match l with
+    | [] => inl _
+    | y :: l =>
+       if decide (x = y) then inr (l ↾ _) else
+       match elem_of_or_Permutation x l return _ with
+       | inl _ => inl _ | inr (k ↾ _) => inr ((y :: k) ↾ _)
+       end
+    end.
+  Next Obligation. inv 2. Qed.
+  Next Obligation. naive_solver. Qed.
+  Next Obligation. intros ? x y l <- ??. by rewrite not_elem_of_cons. Qed.
+  Next Obligation.
+    intros ? x y l <- ? _ k Hl. simpl. by rewrite Hl, Permutation_swap.
+  Qed.
+
+  Global Program Instance submseteq_dec : RelDecision (@submseteq A) :=
+    fix go l1 l2 :=
+    match l1 with
+    | [] => left _
+    | x :: l1 =>
+       match elem_of_or_Permutation x l2 return _ with
+       | inl _ => right _
+       | inr (l2 ↾ _) => cast_if (go l1 l2)
+       end
+    end.
+  Next Obligation. intros _ l1 l2 _. apply submseteq_nil_l. Qed.
+  Next Obligation.
+    intros _ ? l2 x l1 <- Hx Hxl1. eapply Hx, elem_of_submseteq, Hxl1. by left.
+  Qed.
+  Next Obligation. intros _ ?? x l1 <- _ l2 -> Hl. by apply submseteq_skip. Qed.
+  Next Obligation.
+    intros _ ?? x l1 <- _ l2 -> Hl (l2' & Hl2%(inj _) & ?)%submseteq_cons_l.
+    apply Hl. by rewrite Hl2.
+  Qed.
+
+  Global Instance Permutation_dec : RelDecision (≡ₚ@{A}).
+  Proof using Type*.
+    refine (λ l1 l2, cast_if_and
+      (decide (l1 ⊆+ l2)) (decide (length l2 ≤ length l1)));
+      [by apply submseteq_length_Permutation
+      |abstract (intros He; by rewrite He in *)..].
+  Defined.
+End submseteq_dec.
+
 
 (** ** Properties of the [Forall] and [Exists] predicate *)
 Lemma Forall_Exists_dec (P Q : A → Prop) (dec : ∀ x, {P x} + {Q x}) :

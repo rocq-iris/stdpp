@@ -74,7 +74,6 @@ Fixpoint interleave {A} (x : A) (l : list A) : list (list A) :=
 Fixpoint permutations {A} (l : list A) : list (list A) :=
   match l with [] => [[]] | x :: l => permutations l ≫= interleave x end.
 
-
 Section general_properties.
 Context {A : Type}.
 Implicit Types x y z : A.
