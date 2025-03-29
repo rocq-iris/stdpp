@@ -65,9 +65,9 @@ Global Hint Extern 0 (_ ⊆+ _) => reflexivity : core.
 (** * Basic tactics on lists *)
 (** These are used already in this file so we cannot have them in [list_tactics]. *)
 
-(** The tactic [discriminate_list] discharges a goal if it submseteq
-a list equality involving [(::)] and [(++)] of two lists that have a different
-length as one of its hypotheses. *)
+(** The tactic [discriminate_list] discharges a goal if there is a hypothesis
+[l1 = l2] where [l1] and [l2] have different lengths. The tactic is guaranteed
+to work if [l1] and [l2] contain solely [ [] ], [(::)] and [(++)]. *)
 Tactic Notation "discriminate_list" hyp(H) :=
   apply (f_equal length) in H;
   repeat (csimpl in H || rewrite length_app in H); exfalso; lia.
