@@ -106,16 +106,6 @@ Global Instance list_filter {A} : Filter A (list A) :=
   | x :: l => if decide (P x) then x :: filter P l else filter P l
   end.
 
-(** The function [list_find P l] returns the first index [i] whose element
-satisfies the predicate [P]. *)
-Definition list_find {A} P `{∀ x, Decision (P x)} : list A → option (nat * A) :=
-  fix go l :=
-  match l with
-  | [] => None
-  | x :: l => if decide (P x) then Some (0,x) else prod_map S id <$> go l
-  end.
-Global Instance: Params (@list_find) 3 := {}.
-
 (** The function [replicate n x] generates a list with length [n] of elements
 with value [x]. *)
 Fixpoint replicate {A} (n : nat) (x : A) : list A :=

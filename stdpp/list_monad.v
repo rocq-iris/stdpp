@@ -227,13 +227,6 @@ Section fmap.
     intros ?%list_fmap_inj ?? ?%list_equiv_Forall2%(inj _).
     by apply list_equiv_Forall2.
   Qed.
-  Lemma list_find_fmap (P : B → Prop) `{∀ x, Decision (P x)} (l : list A) :
-    list_find P (f <$> l) = prod_map id f <$> list_find (P ∘ f) l.
-  Proof.
-    induction l as [|x l IH]; [done|]; csimpl. (* csimpl re-folds fmap *)
-    case_decide; [done|].
-    rewrite IH. by destruct (list_find (P ∘ f) l).
-  Qed.
 
   (** A version of [NoDup_fmap_2] that does not require [f] to be injective for
       *all* inputs. *)
