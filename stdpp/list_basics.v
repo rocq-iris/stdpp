@@ -1280,3 +1280,30 @@ Proof.
   apply list_filter_iff. naive_solver.
 Qed.
 End general_properties.
+
+(** * Basic tactics on lists *)
+(** These are used already in [list_relations] so we cannot have them in
+[list_tactics]. *)
+
+(** The tactic [discriminate_list] discharges a goal if there is a hypothesis
+[l1 = l2] where [l1] and [l2] have different lengths. The tactic is guaranteed
+to work if [l1] and [l2] contain solely [ [] ], [(::)] and [(++)]. *)
+Tactic Notation "discriminate_list" hyp(H) :=
+  apply (f_equal length) in H;
+  repeat (csimpl in H || rewrite length_app in H); exfalso; lia.
+Tactic Notation "discriminate_list" :=
+  match goal with H : _ =@{list _} _ |- _ => discriminate_list H end.
+
+(** The tactic [simplify_list_eq] simplifies hypotheses involving
+equalities on lists using injectivity of [(::)] and [(++)]. Also, it simplifies
+lookups in singleton lists. *)
+Ltac simplify_list_eq :=
+  repeat match goal with
+  | _ => progress simplify_eq/=
+  | H : _ ++ _ = _ ++ _ |- _ => first
+    [ apply app_inv_head in H | apply app_inv_tail in H
+    | apply app_inj_1 in H; [destruct H|done]
+    | apply app_inj_2 in H; [destruct H|done] ]
+  | H : [?x] !! ?i = Some ?y |- _ =>
+    destruct i; [change (Some x = Some y) in H | discriminate]
+  end.

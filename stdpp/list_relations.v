@@ -61,33 +61,6 @@ Inductive submseteq {A} : relation (list A) :=
 Infix "⊆+" := submseteq (at level 70) : stdpp_scope.
 Global Hint Extern 0 (_ ⊆+ _) => reflexivity : core.
 
-
-(** * Basic tactics on lists *)
-(** These are used already in this file so we cannot have them in [list_tactics]. *)
-
-(** The tactic [discriminate_list] discharges a goal if there is a hypothesis
-[l1 = l2] where [l1] and [l2] have different lengths. The tactic is guaranteed
-to work if [l1] and [l2] contain solely [ [] ], [(::)] and [(++)]. *)
-Tactic Notation "discriminate_list" hyp(H) :=
-  apply (f_equal length) in H;
-  repeat (csimpl in H || rewrite length_app in H); exfalso; lia.
-Tactic Notation "discriminate_list" :=
-  match goal with H : _ =@{list _} _ |- _ => discriminate_list H end.
-
-(** The tactic [simplify_list_eq] simplifies hypotheses involving
-equalities on lists using injectivity of [(::)] and [(++)]. Also, it simplifies
-lookups in singleton lists. *)
-Ltac simplify_list_eq :=
-  repeat match goal with
-  | _ => progress simplify_eq/=
-  | H : _ ++ _ = _ ++ _ |- _ => first
-    [ apply app_inv_head in H | apply app_inv_tail in H
-    | apply app_inj_1 in H; [destruct H|done]
-    | apply app_inj_2 in H; [destruct H|done] ]
-  | H : [?x] !! ?i = Some ?y |- _ =>
-    destruct i; [change (Some x = Some y) in H | discriminate]
-  end.
-
 Section prefix_suffix_ops.
   Context `{EqDecision A}.
 
@@ -113,7 +86,6 @@ Inductive Forall3 {A B C} (P : A → B → C → Prop) :
   | Forall3_nil : Forall3 P [] [] []
   | Forall3_cons x y z l k k' :
      P x y z → Forall3 P l k k' → Forall3 P (x :: l) (y :: k) (z :: k').
-
 
 Section general_properties.
 Context {A : Type}.
