@@ -18,6 +18,14 @@ API-breaking change is listed.
   `StronglySorted_app_inv_l` → `StronglySorted_app_1_l`
   `StronglySorted_app_inv_r` → `StronglySorted_app_1_r`. (by Marijn van Wezel)
 - Add `SetUnfoldElemOf` instance for `dom` on `gmultiset`. (by Marijn van Wezel)
+- Split up `stdpp.list` into smaller files. Users should keep importing
+  `stdpp.list`; the organization into smaller modules is considered an
+  implementation detail. `stdpp.list_numbers` is now re-exported by `stdpp.list`
+  and also considered part of the list module, so existing imports should be
+  updated.
+- Remove `list_remove` and `list_remove_list`. There were no lemmas about these
+  functions; they existed solely to facilitate the proofs of decidability of
+  `submseteq` and `≡ₚ`, which have been refactored.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

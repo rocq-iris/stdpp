@@ -52,6 +52,11 @@ stdpp/lexico.v
 stdpp/propset.v
 stdpp/decidable.v
 stdpp/list.v
+stdpp/list_basics.v
+stdpp/list_relations.v
+stdpp/list_monad.v
+stdpp/list_misc.v
+stdpp/list_tactics.v
 stdpp/list_numbers.v
 stdpp/functions.v
 stdpp/hlist.v
