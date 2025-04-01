@@ -3,6 +3,8 @@ lists of numbers that are not in the Coq standard library. *)
 From stdpp Require Export list_basics list_monad list_misc list_tactics.
 From stdpp Require Import options.
 
+Module Export list.
+
 (** * Definitions *)
 (** [seqZ m n] generates the sequence [m], [m + 1], ..., [m + n - 1]
 over integers, provided [0 ≤ n]. If [n < 0], then the range is empty. **)
@@ -443,3 +445,5 @@ Section Z_little_endian.
       by rewrite <-Zminus_mod_idemp_r, Z_mod_same_full, Z.sub_0_r.
   Qed.
 End Z_little_endian.
+
+End list.

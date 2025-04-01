@@ -2,6 +2,8 @@ From Coq Require Export Permutation.
 From stdpp Require Export numbers base option list_basics list_relations list_monad.
 From stdpp Require Import options.
 
+Module Export list.
+
 (** * Reflection over lists *)
 (** We define a simple data structure [rlist] to capture a syntactic
 representation of lists consisting of constants, applications and the nil list.
@@ -299,3 +301,5 @@ Ltac solve_suffix := by intuition (repeat
   | |- suffix _ (_ ++ _) => apply suffix_app_r
   | H : suffix _ _ → False |- _ => destruct H
   end).
+
+End list.

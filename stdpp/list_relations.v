@@ -2,6 +2,8 @@ From Coq Require Export Permutation.
 From stdpp Require Export numbers base option list_basics.
 From stdpp Require Import options.
 
+Module Export list.
+
 Global Instance: Params (@Forall) 1 := {}.
 Global Instance: Params (@Exists) 1 := {}.
 Global Instance: Params (@NoDup) 1 := {}.
@@ -1917,3 +1919,5 @@ Proof. split; induction 1; constructor; auto. Qed.
 
 Lemma TCExists_Exists {A} (P : A → Prop) l : TCExists P l ↔ Exists P l.
 Proof. split; induction 1; constructor; solve [auto]. Qed.
+
+End list.
