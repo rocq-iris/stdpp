@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 ## A simple shell script checking for some common Coq issues.
 
