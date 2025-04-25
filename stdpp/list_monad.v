@@ -1171,6 +1171,42 @@ Section zip.
   Lemma lookup_zip_None l k i :
     zip l k !! i = None ↔ l !! i = None ∨ k !! i = None.
   Proof. by rewrite lookup_zip_with_None. Qed.
+
+  Lemma zip_nil_l k :
+    zip ([] : list A) k = [].
+  Proof. done. Qed.
+  Lemma zip_nil_r l :
+    zip l ([] : list B) = [].
+  Proof. by destruct l as [| a l]; simpl. Qed.
+
+  Lemma prod_map_zip {A' B' : Type}
+      (f : A → A') (g : B → B') l k :
+    prod_map f g <$> zip l k = zip (f <$> l) (g <$> k).
+  Proof.
+    unfold fmap.
+    induction l as [| a l IHl] in k |- *; simpl; f_equal.
+    destruct k as [| b k]; simpl; f_equal.
+    by rewrite IHl.
+  Qed.
+
+  Local Hint Constructors NoDup : core.
+  Lemma NoDup_zip_l l k :
+    NoDup l →
+    NoDup (zip l k).
+  Proof.
+    induction 1 as [| a l Ha HNoDup IHl] in k |- *; simpl; auto.
+    destruct k as [| b k]; simpl; auto. constructor; eauto.
+    intros []%elem_of_zip_l%Ha.
+  Qed.
+  Lemma NoDup_zip_r l k :
+    NoDup k →
+    NoDup (zip l k).
+  Proof.
+    induction 1 as [| b k Hb HNoDup IHk] in l |- *;
+      first by rewrite zip_nil_r.
+    destruct l as [| a l]; simpl; auto. constructor; eauto.
+    intros []%elem_of_zip_r%Hb.
+  Qed.
 End zip.
 
 Lemma zip_diag {A} (l : list A) :
