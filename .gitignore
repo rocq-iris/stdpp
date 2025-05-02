@@ -15,6 +15,7 @@
 .coq-native/
 Makefile.coq
 Makefile.coq.conf
+_CoqProject
 _CoqProject.*
 Makefile.package.*
 .Makefile.package.*
@@ -24,3 +25,4 @@ builddep/
 _opam
 _build/
 *.install
+config/local-flags

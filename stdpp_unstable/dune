@@ -2,4 +2,4 @@
 (coq.theory
  (name stdpp.unstable)
  (package coq-stdpp-unstable)
- (theories stdpp stdpp.bitvector))
+ (theories Stdlib stdpp stdpp.bitvector))
