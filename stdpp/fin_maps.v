@@ -159,6 +159,14 @@ Global Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption : core.
 Notation "( m ##ₘ.)" := (map_disjoint m) (only parsing) : stdpp_scope.
 Notation "(.##ₘ m )" := (λ m2, m2 ##ₘ m) (only parsing) : stdpp_scope.
 
+(** Lists of pairwise disjoint finite maps. *)
+Definition maps_disjoint `{∀ A, Lookup K A (M A)} {A} (ms : list (M A)) : Prop :=
+  ∀ j1 j2 m1 m2,
+    j1 ≠ j2 →
+    ms !! j1 = Some m1 →
+    ms !! j2 = Some m2 →
+    m1 ##ₘ m2.
+
 Global Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
   map_included (λ _, (=)).
 
@@ -3140,6 +3148,133 @@ Proof. by rewrite map_disjoint_union_list_l. Qed.
 Lemma map_disjoint_union_list_r_2 {A} (ms : list (M A)) (m : M A) :
   Forall (.##ₘ m) ms → m ##ₘ ⋃ ms.
 Proof. by rewrite map_disjoint_union_list_r. Qed.
+
+Section union_list_lookup.
+  Context {A : Type}.
+  Implicit Types m : M A.
+  Implicit Types ms : list (M A).
+  Implicit Types i : K.
+  Implicit Types j : nat.
+  Implicit Types x : A.
+
+  (** ** Properties of [maps_disjoint]. *)
+  Lemma maps_disjoint_nil : maps_disjoint ([] : list (M A)).
+  Proof.
+    intros j1 j2 m1 m2 Hi12 Hm1.
+    by rewrite lookup_nil in Hm1.
+  Qed.
+  Lemma maps_disjoint_cons ms m :
+    Forall (.##ₘ m) ms →
+    maps_disjoint ms →
+    maps_disjoint (m :: ms).
+  Proof.
+    rewrite Forall_lookup.
+    intros Hall Hms [| j1] [| j2] m1 m2 Hj Hm1 Hm2; simpl in *; first lia; eauto.
+    - injection Hm1 as ->.
+      apply Hall in Hm2. by symmetry.
+    - injection Hm2 as ->.
+      by apply Hall in Hm1.
+  Qed.
+  Lemma maps_disjoint_cons_inv ms m :
+    maps_disjoint (m :: ms) →
+    Forall (.##ₘ m) ms ∧ maps_disjoint ms.
+  Proof.
+    rewrite Forall_lookup. intros Hdisj. split.
+    - intros j m' Hmsm.
+      by pose proof Hdisj _ _ _ _ (O_S _) eq_refl Hmsm.
+    - intros j1 j2 m1 m2 Hj Hj1 Hj2.
+      refine (Hdisj (S _) (S _) _ _ _ Hj1 Hj2). lia.
+  Qed.
+  Lemma maps_disjoint_perm ms1 ms2 :
+    ms1 ≡ₚ ms2 →
+    maps_disjoint ms1 → maps_disjoint ms2.
+  Proof.
+    intros Hperm Hms1 j1 j2 mj1 mj2 Hj Hmj1 Hmj2.
+    pose proof (elem_of_list_lookup_2 _ _ _ Hmj1) as Hm1.
+    pose proof (elem_of_list_lookup_2 _ _ _ Hmj2) as Hm2.
+    symmetry in Hperm.
+    pose proof (Permutation_inj ms2 ms1) as [HLR _].
+    destruct (HLR Hperm) as (Hlen & f & Hf & Hlookup).
+    rewrite Hlookup in Hmj1, Hmj2.
+    apply Hms1 with (2:=Hmj1) (3:=Hmj2).
+    intros []%Hf%Hj.
+  Qed.
+  Global Instance map_disjoint_Permutation_proper :
+    Proper ((≡ₚ) ==> iff) (maps_disjoint (K:=K) (M:=M) (A:=A)).
+  Proof.
+    intros ms1 ms2 Hperm. split; by apply maps_disjoint_perm.
+  Qed.
+
+  (** ** [Lookup] lemmas for [union_list]. *)
+  Lemma union_maps_lookup_none_1 ms i :
+    Forall (λ m, m !! i = None) ms →
+    ⋃ ms !! i = None.
+  Proof.
+    induction 1 as [| m ms Hm Hms IHms]; simpl; first by rewrite lookup_empty.
+    by rewrite lookup_union, Hm, IHms.
+  Qed.
+  Local Hint Constructors Forall : core.
+  Lemma union_maps_lookup_none_2 ms i :
+    ⋃ ms !! i = None →
+    Forall (λ m, m !! i = None) ms.
+  Proof.
+    induction ms as [| m ms IHms]; simpl; auto.
+    intros [Hm Hms%IHms]%lookup_union_None_1. auto.
+  Qed.
+  Lemma union_maps_lookup_none ms i :
+    ⋃ ms !! i = None ↔
+    Forall (λ m, m !! i = None) ms.
+  Proof.
+    split; auto using union_maps_lookup_none_1, union_maps_lookup_none_2.
+  Qed.
+  Lemma union_list_perm ms1 ms2 :
+    ms1 ≡ₚ ms2 →
+    maps_disjoint ms1 →
+    maps_disjoint ms2 →
+    ⋃ ms1 = ⋃ ms2.
+  Proof.
+    intros Hperm.
+    induction Hperm as [| m ms1 ms2 Hperm IH | m1 m2 ms | ms1 ms2 ms3 Hperm1 IH1 Hperm2 IH2] in *; simpl; auto.
+    - intros [Hm1 Hms1]%maps_disjoint_cons_inv [Hm2 Hms2]%maps_disjoint_cons_inv.
+      by rewrite IH.
+    - intros
+        [[Hdisj Hm2]%Forall_cons_1 [Hm1 Hms]%maps_disjoint_cons_inv]%maps_disjoint_cons_inv _.
+      repeat rewrite map_union_assoc.
+      by rewrite (map_union_comm m1 m2).
+    - intros Hms1 Hms3.
+      assert (maps_disjoint ms2) as Hms2 by by rewrite Hperm2.
+      rewrite IH1; try done. by apply IH2.
+  Qed.
+  Lemma union_maps_lookup_some_1 ms m i x :
+    m ∈ ms →
+    maps_disjoint ms →
+    m !! i = Some x →
+    ⋃ ms !! i = Some x.
+  Proof.
+    intros [j Hj]%elem_of_list_lookup_1; revert Hj.
+    induction j as [| j IHj] in ms, m |- *;
+      destruct ms as [| mp ms]; simpl; try discriminate.
+    - intros [= ->] [Hmms Hdisj]%maps_disjoint_cons_inv Hmi.
+      rewrite lookup_union, Hmi, union_maps_lookup_none_1; first done.
+      rewrite Forall_lookup in Hmms |- *.
+      intros j' m' Hms%Hmms.
+      eapply map_disjoint_Some_r; eauto.
+    - intros Hmsj [Hmms Hdisj]%maps_disjoint_cons_inv Hmi.
+      erewrite lookup_union, IHj; eauto.
+      enough (mp !! i = None) as Hmp by by rewrite Hmp; done.
+      rewrite Forall_lookup in Hmms.
+      apply Hmms in Hmsj.
+      eapply map_disjoint_Some_r; eauto.
+  Qed.
+  Lemma union_maps_lookup_some_2 ms i x :
+    ⋃ ms !! i = Some x →
+    ∃ m, m ∈ ms ∧ m !! i = Some x.
+  Proof.
+    induction ms as [| m ms IHms]; simpl; first by rewrite lookup_empty.
+    intros [Hmk | [Hmk (m' & Hmms & IH)%IHms]]%lookup_union_Some_raw;
+      eauto using elem_of_list_here, elem_of_list_further.
+  Qed.
+End union_list_lookup.
 
 (** ** Properties of the folding the [delete] function *)
 Lemma lookup_foldr_delete {A} (m : M A) is j :
