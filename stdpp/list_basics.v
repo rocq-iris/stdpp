@@ -1,6 +1,8 @@
 From stdpp Require Export numbers base option.
 From stdpp Require Import options.
 
+Module Export list.
+
 Global Arguments length {_} _ : assert.
 Global Arguments cons {_} _ _ : assert.
 Global Arguments app {_} _ _ : assert.
@@ -1297,3 +1299,5 @@ Ltac simplify_list_eq :=
   | H : [?x] !! ?i = Some ?y |- _ =>
     destruct i; [change (Some x = Some y) in H | discriminate]
   end.
+
+End list.

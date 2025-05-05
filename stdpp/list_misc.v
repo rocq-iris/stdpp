@@ -2,6 +2,8 @@ From Coq Require Export Permutation.
 From stdpp Require Export numbers base option list_basics list_relations list_monad.
 From stdpp Require Import options.
 
+Module Export list.
+
 (** The function [list_find P l] returns the first index [i] whose element
 satisfies the predicate [P]. *)
 Definition list_find {A} P `{∀ x, Decision (P x)} : list A → option (nat * A) :=
@@ -892,3 +894,5 @@ Section positives_flatten_unflatten.
     by apply (inj Pos.reverse).
   Qed.
 End positives_flatten_unflatten.
+
+End list.

@@ -2,6 +2,8 @@ From Coq Require Export Permutation.
 From stdpp Require Export numbers base option list_basics list_relations.
 From stdpp Require Import options.
 
+Module Export list.
+
 (** The monadic operations. *)
 Global Instance list_ret: MRet list := λ A x, x :: @nil A.
 Global Instance list_fmap : FMap list := λ A B f,
@@ -1148,3 +1150,5 @@ Proof.
   revert l. induction k as [|x k IH]; simpl; [done |].
   inv 1. rewrite reverse_cons, <-(assoc_L (++)). by apply IH.
 Qed.
+
+End list.

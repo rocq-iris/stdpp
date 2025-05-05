@@ -1,5 +1,10 @@
 From stdpp Require Import list.
 
+(* Ensure that we can refer to lemmas both directly and as-if they are in the
+"list" module. *)
+Definition test1 := @elem_of_list_singleton.
+Definition test2 := @list.elem_of_list_singleton.
+
 Lemma last_simpl_test_nil : last [] =@{option nat} None.
 Proof. simpl. Show. done. Qed.
 
