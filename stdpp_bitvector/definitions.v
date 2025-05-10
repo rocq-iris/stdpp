@@ -1,4 +1,5 @@
 (** This file is maintained by Michael Sammler. *)
+From Coq Require Znumtheory.
 From stdpp Require Export numbers.
 From stdpp Require Import countable finite.
 From stdpp Require Import options.
