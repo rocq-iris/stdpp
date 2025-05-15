@@ -297,6 +297,12 @@ Lemma vmap_insert {A B} (f : A → B) (n : nat) i x (v : vec A n) :
   vmap f (vinsert i x v) = vinsert i (f x) (vmap f v).
 Proof. induction v; inv_fin i; intros; f_equal/=; auto. Qed.
 
+Lemma Forall_vinsert {A} (P : A → Prop) {n} (v : vec A n) (i : fin n) (x : A) :
+  Forall P (vec_to_list v) →
+  P x →
+  Forall P (vec_to_list (vinsert i x v)).
+Proof. rewrite vec_to_list_insert. apply Forall_insert. Qed.
+
 (** The functions [vtake i v] and [vdrop i v] take the first [i] elements of
 a vector [v], respectively remove the first [i] elements of a vector [v]. *)
 Fixpoint vtake {A n} (i : fin n) : vec A n → vec A i :=
@@ -332,6 +338,11 @@ Proof. induction i; f_equal/=; auto. Qed.
 Lemma vmap_replicate {A B} (f : A → B) n (x : A) :
   vmap f (vreplicate n x) = vreplicate n (f x).
 Proof. induction n; f_equal/=; auto. Qed.
+
+Lemma Forall_vreplicate {A} (P : A → Prop) n (x : A) :
+  P x →
+  Forall P (vec_to_list (vreplicate n x)).
+Proof. rewrite vec_to_list_replicate. apply Forall_replicate. Qed.
 
 (** Vectors are inhabited and countable *)
 Global Instance vec_0_inhabited T : Inhabited (vec T 0) := populate [#].
