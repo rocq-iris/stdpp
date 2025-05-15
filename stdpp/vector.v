@@ -203,20 +203,20 @@ Proof.
 Qed.
 
 Lemma Forall_vlookup {A} (P : A → Prop) {n} (v : vec A n) :
-  Forall P (vec_to_list v) ↔ ∀ i, P (v !!! i).
+  Forall P v ↔ ∀ i, P (v !!! i).
 Proof. rewrite Forall_forall. setoid_rewrite elem_of_vlookup. naive_solver. Qed.
 Lemma Forall_vlookup_1 {A} (P : A → Prop) {n} (v : vec A n) i :
-  Forall P (vec_to_list v) → P (v !!! i).
+  Forall P v → P (v !!! i).
 Proof. by rewrite Forall_vlookup. Qed.
 Lemma Forall_vlookup_2 {A} (P : A → Prop) {n} (v : vec A n) :
-  (∀ i, P (v !!! i)) → Forall P (vec_to_list v).
+  (∀ i, P (v !!! i)) → Forall P v.
 Proof. by rewrite Forall_vlookup. Qed.
 Lemma Exists_vlookup {A} (P : A → Prop) {n} (v : vec A n) :
-  Exists P (vec_to_list v) ↔ ∃ i, P (v !!! i).
+  Exists P v ↔ ∃ i, P (v !!! i).
 Proof. rewrite Exists_exists. setoid_rewrite elem_of_vlookup. naive_solver. Qed.
 Lemma Forall2_vlookup {A B} (P : A → B → Prop) {n}
     (v1 : vec A n) (v2 : vec B n) :
-  Forall2 P (vec_to_list v1) (vec_to_list v2) ↔ ∀ i, P (v1 !!! i) (v2 !!! i).
+  Forall2 P v1 v2 ↔ ∀ i, P (v1 !!! i) (v2 !!! i).
 Proof.
   split.
   - vec_double_ind v1 v2; [intros _ i; inv_fin i |].
@@ -298,9 +298,9 @@ Lemma vmap_insert {A B} (f : A → B) (n : nat) i x (v : vec A n) :
 Proof. induction v; inv_fin i; intros; f_equal/=; auto. Qed.
 
 Lemma Forall_vinsert {A} (P : A → Prop) {n} (v : vec A n) (i : fin n) (x : A) :
-  Forall P (vec_to_list v) →
+  Forall P v →
   P x →
-  Forall P (vec_to_list (vinsert i x v)).
+  Forall P (vinsert i x v).
 Proof. rewrite vec_to_list_insert. apply Forall_insert. Qed.
 
 (** The functions [vtake i v] and [vdrop i v] take the first [i] elements of
@@ -341,7 +341,7 @@ Proof. induction n; f_equal/=; auto. Qed.
 
 Lemma Forall_vreplicate {A} (P : A → Prop) n (x : A) :
   P x →
-  Forall P (vec_to_list (vreplicate n x)).
+  Forall P (vreplicate n x).
 Proof. rewrite vec_to_list_replicate. apply Forall_replicate. Qed.
 
 (** Vectors are inhabited and countable *)
