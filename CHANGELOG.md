@@ -3,6 +3,7 @@ API-breaking change is listed.
 
 ## std++ master
 
+- Add lemmas `Forall_vinsert` and `Forall_vreplicate`. (by Rudy Peterson)
 - Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
 - Add lemma `lookup_total_fmap`.
 - Add lemmas about `last` and `head`: `last_app_Some`, `last_app_None`,
