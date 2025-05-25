@@ -152,6 +152,14 @@ Section setoids.
   Global Instance from_option_proper {B} (R : relation B) :
     Proper (((≡@{A}) ==> R) ==> R ==> (≡) ==> R) from_option.
   Proof. destruct 3; simpl; auto. Qed.
+  Global Instance from_option_proper_leibniz `{!Equiv B, !Equivalence (≡@{B})} :
+    Proper
+      (pointwise_relation A (≡@{B}) ==> (≡@{B}) ==> eq ==> (≡@{B}))
+      (from_option (A:=A) (B:=B)).
+  Proof.
+    intros f1 f2 Hf b1 b2 Hb mx ? <-.
+    destruct mx as [x |]; simplify_eq; simpl; auto.
+  Qed.
 End setoids.
 
 Global Typeclasses Opaque option_equiv.
@@ -227,6 +235,11 @@ Proof. intros; destruct mx; f_equal/=; auto. Qed.
 Lemma option_fmap_equiv_ext {A} `{Equiv B} (f g : A → B) (mx : option A) :
   (∀ x, f x ≡ g x) → f <$> mx ≡ g <$> mx.
 Proof. destruct mx; constructor; auto. Qed.
+
+Lemma from_option_fmap {A B} `{!Equiv C, !Equivalence (≡@{C})}
+    (P : B → C) c (f : A → B) (mx : option A) :
+  from_option P c (f <$> mx) ≡ from_option (P ∘ f) c mx.
+Proof. destruct mx as [x |]; done. Qed.
 
 Lemma option_fmap_bind {A B C} (f : A → B) (g : B → option C) mx :
   (f <$> mx) ≫= g = mx ≫= g ∘ f.
