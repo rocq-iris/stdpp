@@ -3954,6 +3954,49 @@ Section map_seq.
     i < length xs →
     <[i:=x]> (map_seq 0 xs) =@{M A} map_seq 0 (<[i:=x]> xs).
   Proof. intros. rewrite insert_map_seq by lia. auto with f_equal lia. Qed.
+
+  Lemma map_seq_inj start : Inj eq eq (map_seq (M:=M A) start).
+  Proof.
+    intros xs1 xs2. rewrite map_eq_iff.
+    intros Hmap. apply list_eq. intros i.
+    specialize Hmap with (i + start).
+    rewrite !lookup_map_seq in Hmap.
+    rewrite !option_guard_True in Hmap; try lia.
+    by rewrite Nat.add_sub in Hmap.
+  Qed.
+  Lemma map_seq_list_to_map start xs :
+    list_to_map (zip (seq start (length xs)) xs) = map_seq (M:=M A) start xs.
+  Proof.
+    rewrite map_eq_iff => i.
+    rewrite lookup_map_seq.
+    destruct (decide (start ≤ i)) as [Hstarti | Hstarti].
+    - rewrite option_guard_True; last done.
+      destruct (decide (i - start < length xs)) as [Hlen | Hlen].
+      + destruct (lookup_lt_is_Some_2 _ _ Hlen) as [x Hx].
+        rewrite Hx. apply elem_of_list_to_map_1.
+        * rewrite fst_zip; first apply NoDup_seq.
+          rewrite length_seq. lia.
+        * rewrite elem_of_list_lookup. exists (i - start)%nat.
+          rewrite lookup_zip_Some, lookup_seq_lt; last done.
+          by rewrite <-Nat.le_add_sub.
+      + rewrite lookup_ge_None_2; last lia.
+        rewrite not_elem_of_list_to_map_1; first done.
+        rewrite fst_zip; last by rewrite length_seq.
+        rewrite elem_of_seq. lia.
+    - rewrite option_guard_False; last lia.
+      simpl. rewrite not_elem_of_list_to_map_1; first done.
+      rewrite fst_zip; last by rewrite length_seq.
+      rewrite elem_of_seq. lia.
+  Qed.
+  Lemma map_seq_to_list start xs :
+    map_to_list (map_seq (M:=M A) start xs) ≡ₚ zip (seq start (length xs)) xs.
+  Proof.
+    apply list_to_map_inj.
+    - apply NoDup_fst_map_to_list.
+    - rewrite fst_zip; first apply NoDup_seq.
+      by rewrite length_seq.
+    - by rewrite list_to_map_to_list, map_seq_list_to_map.
+  Qed.
 End map_seq.
 
 (** ** The [map_seqZ] operation *)
@@ -4090,6 +4133,52 @@ Section map_seqZ.
     (i < length xs)%nat →
     map_seqZ 0 (<[i:=x]> xs) =@{M A} <[Z.of_nat i:=x]> (map_seqZ 0 xs).
   Proof. intros. by rewrite map_seqZ_insert. Qed.
+
+  Lemma map_seqZ_inj start : Inj eq eq (map_seqZ (M:=M A) start).
+  Proof.
+    intros xs1 xs2. rewrite map_eq_iff.
+    intros Hmap. apply list_eq. intros i.
+    specialize Hmap with (Z.of_nat i + start)%Z.
+    rewrite !lookup_map_seqZ in Hmap.
+    rewrite !option_guard_True in Hmap; try lia.
+    by rewrite Z.add_simpl_r, !Nat2Z.id in Hmap.
+  Qed.
+  Lemma map_seqZ_list_to_map start xs :
+    list_to_map (zip (seqZ start (Z.of_nat (length xs))) xs)
+    = map_seqZ (M:=M A) start xs.
+  Proof.
+    rewrite map_eq_iff => i.
+    rewrite lookup_map_seqZ.
+    destruct (decide (start ≤ i)%Z) as [Hstarti | Hstarti].
+    - rewrite option_guard_True; last done.
+      destruct (decide (Z.to_nat (i - start) < length xs)%nat) as [Hlen | Hlen].
+      + destruct (lookup_lt_is_Some_2 _ _ Hlen) as [x Hx].
+        rewrite Hx. apply elem_of_list_to_map_1.
+        * rewrite fst_zip; first apply NoDup_seqZ.
+          rewrite length_seqZ. lia.
+        * rewrite elem_of_list_lookup. exists (Z.to_nat (i - start))%nat.
+          rewrite lookup_zip_Some, lookup_seqZ_lt; last lia.
+          rewrite Z2Nat.id; last lia.
+          by rewrite Zplus_minus.
+      + rewrite lookup_ge_None_2; last lia.
+        rewrite not_elem_of_list_to_map_1; first done.
+        rewrite fst_zip; last by rewrite length_seqZ, Nat2Z.id.
+        rewrite elem_of_seqZ. lia.
+    - rewrite option_guard_False; last lia.
+      simpl. rewrite not_elem_of_list_to_map_1; first done.
+      rewrite fst_zip; last by rewrite length_seqZ, Nat2Z.id.
+      rewrite elem_of_seqZ. lia.
+  Qed.
+  Lemma map_seqZ_to_list start xs :
+    map_to_list (map_seqZ (M:=M A) start xs)
+      ≡ₚ zip (seqZ start (Z.of_nat (length xs))) xs.
+  Proof.
+    apply list_to_map_inj.
+    - apply NoDup_fst_map_to_list.
+    - rewrite fst_zip; first apply NoDup_seqZ.
+      by rewrite length_seqZ, Nat2Z.id.
+    - by rewrite list_to_map_to_list, map_seqZ_list_to_map.
+  Qed.
 End map_seqZ.
 
 Section kmap.
