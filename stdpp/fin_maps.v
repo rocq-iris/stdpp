@@ -4243,6 +4243,24 @@ Section kmap.
   Lemma kmap_subset {A} (m1 m2 : M1 A) :
     kmap f m1 ⊂ kmap f m2 ↔ m1 ⊂ m2.
   Proof. unfold strict. by rewrite !kmap_subseteq. Qed.
+
+   Lemma kmap_map_to_list {A : Type} (m : M1 A) :
+     map_to_list (kmap f m) ≡ₚ (prod_map f id) <$> map_to_list m.
+   Proof.
+     induction m as [| i1 x m HNone Hfirstkey IHm] using map_first_key_ind.
+     - rewrite kmap_empty.
+       by do 2! rewrite map_to_list_empty.
+     - rewrite map_to_list_insert_first_key by done.
+       rewrite kmap_insert, map_to_list_insert.
+       + by rewrite IHm.
+       + by rewrite lookup_kmap.
+   Qed.
+   Lemma kmap_list_to_map {A : Type} (l : list (K1 * A)) :
+     kmap f (list_to_map l) = list_to_map (prod_map f id <$> l).
+   Proof.
+     induction l as [| [i1 x] l IHl]; simpl; first by rewrite kmap_empty.
+     by rewrite kmap_insert, IHl.
+   Qed.
 End kmap.
 
 Section preimg.
