@@ -28,6 +28,71 @@ Definition from_option {A B} (f : A → B) (y : B) (mx : option A) : B :=
 Global Instance: Params (@from_option) 2 := {}.
 Global Arguments from_option {_ _} _ _ !_ / : assert.
 
+(** Predicate over member of [option A].
+    We define it with [Inductive] to allow [option_Forall] to be used in other
+    inductively defined predicates. *)
+Inductive option_Forall {A} (P : A → Prop) : option A → Prop :=
+| Forall_None : option_Forall P None
+| Forall_Some x : P x → option_Forall P (Some x).
+
+Section Forall.
+  Context {A : Type}.
+  Implicit Types x : A.
+  Implicit Types mx : option A.
+  Implicit Types P : A → Prop.
+
+  Lemma option_Forall_from_option P mx :
+    option_Forall P mx ↔ from_option P True mx.
+  Proof. destruct mx; simpl; split; intros H; try by constructor. by inv H. Qed.
+  Lemma option_Forall_true P mx :
+    (∀ x, P x) →
+    option_Forall P mx.
+  Proof. destruct mx; rewrite !option_Forall_from_option; simpl; auto. Qed.
+  Lemma option_Forall_impl_strong_1 P1 P2 mx :
+    option_Forall (λ x, P1 x → P2 x) mx →
+    option_Forall P1 mx →
+    option_Forall P2 mx.
+  Proof. destruct mx; rewrite !option_Forall_from_option; done. Qed.
+  Lemma option_Forall_impl_strong' P1 P2 mx :
+    option_Forall P1 mx →
+    option_Forall P2 mx →
+    option_Forall (λ x, P1 x → P2 x) mx.
+  Proof. destruct mx; rewrite !option_Forall_from_option; simpl; done. Qed.
+  Lemma option_Forall_impl_strong_2 P1 P2 mx :
+    (option_Forall P1 mx → option_Forall P2 mx) →
+    option_Forall (λ x, P1 x → P2 x) mx.
+  Proof. destruct mx; rewrite !option_Forall_from_option; simpl; done. Qed.
+  Lemma option_Forall_impl_strong_iff P1 P2 mx :
+    option_Forall (λ x, P1 x → P2 x) mx ↔
+    (option_Forall P1 mx → option_Forall P2 mx).
+  Proof.
+    split.
+    - apply option_Forall_impl_strong_1.
+    - apply option_Forall_impl_strong_2.
+  Qed.
+  Lemma option_Forall_impl P1 P2 mx :
+    (∀ x, P1 x → P2 x) →
+    option_Forall P1 mx → option_Forall P2 mx.
+  Proof.
+    rewrite <-option_Forall_impl_strong_iff.
+    intros HP. by apply option_Forall_true.
+  Qed.
+
+  Lemma option_Forall_iff_strong_iff P1 P2 mx :
+    option_Forall (λ x, P1 x ↔ P2 x) mx
+    ↔ (option_Forall P1 mx ↔ option_Forall P2 mx).
+  Proof. destruct mx; rewrite !option_Forall_from_option; done. Qed.
+  Lemma option_Forall_iff P1 P2 mx :
+    (∀ a, P1 a ↔ P2 a) →
+    (option_Forall P1 mx ↔ option_Forall P2 mx).
+  Proof. destruct mx; rewrite !option_Forall_from_option; simpl; done. Qed.
+
+  Lemma option_Forall_conj_strong P1 P2 mx :
+    option_Forall (λ a, P1 a ∧ P2 a) mx
+    ↔ (option_Forall P1 mx ∧ option_Forall P2 mx).
+  Proof. destruct mx; rewrite !option_Forall_from_option; done. Qed.
+End Forall.
+
 (** The eliminator with the identity function. *)
 Notation default := (from_option id).
 
@@ -160,6 +225,13 @@ Section setoids.
     intros f1 f2 Hf b1 b2 Hb mx ? <-.
     destruct mx as [x |]; simplify_eq; simpl; auto.
   Qed.
+  Global Instance option_Forall_proper :
+    Proper
+      (pointwise_relation A iff ==> eq ==> iff)
+      option_Forall.
+  Proof.
+    intros P1 P2 HP [x|] ? <-; rewrite !option_Forall_from_option; simpl; auto.
+  Qed.
 End setoids.
 
 Global Typeclasses Opaque option_equiv.
@@ -240,6 +312,9 @@ Lemma from_option_fmap {A B} `{!Equiv C, !Equivalence (≡@{C})}
     (P : B → C) c (f : A → B) (mx : option A) :
   from_option P c (f <$> mx) ≡ from_option (P ∘ f) c mx.
 Proof. destruct mx as [x |]; done. Qed.
+Lemma option_Forall_fmap {A B} (f : A → B) (P : B → Prop) (mx : option A) :
+  option_Forall P (f <$> mx) ↔ option_Forall (P ∘ f) mx.
+Proof. rewrite !option_Forall_from_option; apply from_option_fmap. Qed.
 
 Lemma option_fmap_bind {A B C} (f : A → B) (g : B → option C) mx :
   (f <$> mx) ≫= g = mx ≫= g ∘ f.
