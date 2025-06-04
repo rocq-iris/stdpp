@@ -1,7 +1,16 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## std++ master
+## 1.12.0 (2025-06-04)
+
+std++ 1.12 supports Coq 8.18, 8.19, 8.20, and Rocq 9.0.
+
+This released of std++ was managed by Jesper Bengtson, Ralf Jung,
+and Robbert Krebbers, with contributinos from Andres Erbsen, Kimaya Bedarkar,
+Marijn van Wezel, Michael Sammler, Ralf Jung, Robbert Krebbers, Rodolphe Lepigre,
+Rudy Peterson, and Marijn van Wezel. Thanks a lot to everyone involved.
+
+**Detailed list of changes:**
 
 - Add lemmas `Forall_vinsert` and `Forall_vreplicate`. (by Rudy Peterson)
 - Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
