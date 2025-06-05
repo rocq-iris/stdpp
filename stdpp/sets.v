@@ -932,6 +932,10 @@ Section option_and_list_to_set.
     Lemma list_to_set_app_L l1 l2 :
       list_to_set (l1 ++ l2) =@{C} list_to_set l1 ∪ list_to_set l2.
     Proof. set_solver. Qed.
+    Lemma list_to_set_singleton_L x : list_to_set [x] =@{C} {[ x ]}.
+    Proof. set_solver. Qed.
+    Lemma list_to_set_snoc_L l x : list_to_set (l ++ [x]) =@{C} list_to_set l ∪ {[ x ]}.
+    Proof. set_solver. Qed.
     Global Instance list_to_set_perm_L : Proper ((≡ₚ) ==> (=)) (list_to_set (C:=C)).
     Proof. induction 1; set_solver. Qed.
   End leibniz.
