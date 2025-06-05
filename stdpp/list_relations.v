@@ -1609,6 +1609,26 @@ Section Forall2.
   Defined.
 End Forall2.
 
+Lemma Forall_exists_Forall2_1 {A B} (R : A → B → Prop) (l : list A) :
+  Forall (λ x, ∃ y, R x y) l ↔ ∃ k, Forall2 R l k.
+Proof.
+  split.
+  - induction l as [| x l IHl].
+    + intros _. exists []. constructor.
+    + rewrite Forall_cons_iff. intros [[y HRxy] (k & IH)%IHl].
+      exists (y :: k). constructor; done.
+  - intros [k HRlk]. rewrite Forall2_lookup in HRlk.
+    rewrite Forall_lookup. intros i x Hlix.
+    specialize HRlk with i. rewrite Hlix in HRlk.
+    inversion HRlk as [x' y HRxy Hsome Hkiy |]; clear HRlk; subst x'; eauto.
+Qed.
+Lemma Forall_exists_Forall2_2 {A B} (R : A → B → Prop) (k : list B) :
+  Forall (λ y, ∃ x, R x y) k ↔ ∃ l, Forall2 R l k.
+Proof.
+  setoid_rewrite Forall2_flip.
+  rewrite Forall_exists_Forall2_1; done.
+Qed.
+
 Section Forall2_proper.
   Context  {A} (R : relation A).
 
