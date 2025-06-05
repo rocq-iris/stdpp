@@ -2,6 +2,12 @@
 (bounded naturals). It uses the definitions from the standard library, but
 renames or changes their notations, so that it becomes more consistent with the
 naming conventions in this development. *)
+(* Coq warns about using vector, but it is not deprecated. Instead somehow they seem concerned
+about people having too much fun with type indices. See
+<https://github.com/coq/coq/pull/18032> for discussion. The warning is also emitted by [Fin].
+Let's just silence that. *)
+Local Set Warnings "-stdlib-vector".
+From Coq Require Fin.
 From stdpp Require Export base tactics.
 From stdpp Require Import options.
 
