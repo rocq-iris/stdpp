@@ -780,6 +780,55 @@ Proof.
   - destruct (IH k) as [is His]. exists (is ++ [length k]).
     rewrite fold_right_app. simpl. by rewrite delete_middle.
 Qed.
+Lemma mem_sublist  l1 l2 s :
+  l1 `sublist_of` l2 →
+  s ∈ l1 →
+  s ∈ l2.
+Proof.
+  induction 1 as [| x l1 l2 IHsub1 IHsub2 | x l1 l2 IHsub1 IHsub2]; first done.
+  - rewrite elem_of_cons.
+    intros [-> | Hin]; first by apply elem_of_list_here.
+    rewrite elem_of_cons.
+    right.
+    by apply IHsub2.
+  - rewrite elem_of_cons.
+    right.
+    by apply IHsub2.
+Qed.
+Lemma sublist_singleton_eq_mem l s :
+  [s] `sublist_of` l ↔ s ∈ l.
+Proof.
+  induction l as [| hd tail IH];
+    first by rewrite sublist_nil_r;setoid_rewrite elem_of_nil.
+  split.
+  - inversion 1; first by apply elem_of_list_here.
+    subst.
+    rewrite elem_of_cons; setoid_rewrite <-IH.
+    naive_solver.
+  - inversion 1; subst.
+    + apply sublist_skip.
+      apply sublist_nil_l.
+    + apply sublist_cons.
+      by rewrite IH.
+Qed.
+Lemma sublist_NoDup l1 l2 :
+  NoDup l2 ->
+  l1 `sublist_of` l2  ->
+  NoDup l1.
+Proof.
+  intros Hnodup.
+  induction 1 as [| s l1 l2 IHsub1 IHsub2 | s l1 l2 IHsub1 IHsub2]; first done.
+  - rewrite NoDup_cons in Hnodup.
+    destruct Hnodup as [Hnotin Hnodup].
+    rewrite NoDup_cons.
+    split; last by apply IHsub2.
+    unfold not. intros Hin.
+    apply Hnotin.
+    by eapply mem_sublist; first exact IHsub1.
+  - rewrite NoDup_cons in Hnodup.
+    destruct Hnodup as [Hnotin Hnodup].
+    by apply IHsub2.
+Qed.
 Lemma Permutation_sublist l1 l2 l3 :
   l1 ≡ₚ l2 → l2 `sublist_of` l3 → ∃ l4, l1 `sublist_of` l4 ∧ l4 ≡ₚ l3.
 Proof.
