@@ -2,4 +2,4 @@
 (coq.theory
  (name stdpp.bitvector)
  (package coq-stdpp-bitvector)
- (theories stdpp))
+ (theories Stdlib stdpp))
