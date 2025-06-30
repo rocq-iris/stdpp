@@ -1,7 +1,12 @@
 This file lists "large-ish" changes to the std++ Coq library, but not every
 API-breaking change is listed.
 
-## 1.12.0 (2025-06-04)
+## std++ master
+
+- Declare the internals of `coPset` as `Local`.
+- Improve documentation of `coPset`. (by François Pottier)
+
+## std++ 1.12.0 (2025-06-04)
 
 std++ 1.12 supports Coq 8.18, 8.19, 8.20, and Rocq 9.0.
 
