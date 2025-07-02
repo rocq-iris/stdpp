@@ -6,6 +6,11 @@ API-breaking change is listed.
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
+- Generalise `gmap_curry`, `gmap_uncurry` to any finite map as `map_curry`,
+  `map_uncurry`. (by Isaac van Bakel)
+- Add generalised versions of all `gmap_curry`, `gmap_uncurry` lemmas which
+  apply to `map_curry`, `map_uncurry`. These have the same naming scheme as
+  their `gmap` versions, just with `map` instead.
 
 ## std++ 1.12.0 (2025-06-04)
 
