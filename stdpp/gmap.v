@@ -597,89 +597,37 @@ Proof. destruct m as [|t]; [done|]. apply lookup_pmap_ne_to_gmap_dep_ne. Qed.
 
 (** * Curry and uncurry *)
 Definition gmap_uncurry `{Countable K1, Countable K2} {A} :
-    gmap K1 (gmap K2 A) → gmap (K1 * K2) A :=
-  map_fold (λ i1 m' macc,
-    map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
+    gmap K1 (gmap K2 A) → gmap (K1 * K2) A := map_uncurry.
 Definition gmap_curry `{Countable K1, Countable K2} {A} :
-    gmap (K1 * K2) A → gmap K1 (gmap K2 A) :=
-  map_fold (λ '(i1, i2) x,
-    partial_alter (Some ∘ <[i2:=x]> ∘ default ∅) i1) ∅.
+    gmap (K1 * K2) A → gmap K1 (gmap K2 A) := map_curry.
 
 Section curry_uncurry.
   Context `{Countable K1, Countable K2} {A : Type}.
 
   Lemma lookup_gmap_uncurry (m : gmap K1 (gmap K2 A)) i j :
     gmap_uncurry m !! (i,j) = m !! i ≫= (.!! j).
-  Proof.
-    apply (map_fold_weak_ind (λ mr m, mr !! (i,j) = m !! i ≫= (.!! j))).
-    { by rewrite !lookup_empty. }
-    clear m; intros i' m2 m m12 Hi' IH.
-    apply (map_fold_weak_ind (λ m2r m2, m2r !! (i,j) = <[i':=m2]> m !! i ≫= (.!! j))).
-    { rewrite IH. destruct (decide (i' = i)) as [->|].
-      - rewrite lookup_insert, Hi'; simpl; by rewrite lookup_empty.
-      - by rewrite lookup_insert_ne by done. }
-    intros j' y m2' m12' Hj' IH'. destruct (decide (i = i')) as [->|].
-    - rewrite lookup_insert; simpl. destruct (decide (j = j')) as [->|].
-      + by rewrite !lookup_insert.
-      + by rewrite !lookup_insert_ne, IH', lookup_insert by congruence.
-    - by rewrite !lookup_insert_ne, IH', lookup_insert_ne by congruence.
-  Qed.
+  Proof. apply lookup_map_uncurry. Qed.
 
   Lemma lookup_gmap_curry (m : gmap (K1 * K2) A) i j :
     gmap_curry m !! i ≫= (.!! j) = m !! (i, j).
-  Proof.
-    apply (map_fold_weak_ind (λ mr m, mr !! i ≫= (.!! j) = m !! (i, j))).
-    { by rewrite !lookup_empty. }
-    clear m; intros [i' j'] x m12 mr Hij' IH.
-    destruct (decide (i = i')) as [->|].
-    - rewrite lookup_partial_alter. destruct (decide (j = j')) as [->|].
-      + destruct (mr !! i'); simpl; by rewrite !lookup_insert.
-      + destruct (mr !! i'); simpl; by rewrite !lookup_insert_ne by congruence.
-    - by rewrite lookup_partial_alter_ne, lookup_insert_ne by congruence.
-  Qed.
+  Proof. apply lookup_map_curry. Qed.
 
   Lemma lookup_gmap_curry_None (m : gmap (K1 * K2) A) i :
     gmap_curry m !! i = None ↔ (∀ j, m !! (i, j) = None).
-  Proof.
-    apply (map_fold_weak_ind
-      (λ mr m, mr !! i = None ↔ (∀ j, m !! (i, j) = None))); [done|].
-    clear m; intros [i' j'] x m12 mr Hij' IH.
-    destruct (decide (i = i')) as [->|].
-    - split; [by rewrite lookup_partial_alter|].
-      intros Hi. specialize (Hi j'). by rewrite lookup_insert in Hi.
-    - rewrite lookup_partial_alter_ne, IH; [|done]. apply forall_proper.
-      intros j. rewrite lookup_insert_ne; [done|congruence].
-  Qed.
+  Proof. apply lookup_map_curry_None. Qed.
 
   Lemma gmap_uncurry_curry (m : gmap (K1 * K2) A) :
     gmap_uncurry (gmap_curry m) = m.
-  Proof.
-   apply map_eq; intros [i j]. by rewrite lookup_gmap_uncurry, lookup_gmap_curry.
-  Qed.
+  Proof. apply map_uncurry_curry. Qed.
 
   Lemma gmap_curry_non_empty (m : gmap (K1 * K2) A) i x :
     gmap_curry m !! i = Some x → x ≠ ∅.
-  Proof.
-    intros Hm ->. eapply eq_None_not_Some; [|by eexists].
-    eapply lookup_gmap_curry_None; intros j.
-    by rewrite <-lookup_gmap_curry, Hm.
-  Qed.
+  Proof. apply map_curry_non_empty. Qed.
 
   Lemma gmap_curry_uncurry_non_empty (m : gmap K1 (gmap K2 A)) :
     (∀ i x, m !! i = Some x → x ≠ ∅) →
     gmap_curry (gmap_uncurry m) = m.
-  Proof.
-    intros Hne. apply map_eq; intros i. destruct (m !! i) as [m2|] eqn:Hm.
-    - destruct (gmap_curry (gmap_uncurry m) !! i) as [m2'|] eqn:Hcurry.
-      + f_equal. apply map_eq. intros j.
-        trans (gmap_curry (gmap_uncurry m) !! i ≫= (.!! j)).
-        { by rewrite Hcurry. }
-        by rewrite lookup_gmap_curry, lookup_gmap_uncurry, Hm.
-      + rewrite lookup_gmap_curry_None in Hcurry.
-        exfalso; apply (Hne i m2), map_eq; [done|intros j].
-        by rewrite lookup_empty, <-(Hcurry j), lookup_gmap_uncurry, Hm.
-   - apply lookup_gmap_curry_None; intros j. by rewrite lookup_gmap_uncurry, Hm.
-  Qed.
+  Proof. apply map_curry_uncurry_non_empty. Qed.
 End curry_uncurry.
 
 (** * Finite sets *)
