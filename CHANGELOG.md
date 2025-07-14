@@ -6,11 +6,28 @@ API-breaking change is listed.
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
-- Generalise `gmap_curry`, `gmap_uncurry` to any finite map as `map_curry`,
+- Generalize `gmap_curry`, `gmap_uncurry` to any finite map as `map_curry`,
   `map_uncurry`. (by Isaac van Bakel)
-- Add generalised versions of all `gmap_curry`, `gmap_uncurry` lemmas which
-  apply to `map_curry`, `map_uncurry`. These have the same naming scheme as
-  their `gmap` versions, just with `map` instead.
+- Replace all `gmap_curry`, `gmap_uncurry` lemmas with generalized versions
+  which apply to `map_curry`, `map_uncurry`. These have the same naming scheme
+  as their `gmap` versions, just with `map` instead.
+
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
+Note that the script is not idempotent, do not run it twice.
+```
+sed -i -E -f- $(find theories -name "*.v") <<EOF
+# gmap_curry/uncurry
+s/\bgmap_curry\b/map_curry/g
+s/\bgmap_uncurry\b/map_uncurry/g
+s/\blookup_gmap_uncurry\b/lookup_map_uncurry/g
+s/\blookup_gmap_curry\b/lookup_map_curry/g
+s/\blookup_gmap_curry_None\b/lookup_map_curry_None/g
+s/\bgmap_uncurry_curry\b/map_uncurry_curry/g
+s/\bgmap_curry_non_empty\b/map_curry_non_empty/g
+s/\bgmap_curry_uncurry_non_empty\b/map_curry_uncurry_non_empty/g
+EOF
+```
 
 ## std++ 1.12.0 (2025-06-04)
 
