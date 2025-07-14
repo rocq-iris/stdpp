@@ -595,41 +595,6 @@ Proof. revert P i p; induction t; intros ? [] ?; by simpl. Qed.
 Lemma lookup_pmap_to_gmap {A} (m : Pmap A) i : pmap_to_gmap m !! i = m !! i.
 Proof. destruct m as [|t]; [done|]. apply lookup_pmap_ne_to_gmap_dep_ne. Qed.
 
-(** * Curry and uncurry *)
-Definition gmap_uncurry `{Countable K1, Countable K2} {A} :
-    gmap K1 (gmap K2 A) → gmap (K1 * K2) A := map_uncurry.
-Definition gmap_curry `{Countable K1, Countable K2} {A} :
-    gmap (K1 * K2) A → gmap K1 (gmap K2 A) := map_curry.
-
-Section curry_uncurry.
-  Context `{Countable K1, Countable K2} {A : Type}.
-
-  Lemma lookup_gmap_uncurry (m : gmap K1 (gmap K2 A)) i j :
-    gmap_uncurry m !! (i,j) = m !! i ≫= (.!! j).
-  Proof. apply lookup_map_uncurry. Qed.
-
-  Lemma lookup_gmap_curry (m : gmap (K1 * K2) A) i j :
-    gmap_curry m !! i ≫= (.!! j) = m !! (i, j).
-  Proof. apply lookup_map_curry. Qed.
-
-  Lemma lookup_gmap_curry_None (m : gmap (K1 * K2) A) i :
-    gmap_curry m !! i = None ↔ (∀ j, m !! (i, j) = None).
-  Proof. apply lookup_map_curry_None. Qed.
-
-  Lemma gmap_uncurry_curry (m : gmap (K1 * K2) A) :
-    gmap_uncurry (gmap_curry m) = m.
-  Proof. apply map_uncurry_curry. Qed.
-
-  Lemma gmap_curry_non_empty (m : gmap (K1 * K2) A) i x :
-    gmap_curry m !! i = Some x → x ≠ ∅.
-  Proof. apply map_curry_non_empty. Qed.
-
-  Lemma gmap_curry_uncurry_non_empty (m : gmap K1 (gmap K2 A)) :
-    (∀ i x, m !! i = Some x → x ≠ ∅) →
-    gmap_curry (gmap_uncurry m) = m.
-  Proof. apply map_curry_uncurry_non_empty. Qed.
-End curry_uncurry.
-
 (** * Finite sets *)
 Definition gset K `{Countable K} := mapset (gmap K).
 

@@ -246,6 +246,21 @@ Notation "(∘ₘ)" := map_compose (only parsing) : stdpp_scope.
 Notation "( m ∘ₘ.)" := (map_compose m) (only parsing) : stdpp_scope.
 Notation "(.∘ₘ m )" := (λ n, map_compose n m) (only parsing) : stdpp_scope.
 
+Definition map_uncurry {M1 M2 M12}
+    `{!∀ A, MapFold K1 A (M1 A), !∀ A, MapFold K2 A (M2 A),
+      !∀ A, Empty (M12 A), !∀ A, PartialAlter (K1 * K2) A (M12 A)} {A} :
+    M1 (M2 A) → M12 A :=
+  map_fold (λ i1 m' macc,
+    map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
+
+Definition map_curry {M1 M2 M12}
+    `{!∀ A, PartialAlter K1 A (M1 A), !∀ A, Empty (M1 A),
+      !∀ A, PartialAlter K2 A (M2 A), !∀ A, Empty (M2 A),
+      !∀ A, MapFold (K1 * K2) A (M12 A)} {A} :
+    M12 A → M1 (M2 A) :=
+  map_fold (λ '(i1, i2) x,
+    partial_alter (Some ∘ <[i2:=x]> ∘ default ∅) i1) ∅.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -4726,19 +4741,10 @@ Proof.
 Qed.
 
 (** * Curry and uncurry *)
-Definition map_uncurry `{FinMap K1 M1, FinMap K2 M2, FinMap (K1 * K2) MC} {A} :
-    M1 (M2 A) → MC A :=
-  map_fold (λ i1 m' macc,
-    map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
-Definition map_curry `{FinMap K1 M1, FinMap K2 M2, FinMap (K1 * K2) MC} {A} :
-    MC A → M1 (M2 A) :=
-  map_fold (λ '(i1, i2) x,
-    partial_alter (Some ∘ <[i2:=x]> ∘ default ∅) i1) ∅.
-
 Section curry_uncurry.
   Context `{FinMap K1 M1, FinMap K2 M2, FinMap (K1 * K2) MC} {A : Type}.
   Notation map_curry := (map_curry (M1:=M1) (M2:=M2)).
-  Notation map_uncurry := (map_uncurry (MC:=MC)).
+  Notation map_uncurry := (map_uncurry (M12:=MC)).
 
   Lemma lookup_map_uncurry (m : M1 (M2 A)) i j :
     map_uncurry m !! (i,j) = m !! i ≫= (.!! j).
