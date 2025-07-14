@@ -5,6 +5,7 @@ API-breaking change is listed.
 
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
+- Add lemma `map_fmap_imap`. (by Rudy Peterson)
 
 ## std++ 1.12.0 (2025-06-04)
 
