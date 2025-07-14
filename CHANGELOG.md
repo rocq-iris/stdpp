@@ -16,6 +16,9 @@ API-breaking change is listed.
 - Add lemmas `list_to_set_singleton_L` and `list_to_set_snoc_L`. (by Rudy Peterson)
 - Add lemmas `elem_of_sublist`, `singleton_sublist_l` and `sublist_NoDup`.
   (by Kimaya Bedarkar)
+- Add instances `map_seq_inj` and `map_seqZ_inj`, and lemmas
+  `map_seq_list_to_map`, `map_seq_to_list`, `map_seqZ_list_to_map` and
+  `map_seqZ_to_list`. (by Rudy Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
