@@ -3954,6 +3954,37 @@ Section map_seq.
     i < length xs →
     <[i:=x]> (map_seq 0 xs) =@{M A} map_seq 0 (<[i:=x]> xs).
   Proof. intros. rewrite insert_map_seq by lia. auto with f_equal lia. Qed.
+
+  Global Instance map_seq_inj start : Inj (=) (=) (map_seq (M:=M A) start).
+  Proof.
+    intros xs1 xs2. rewrite map_eq_iff. intros Hmap. apply list_eq. intros i.
+    specialize Hmap with (i + start).
+    rewrite !lookup_map_seq in Hmap.
+    rewrite !option_guard_True in Hmap by lia.
+    by rewrite Nat.add_sub in Hmap.
+  Qed.
+
+  Lemma list_to_map_zip_seq start xs :
+    list_to_map (zip (seq start (length xs)) xs) = map_seq (M:=M A) start xs.
+  Proof.
+    apply map_eq; intros i. apply option_eq; intros x.
+    assert (NoDup (zip (seq start (length xs)) xs).*1).
+    { rewrite fst_zip by (rewrite length_seq; lia). apply NoDup_seq. }
+    rewrite lookup_map_seq_Some, <-elem_of_list_to_map by done.
+    rewrite elem_of_list_lookup.
+    setoid_rewrite lookup_zip_Some. setoid_rewrite lookup_seq. split.
+    - intros (i' & [-> ?] & <-). auto with f_equal lia.
+    - intros [??]. assert (i - start < length xs) by eauto using lookup_lt_Some.
+      exists (i - start). auto with lia.
+  Qed.
+  Lemma map_to_list_seq start xs :
+    map_to_list (map_seq (M:=M A) start xs) ≡ₚ zip (seq start (length xs)) xs.
+  Proof.
+    apply list_to_map_inj.
+    - apply NoDup_fst_map_to_list.
+    - rewrite fst_zip by (rewrite length_seq; lia). apply NoDup_seq.
+    - by rewrite list_to_map_to_list, list_to_map_zip_seq.
+  Qed.
 End map_seq.
 
 (** ** The [map_seqZ] operation *)
@@ -4090,6 +4121,41 @@ Section map_seqZ.
     (i < length xs)%nat →
     map_seqZ 0 (<[i:=x]> xs) =@{M A} <[Z.of_nat i:=x]> (map_seqZ 0 xs).
   Proof. intros. by rewrite map_seqZ_insert. Qed.
+
+  Global Instance map_seqZ_inj start : Inj (=) (=) (map_seqZ (M:=M A) start).
+  Proof.
+    intros xs1 xs2. rewrite map_eq_iff. intros Hmap. apply list_eq. intros i.
+    specialize Hmap with (Z.of_nat i + start).
+    rewrite !lookup_map_seqZ in Hmap.
+    rewrite !option_guard_True in Hmap by lia.
+    by rewrite !Z.add_simpl_r, !Nat2Z.id in Hmap.
+  Qed.
+
+  Lemma list_to_map_zip_seqZ start xs :
+    list_to_map (zip (seqZ start (Z.of_nat (length xs))) xs)
+    = map_seqZ (M:=M A) start xs.
+  Proof.
+    apply map_eq; intros i. apply option_eq; intros x.
+    assert (NoDup (zip (seqZ start (Z.of_nat (length xs))) xs).*1).
+    { rewrite fst_zip by (rewrite length_seqZ; lia). apply NoDup_seqZ. }
+    rewrite lookup_map_seqZ_Some, <-elem_of_list_to_map by done.
+    rewrite elem_of_list_lookup.
+    setoid_rewrite lookup_zip_Some. setoid_rewrite lookup_seqZ. split.
+    - intros (i' & [-> ?] & <-). auto with f_equal lia.
+    - intros [??]. assert (Z.to_nat (i - start) < length xs)%nat
+        by eauto using lookup_lt_Some.
+      exists (Z.to_nat (i - start)). auto with lia.
+  Qed.
+  Lemma map_to_list_seqZ start xs :
+    map_to_list (map_seqZ (M:=M A) start xs)
+    ≡ₚ zip (seqZ start (Z.of_nat (length xs))) xs.
+  Proof.
+    apply list_to_map_inj.
+    - apply NoDup_fst_map_to_list.
+    - rewrite fst_zip; first apply NoDup_seqZ.
+      by rewrite length_seqZ, Nat2Z.id.
+    - by rewrite list_to_map_to_list, list_to_map_zip_seqZ.
+  Qed.
 End map_seqZ.
 
 Section kmap.
