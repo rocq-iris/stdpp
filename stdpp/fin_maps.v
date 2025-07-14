@@ -4244,23 +4244,25 @@ Section kmap.
     kmap f m1 ⊂ kmap f m2 ↔ m1 ⊂ m2.
   Proof. unfold strict. by rewrite !kmap_subseteq. Qed.
 
-   Lemma kmap_map_to_list {A : Type} (m : M1 A) :
-     map_to_list (kmap f m) ≡ₚ (prod_map f id) <$> map_to_list m.
-   Proof.
-     induction m as [| i1 x m HNone Hfirstkey IHm] using map_first_key_ind.
-     - rewrite kmap_empty.
-       by do 2! rewrite map_to_list_empty.
-     - rewrite map_to_list_insert_first_key by done.
-       rewrite kmap_insert, map_to_list_insert.
-       + by rewrite IHm.
-       + by rewrite lookup_kmap.
-   Qed.
-   Lemma kmap_list_to_map {A : Type} (l : list (K1 * A)) :
-     kmap f (list_to_map l) = list_to_map (prod_map f id <$> l).
-   Proof.
-     induction l as [| [i1 x] l IHl]; simpl; first by rewrite kmap_empty.
-     by rewrite kmap_insert, IHl.
-   Qed.
+  (** This lemma is not an equality [=] but a permutation [≡ₚ] because it not
+  guaranteed that when we perform the list conversion on [m : M1] and
+  [kmap f m : M2] it happens in the same order. After all, [M1] and [M2] could
+  use two entirely different implementations of a finite map. *)
+  Lemma map_to_list_kmap {A} (m : M1 A) :
+    map_to_list (kmap f m) ≡ₚ prod_map f id <$> map_to_list m.
+  Proof.
+    induction m as [|i x m ?? IH] using map_first_key_ind.
+    { by rewrite kmap_empty, !map_to_list_empty. }
+    rewrite map_to_list_insert_first_key by done.
+    rewrite kmap_insert, map_to_list_insert by (by rewrite lookup_kmap).
+    by rewrite IH.
+  Qed.
+  Lemma kmap_list_to_map {A} (l : list (K1 * A)) :
+    kmap f (list_to_map l) = list_to_map (prod_map f id <$> l).
+  Proof.
+    induction l as [|[i x] l IH]; simpl; first by rewrite kmap_empty.
+    by rewrite kmap_insert, IH.
+  Qed.
 End kmap.
 
 Section preimg.
