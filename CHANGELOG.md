@@ -35,7 +35,7 @@ EOF
 std++ 1.12 supports Coq 8.18, 8.19, 8.20, and Rocq 9.0.
 
 This released of std++ was managed by Jesper Bengtson, Ralf Jung,
-and Robbert Krebbers, with contributinos from Andres Erbsen, Kimaya Bedarkar,
+and Robbert Krebbers, with contributions from Andres Erbsen, Kimaya Bedarkar,
 Marijn van Wezel, Michael Sammler, Ralf Jung, Robbert Krebbers, Rodolphe Lepigre,
 Rudy Peterson, and Marijn van Wezel. Thanks a lot to everyone involved.
 
