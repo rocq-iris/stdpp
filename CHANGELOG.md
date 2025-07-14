@@ -11,6 +11,7 @@ API-breaking change is listed.
 - Replace all `gmap_curry`, `gmap_uncurry` lemmas with generalized versions
   which apply to `map_curry`, `map_uncurry`. These have the same naming scheme
   as their `gmap` versions, just with `map` instead.
+- Add lemmas `map_to_list_kmap` and `kmap_list_to_map`. (by Rudy Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
