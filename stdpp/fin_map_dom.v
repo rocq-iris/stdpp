@@ -209,27 +209,21 @@ Lemma map_to_list_update {A} (m : M A) j i x1 x2 :
   map_to_list m !! j = Some (i, x1) →
   map_to_list (<[i:=x2]> m) = <[j:=(i,x2)]> (map_to_list m).
 Proof.
-  revert j i x1 x2.
-  induction m as [| i x m HNone Hfirstkey IHm] using map_first_key_ind;
-    intros j i1 x1 x2; simpl; first by rewrite map_to_list_empty, lookup_nil.
-  rewrite map_to_list_insert_first_key by done.
-  destruct (decide (i1 = i)) as [-> | Hii1].
-  - rewrite insert_insert, map_to_list_insert_first_key; try done.
-    2:{ rewrite (map_first_key_dom _ (<[i:=x]> m)); first assumption.
-        by do 2 rewrite dom_insert. }
-    destruct j as [| j]; simpl; first by intros [= <-].
-    intros Hm%elem_of_list_lookup_2.
-    by rewrite elem_of_map_to_list, HNone in Hm.
-  - destruct j as [| j]; simpl; first by intros [= <- <-].
-    rewrite insert_commute by done. intros Hm.
-    pose proof elem_of_list_lookup_2 _ _ _ Hm as Hmem.
-    rewrite elem_of_map_to_list in Hmem.
-    apply elem_of_dom_2 in Hmem.
-    rewrite map_to_list_insert_first_key.
-    2: by rewrite lookup_insert_ne.
-    2:{ rewrite (map_first_key_dom _ (<[i:=x]> m)); first assumption.
-        repeat rewrite dom_insert. set_solver. }
-    by rewrite (IHm _ _ _ x2 Hm).
+  revert j i.
+  induction m as [|i x m ?? IH] using map_first_key_ind; intros j i' Hj.
+  { by rewrite map_to_list_empty in Hj. }
+  rewrite (map_to_list_insert_first_key m) by done.
+  rewrite map_to_list_insert_first_key in Hj by done. destruct j; simplify_eq/=.
+  - assert (map_first_key (<[i':=x2]> m) i').
+    { eapply map_first_key_dom; last done. by rewrite !dom_insert. }
+    by rewrite insert_insert, !map_to_list_insert_first_key by done.
+  - assert (m !! i' = Some x1) as Hi'.
+    { by apply elem_of_list_lookup_2, elem_of_map_to_list in Hj. }
+    rewrite insert_commute by naive_solver. rewrite <-IH by done.
+    apply map_to_list_insert_first_key.
+    { rewrite lookup_insert_ne; naive_solver. }
+    eapply map_first_key_dom; last done.
+    apply elem_of_dom_2 in Hi'. rewrite !dom_insert. set_solver.
 Qed.
 
 Lemma size_dom `{!Elements K D, !FinSet K D} {A} (m : M A) :
