@@ -904,7 +904,7 @@ Proof. reflexivity. Qed.
 Lemma take_nil n : take n [] =@{list A} [].
 Proof. by destruct n. Qed.
 Lemma take_nil_inv l n : take n l = [] → n = 0 ∨ l = [].
-Proof. by destruct n; destruct l; naive_solver. Qed.
+Proof. destruct n, l; naive_solver. Qed.
 Lemma take_S_r l n x : l !! n = Some x → take (S n) l = take n l ++ [x].
 Proof. revert n. induction l; intros []; naive_solver eauto with f_equal. Qed.
 Lemma take_ge l n : length l ≤ n → take n l = l.
@@ -999,13 +999,7 @@ Proof. done. Qed.
 Lemma drop_nil n : drop n [] =@{list A} [].
 Proof. by destruct n. Qed.
 Lemma drop_nil_inv l n : drop n l = [] → length l ≤ n.
-Proof.
-  induction l as [|? ? IHlist] in n|-*.
-  - rewrite drop_nil; intros; simpl; lia.
-  - destruct n as [|n]; first by rewrite drop_0; intros ->; simpl.
-    simpl; intro.
-    by ospecialize (IHlist n _); last lia.
-Qed.
+Proof. revert n; induction l; intros [|?]; naive_solver eauto with lia. Qed.
 Lemma drop_S l x n :
   l !! n = Some x → drop n l = x :: drop (S n) l.
 Proof. revert n. induction l; intros []; naive_solver. Qed.
