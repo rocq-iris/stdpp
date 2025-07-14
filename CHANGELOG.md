@@ -14,6 +14,8 @@ API-breaking change is listed.
 - Add lemmas `map_to_list_kmap` and `kmap_list_to_map`. (by Rudy Peterson)
 - Add lemmas `list_to_set_fmap` and `list_to_set_fmap_L`. (by Rudy Peterson)
 - Add lemmas `list_to_set_singleton_L` and `list_to_set_snoc_L`. (by Rudy Peterson)
+- Add lemmas `elem_of_sublist`, `singleton_sublist_l` and `sublist_NoDup`.
+  (by Kimaya Bedarkar)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
