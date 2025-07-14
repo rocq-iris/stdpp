@@ -558,7 +558,7 @@ Section map.
     set_map (C:=C) (D:=D) f {[x]} ≡ {[f x]}.
   Proof. set_solver. Qed.
 
-  Lemma list_to_set_map (f : A → B) (l : list A) :
+  Lemma list_to_set_fmap (f : A → B) (l : list A) :
     list_to_set (f <$> l) ≡@{D} set_map f (list_to_set (C:=C) l).
   Proof. set_solver. Qed.
 
@@ -569,9 +569,10 @@ Section map.
     set_map (C:=C) (D:=D) f {[x]} = {[f x]}.
   Proof. unfold_leibniz. apply set_map_singleton. Qed.
 
-  Lemma list_to_set_map_L `{!LeibnizEquiv C, !LeibnizEquiv D} (f : A → B) (l : list A) :
+  Lemma list_to_set_fmap_L `{!LeibnizEquiv C, !LeibnizEquiv D}
+      (f : A → B) (l : list A) :
     list_to_set (f <$> l) =@{D} set_map f (list_to_set (C:=C) l).
-  Proof. set_solver. Qed.
+  Proof. unfold_leibniz. apply list_to_set_fmap. Qed.
 End map.
 
 (** * Bind *)
