@@ -246,6 +246,21 @@ Notation "(∘ₘ)" := map_compose (only parsing) : stdpp_scope.
 Notation "( m ∘ₘ.)" := (map_compose m) (only parsing) : stdpp_scope.
 Notation "(.∘ₘ m )" := (λ n, map_compose n m) (only parsing) : stdpp_scope.
 
+Definition map_uncurry {M1 M2 M12}
+    `{!∀ A, MapFold K1 A (M1 A), !∀ A, MapFold K2 A (M2 A),
+      !∀ A, Empty (M12 A), !∀ A, PartialAlter (K1 * K2) A (M12 A)} {A} :
+    M1 (M2 A) → M12 A :=
+  map_fold (λ i1 m' macc,
+    map_fold (λ i2 x, <[(i1,i2):=x]>) macc m') ∅.
+
+Definition map_curry {M1 M2 M12}
+    `{!∀ A, PartialAlter K1 A (M1 A), !∀ A, Empty (M1 A),
+      !∀ A, PartialAlter K2 A (M2 A), !∀ A, Empty (M2 A),
+      !∀ A, MapFold (K1 * K2) A (M12 A)} {A} :
+    M12 A → M1 (M2 A) :=
+  map_fold (λ '(i1, i2) x,
+    partial_alter (Some ∘ <[i2:=x]> ∘ default ∅) i1) ∅.
+
 (** * Theorems *)
 Section theorems.
 Context `{FinMap K M}.
@@ -4724,6 +4739,89 @@ Proof.
   apply map_eq; intros a. rewrite lookup_omap, !map_lookup_compose.
   destruct (n !! a); simpl; [|done]. by rewrite lookup_omap.
 Qed.
+
+(** * Curry and uncurry *)
+Section curry_uncurry.
+  Context `{FinMap K1 M1, FinMap K2 M2, FinMap (K1 * K2) MC} {A : Type}.
+  Notation map_curry := (map_curry (M1:=M1) (M2:=M2)).
+  Notation map_uncurry := (map_uncurry (M12:=MC)).
+
+  Lemma lookup_map_uncurry (m : M1 (M2 A)) i j :
+    map_uncurry m !! (i,j) = m !! i ≫= (.!! j).
+  Proof.
+    apply (map_fold_weak_ind (λ mr m, mr !! (i,j) = m !! i ≫= (.!! j))).
+    { by rewrite !lookup_empty. }
+    clear m; intros i' m2 m m12 Hi' IH.
+    apply (map_fold_weak_ind (λ m2r m2, m2r !! (i,j) = <[i':=m2]> m !! i ≫= (.!! j))).
+    { rewrite IH. destruct (decide (i' = i)) as [->|].
+      - rewrite lookup_insert, Hi'; simpl; by rewrite lookup_empty.
+      - by rewrite lookup_insert_ne by done. }
+    intros j' y m2' m12' Hj' IH'. destruct (decide (i = i')) as [->|].
+    - rewrite lookup_insert; simpl. destruct (decide (j = j')) as [->|].
+      + by rewrite !lookup_insert.
+      + by rewrite !lookup_insert_ne, IH', lookup_insert by congruence.
+    - by rewrite !lookup_insert_ne, IH', lookup_insert_ne by congruence.
+  Qed.
+
+  Lemma lookup_map_curry (m : MC A) i j :
+    map_curry m !! i ≫= (.!! j) = m !! (i, j).
+  Proof.
+    apply (map_fold_weak_ind (λ mr m, mr !! i ≫= (.!! j) = m !! (i, j))).
+    { by rewrite !lookup_empty. }
+    clear m; intros [i' j'] x m12 mr Hij' IH.
+    destruct (decide (i = i')) as [->|].
+    - rewrite lookup_partial_alter. destruct (decide (j = j')) as [->|].
+      + destruct (mr !! i'); simpl; by rewrite !lookup_insert.
+      + destruct (mr !! i'); simpl; rewrite !lookup_insert_ne by congruence; first done.
+        by rewrite <-IH, lookup_empty.
+    - by rewrite lookup_partial_alter_ne, lookup_insert_ne by congruence.
+  Qed.
+
+  Lemma lookup_map_curry_None (m : MC A) i :
+    map_curry m !! i = None ↔ (∀ j, m !! (i, j) = None).
+  Proof.
+    apply (map_fold_weak_ind
+      (λ mr m, mr !! i = None ↔ (∀ j, m !! (i, j) = None))).
+    { split; intros; by rewrite !lookup_empty. }
+    clear m; intros [i' j'] x m12 mr Hij' IH.
+    destruct (decide (i = i')) as [->|].
+    - split; [by rewrite lookup_partial_alter|].
+      intros Hi. specialize (Hi j'). by rewrite lookup_insert in Hi.
+    - rewrite lookup_partial_alter_ne, IH; [|done]. apply forall_proper.
+      intros j. rewrite lookup_insert_ne; [done|congruence].
+  Qed.
+
+  Lemma map_uncurry_curry (m : MC A) :
+    map_uncurry (map_curry m) = m.
+  Proof.
+   apply map_eq; intros [i j]. by rewrite lookup_map_uncurry, lookup_map_curry.
+  Qed.
+
+  Lemma map_curry_non_empty (m : MC A) i x :
+    map_curry m !! i = Some x → x ≠ ∅.
+  Proof.
+    intros Hm ->. eapply eq_None_not_Some; [|by eexists].
+    eapply lookup_map_curry_None; intros j.
+    rewrite <-lookup_map_curry, Hm.
+    simpl. by rewrite lookup_empty.
+  Qed.
+
+  Lemma map_curry_uncurry_non_empty (m : M1 (M2 A)) :
+    (∀ i x, m !! i = Some x → x ≠ ∅) →
+    map_curry (map_uncurry m) = m.
+  Proof.
+    intros Hne. apply map_eq; intros i. destruct (m !! i) as [m2|] eqn:Hm.
+    - destruct (map_curry (map_uncurry m) !! i) as [m2'|] eqn:Hcurry.
+      + f_equal. apply map_eq. intros j.
+        replace (m2 !! j) with (Some m2 ≫= (.!! j)); last by simpl.
+        replace (m2' !! j) with (Some m2' ≫= (.!! j)); last by simpl.
+        by rewrite <-Hcurry, lookup_map_curry, lookup_map_uncurry, Hm.
+      + rewrite lookup_map_curry_None in Hcurry.
+        exfalso; apply (Hne i m2), map_eq; [done|intros j].
+        by rewrite lookup_empty, <-(Hcurry j), lookup_map_uncurry, Hm.
+   - apply lookup_map_curry_None; intros j. by rewrite lookup_map_uncurry, Hm.
+  Qed.
+End curry_uncurry.
 
 (** * Tactics *)
 (** The tactic [decompose_map_disjoint] simplifies occurrences of [disjoint]
