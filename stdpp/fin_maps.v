@@ -3644,14 +3644,14 @@ Proof.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
 
-Lemma map_disjoint_difference_l {A} (m1 m2 m3 : M A) : m3 ⊆ m2 → m1 ∖ m2 ##ₘ m3.
+Lemma map_disjoint_difference_l1 {A} (m1 m2 m3 : M A) : m3 ⊆ m2 → m1 ∖ m2 ##ₘ m3.
 Proof.
   intros Hm i; specialize (Hm i).
   unfold difference, map_difference; rewrite lookup_difference_with.
   by destruct (m1 !! i), (m2 !! i), (m3 !! i).
 Qed.
-Lemma map_disjoint_difference_r {A} (m1 m2 m3 : M A) : m3 ⊆ m2 → m3 ##ₘ m1 ∖ m2.
-Proof. intros. symmetry. by apply map_disjoint_difference_l. Qed.
+Lemma map_disjoint_difference_r1 {A} (m1 m2 m3 : M A) : m3 ⊆ m2 → m3 ##ₘ m1 ∖ m2.
+Proof. intros. symmetry. by apply map_disjoint_difference_l1. Qed.
 
 Lemma map_subseteq_difference_l {A} (m1 m2 m : M A) : m1 ⊆ m → m1 ∖ m2 ⊆ m.
 Proof.
@@ -3667,61 +3667,56 @@ Proof.
   destruct (m1 !! i) as [x'|], (m2 !! i);
     try specialize (Hm1m2 x'); compute; intuition congruence.
 Qed.
+
 Lemma map_difference_union_distr_l {A} (m1 m2 m3 : M A) :
   (m1 ∪ m2) ∖ m3 = m1 ∖ m3 ∪ m2 ∖ m3.
 Proof.
-  eapply map_eq. intros i.
-  rewrite !lookup_union, !lookup_difference.
-  destruct (m3 !! i); [done|].
-  by rewrite lookup_union.
+  apply map_eq. intros i.
+  rewrite !lookup_union, !lookup_difference, !lookup_union.
+  by repeat destruct (_ !! _).
 Qed.
 Lemma map_difference_union_distr_r {A} (m1 m2 m3 : M A) :
   m1 ∖ (m2 ∪ m3) = (m1 ∖ m2) ∩ (m1 ∖ m3).
 Proof.
-  eapply map_eq. intros i.
+  apply map_eq. intros i.
   rewrite lookup_intersection, !lookup_difference, !lookup_union.
-  destruct (m2 !! i), (m3 !! i); simpl.
-  - done.
-  - done.
-  - by rewrite intersection_None_r.
-  - by destruct (m1 !! i).
+  by repeat destruct (_ !! _).
 Qed.
 Lemma map_empty_difference {A} (m : M A) :
   ∅ ∖ m = ∅.
 Proof.
-  eapply map_eq_iff. intros i.
+  apply map_eq. intros i.
   rewrite lookup_difference, !lookup_empty.
-  by destruct lookup.
+  by repeat destruct (_ !! _).
 Qed.
+
 Lemma map_difference_disjoint {A} (m1 m2 : M A) :
   m1 ##ₘ m2 → m1 ∖ m2 = m1.
 Proof.
-  intros HH. rewrite map_disjoint_spec in HH. eapply map_eq_iff. intros i.
-  specialize (HH i).
-  rewrite lookup_difference.
-  destruct (m1 !! i), (m2 !! i); [|done..].
-  exfalso. by eapply HH.
+  intros Hdisj. rewrite map_disjoint_spec in Hdisj. apply map_eq. intros i.
+  specialize (Hdisj i). rewrite lookup_difference.
+  repeat destruct (_ !! _); naive_solver.
 Qed.
 Lemma map_disjoint_difference_l2 {A} (m1 m2 m3 : M A):
   m1 ##ₘ m2 → m1 ∖ m3 ##ₘ m2.
 Proof.
-  intros HH. eapply map_disjoint_spec. intros k v1 v2 Hv1 Hv2.
-  rewrite lookup_difference in Hv1. destruct (m3 !! k); first done.
-  by eapply map_disjoint_spec in HH as [].
+  rewrite !map_disjoint_spec. intros Hdisj k x1 x2 Hx1 Hx2.
+  rewrite lookup_difference in Hx1. destruct (m3 !! k); naive_solver.
 Qed.
 Lemma map_disjoint_difference_r2 {A} (m1 m2 m3 : M A):
   m1 ##ₘ m2 → m1 ##ₘ m2 ∖ m3.
-Proof.
-  intros HH. symmetry. by eapply map_disjoint_difference_l2.
-Qed.
+Proof. intros. symmetry. by apply map_disjoint_difference_l2. Qed.
 Lemma map_difference_diag {A} (m : M A) : m ∖ m = ∅.
 Proof.
   apply map_empty; intros i. rewrite lookup_difference_None.
   destruct (m !! i); eauto.
 Qed.
+
 Global Instance map_difference_right_id {A} : RightId (=@{M A}) ∅ (∖) := _.
+
 Lemma map_difference_empty {A} (m : M A) : m ∖ ∅ = m.
 Proof. by rewrite (right_id _ _). Qed.
+
 Lemma map_fmap_difference {A B} (f : A → B) (m1 m2 : M A) :
   f <$> (m1 ∖ m2) = (f <$> m1) ∖ (f <$> m2).
 Proof.
