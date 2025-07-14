@@ -1245,9 +1245,8 @@ Lemma map_imap_empty {A B} (f : K → A → option B) :
   map_imap f ∅ =@{M B} ∅.
 Proof. apply map_eq; intros i. by rewrite map_lookup_imap, !lookup_empty. Qed.
 
-Lemma map_fmap_imap_compose {A B C : Type}
-    (f : K → A → option B) (g : B → C) (m : M A) :
-  g <$> (map_imap f m) = map_imap (λ i x, g <$> f i x) m.
+Lemma map_fmap_imap {A B C} (f : K → A → option B) (g : B → C) (m : M A) :
+  g <$> map_imap f m = map_imap (λ i x, g <$> f i x) m.
 Proof.
   apply map_eq. intros i. rewrite lookup_fmap.
   rewrite !map_lookup_imap. by destruct (m !! i).
