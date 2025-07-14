@@ -780,6 +780,28 @@ Proof.
   - destruct (IH k) as [is His]. exists (is ++ [length k]).
     rewrite fold_right_app. simpl. by rewrite delete_middle.
 Qed.
+
+Lemma elem_of_sublist l1 l2 x :
+  x ∈ l1 → l1 `sublist_of` l2 → x ∈ l2.
+Proof.
+  intros Hx Hl. revert Hx.
+  induction Hl; rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
+Qed.
+Lemma singleton_sublist_l l x :
+  [x] `sublist_of` l ↔ x ∈ l.
+Proof.
+  split.
+  - intros Hl. eapply elem_of_sublist, Hl. by apply elem_of_list_singleton.
+  - intros (l1&l2&->)%elem_of_list_split.
+    apply sublist_inserts_l, sublist_skip, sublist_nil_l.
+Qed.
+Lemma sublist_NoDup l1 l2 :
+  NoDup l2 → l1 `sublist_of` l2 → NoDup l1.
+Proof.
+  intros Hdup. revert l1.
+  induction Hdup; inv 1; try constructor; eauto using elem_of_sublist.
+Qed.
+
 Lemma Permutation_sublist l1 l2 l3 :
   l1 ≡ₚ l2 → l2 `sublist_of` l3 → ∃ l4, l1 `sublist_of` l4 ∧ l4 ≡ₚ l3.
 Proof.
