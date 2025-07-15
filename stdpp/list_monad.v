@@ -76,11 +76,14 @@ Fixpoint interleave {A} (x : A) (l : list A) : list (list A) :=
 Fixpoint permutations {A} (l : list A) : list (list A) :=
   match l with [] => [[]] | x :: l => permutations l ≫= interleave x end.
 
-(** The function [submsetseq l] yields all lists [l'] such that [l' ⊆+ l]. *)
-Fixpoint submsetseq {A} (l : list A) : list (list A) :=
+(** The function [powermset l] returns the list of all lists [l'] such that
+[l' ⊆+ l] (notation for [submseteq l' l]). In other words, it returns the
+"powerset" of [l], where each [l'] is obtained from [l] by removing elements
+and possibly changing the order. *)
+Fixpoint powermset {A} (l : list A) : list (list A) :=
   match l with
   | [] => [[]]
-  | x :: l => (submsetseq l ≫= interleave x) ++ submsetseq l
+  | x :: l => (powermset l ≫= interleave x) ++ powermset l
   end.
 
 Section general_properties.
@@ -742,13 +745,13 @@ Section permutations.
   Qed.
 End permutations.
 
-(** ** Properties of the [submsetseq] function. *)
-Section submsetseq.
+(** ** Properties of the [powermset] function. *)
+Section powermset.
   Context {A : Type}.
   Implicit Types x y z : A.
   Implicit Types l : list A.
 
-  Lemma submsetseq_submseteq l l' : l ∈ submsetseq l' ↔ l ⊆+ l'.
+  Lemma powermset_submseteq l l' : l ∈ powermset l' ↔ l ⊆+ l'.
   Proof.
    split.
    - revert l; induction l' as [|x l' IH]; simpl; intros l.
@@ -766,18 +769,18 @@ Section submsetseq.
      + apply elem_of_interleave. by exists k1, k2.
      + apply IH. by rewrite <-Hperm.
   Qed.
-  Lemma submsetseq_refl l : l ∈ submsetseq l.
-  Proof. by rewrite submsetseq_submseteq. Qed.
-  Lemma submsetseq_nil l : l ∈ submsetseq [] ↔ l = [].
+  Lemma powermset_refl l : l ∈ powermset l.
+  Proof. by rewrite powermset_submseteq. Qed.
+  Lemma powermset_nil l : l ∈ powermset [] ↔ l = [].
   Proof. simpl. by rewrite elem_of_list_singleton. Qed.
-  Lemma submsetseq_permutations l l' : l ∈ permutations l' → l ∈ submsetseq l'.
+  Lemma powermset_permutations l l' : l ∈ permutations l' → l ∈ powermset l'.
   Proof.
-    rewrite submsetseq_submseteq, permutations_Permutation. by intros ->.
+    rewrite powermset_submseteq, permutations_Permutation. by intros ->.
   Qed.
-  Lemma submsetseq_trans l1 l2 l3 :
-    l1 ∈ submsetseq l2 → l2 ∈ submsetseq l3 → l1 ∈ submsetseq l3.
-  Proof. rewrite !submsetseq_submseteq. apply submseteq_trans. Qed.
-End submsetseq.
+  Lemma powermset_trans l1 l2 l3 :
+    l1 ∈ powermset l2 → l2 ∈ powermset l3 → l1 ∈ powermset l3.
+  Proof. rewrite !powermset_submseteq. apply submseteq_trans. Qed.
+End powermset.
 
 (** ** Properties of the folding functions *)
 (** Note that [foldr] has much better support, so when in doubt, it should be
