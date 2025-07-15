@@ -24,6 +24,10 @@ API-breaking change is listed.
 - Add definition `powermset` and associated lemmas. (by Marijn van Wezel)
 - Add lemmas `interleave_middle` and `elem_of_interleave`. (by Marijn van Wezel)
 - Add lemma `map_to_list_update`. (by Rudy Peterson)
+- Add `lookup_union_list_None` and `lookup_union_list_Some`. (by Rudy Peterson)
+- Add `map_disjoint_list` to express that all maps in a list are pair-wise
+  disjoint from each other, add some lemmas about this definition. (by Rudy
+  Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
