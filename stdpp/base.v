@@ -410,8 +410,14 @@ Class Inj {A B} (R : relation A) (S : relation B) (f : A → B) : Prop :=
 Class Inj2 {A B C} (R1 : relation A) (R2 : relation B)
     (S : relation C) (f : A → B → C) : Prop :=
   inj2 x1 x2 y1 y2 : S (f x1 x2) (f y1 y2) → R1 x1 y1 ∧ R2 x2 y2.
+
 Class Cancel {A B} (S : relation B) (f : A → B) (g : B → A) : Prop :=
   cancel x : S (f (g x)) x.
+(** [Cancel] is used to obtain the left- and right-inverse of a function. So
+one can either use [f] as input and [g] as output, or vice versa. *)
+Global Hint Mode Cancel + + - ! - : typeclass_instances.
+Global Hint Mode Cancel + + - - ! : typeclass_instances.
+
 Class Surj {A B} (R : relation B) (f : A → B) :=
   surj y : ∃ x, R (f x) y.
 Class IdemP {A} (R : relation A) (f : A → A → A) : Prop :=
