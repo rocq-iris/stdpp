@@ -28,6 +28,7 @@ API-breaking change is listed.
 - Add `map_disjoint_list` to express that all maps in a list are pair-wise
   disjoint from each other, add some lemmas about this definition. (by Rudy
   Peterson)
+- Add `Hint Mode` for `Cancel` class.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

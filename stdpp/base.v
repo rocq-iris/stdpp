@@ -410,8 +410,14 @@ Class Inj {A B} (R : relation A) (S : relation B) (f : A → B) : Prop :=
 Class Inj2 {A B C} (R1 : relation A) (R2 : relation B)
     (S : relation C) (f : A → B → C) : Prop :=
   inj2 x1 x2 y1 y2 : S (f x1 x2) (f y1 y2) → R1 x1 y1 ∧ R2 x2 y2.
+
 Class Cancel {A B} (S : relation B) (f : A → B) (g : B → A) : Prop :=
   cancel x : S (f (g x)) x.
+(** [Cancel] is used to obtain the left- and right-inverse of a function. So
+one can either use [f] as input and [g] as output, or vice versa. *)
+Global Hint Mode Cancel + + - ! - : typeclass_instances.
+Global Hint Mode Cancel + + - - ! : typeclass_instances.
+
 Class Surj {A B} (R : relation B) (f : A → B) :=
   surj y : ∃ x, R (f x) y.
 Class IdemP {A} (R : relation A) (f : A → A → A) : Prop :=
@@ -480,6 +486,11 @@ Proof. repeat intro; edestruct (inj2 f); eauto. Qed.
 Global Instance inj2_inj_2 `{Inj2 A B C R1 R2 R3 f} x : Inj R2 R3 (f x).
 Proof. repeat intro; edestruct (inj2 f); eauto. Qed.
 
+(** Smart constructors for [Inj] and [Surj] based on [Cancel]. These are not
+instances because they will blow-up the search space due to diamonds: in every
+node of the search tree for [Inj] or [Surj] of composed functions these
+instances could be applied. Note that [f] and [g] do not need to be given,
+these are infered using [Cancel]. *)
 Lemma cancel_inj `{Cancel A B R1 f g, !Equivalence R1, !Proper (R2 ==> R1) f} :
   Inj R1 R2 g.
 Proof.
