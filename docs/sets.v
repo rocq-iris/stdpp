@@ -3,7 +3,7 @@ From stdpp Require Import gmap sorting.
 (** This file provides a quick start guide to finite sets in std++. It is
 recommended to read this guide by stepping through it in an IDE. *)
 
-(** * What set data type to us? *)
+(** * What set data type to use? *)
 
 (** [gset K] is the type of sets you probably want to use. It enjoys good
 properties w.r.t. computation (most operations are logarithmic or linear w.r.t.
@@ -31,7 +31,7 @@ instances for [gset]. The most important operations are:
 *)
 
 (** Let us try to type check some stuff. Keep in mind that the operations are
-overloaded via type classes. So, you need [gset] type annotations. *)
+overloaded via type classes, so you need [gset] type annotations. *)
 
 Fail Definition my_set := {[ 10 ]}.
 
@@ -45,8 +45,8 @@ Definition my_set_fun := λ X : gset nat, X ∪ {[ 10 ]}.
 (** [(.∪ Y)] is notation for [λ X, X ∪ Y]. *)
 Definition my_set_fun_alt : gset nat → gset nat := (.∪ {[ 10 ]}).
 
-(** Keep in mind that [filter], [set_map], [set_seq], etc are also overloaded,
-so you again  need sufficient type annotations.  *)
+(** [filter], [set_map], [set_seq], etc are also overloaded,
+so you again need sufficient type annotations.  *)
 
 Fail Definition evens X :=
   filter (Nat.divide 2) X.
@@ -67,7 +67,7 @@ Definition until_n (n : nat) : gset nat :=
 
 (** * Automatic proofs using [set_solver] *)
 
-(** And let us write some lemmas. The most useful tactic is [set_solver]. *)
+(** Let us write some lemmas. The most useful tactic is [set_solver]. *)
 
 Lemma some_stuff (X Y Z : gset nat) :
   X ∪ Y ∩ X ∪ Z ∩ X = (Y ∪ X ∪ Z ∖ ∅ ∪ X) ∩ X.
@@ -80,17 +80,19 @@ Proof. set_solver. Qed.
 
 (** * Searching for lemmas *)
 
-(** Unfortunately, [set_solver] cannot solve anything. Particularly, if the
-lemma involves other domains than sets (numbers, lists, etc), or classical
-reasoning is needed (which is often needed for [difference]/[∖]).
+(** Unfortunately, [set_solver] cannot solve everything. In particular,
+it will not be able to prove lemmas that involve other domains than sets
+(numbers, lists, etc), or lemmas for which classical reasoning is needed (which
+is often the case for [difference]/[∖]).
 
 If you want to search for lemmas, search for the operations using their
-type class names. Some important points:
+type class projections (e.g., [elem_of], [subseteq], [union]). Some important
+points:
 
 - Most lemmas look a bit daunting because of the additional arguments (e.g.,
   [∀ {A C : Type} {H : ElemOf A C} {H0 : Empty C} {H1 : Singleton A C} ...]
   due to type classes, but these arguments can mostly be ignored.
-- There are ofter two versions, one for Leibniz equality [=] and another for
+- There are often two versions, one for Leibniz equality [=] and another for
   setoid equality [≡]. The first ones are suffixed [_L]. For [gset] you always
   want to use [=] (and thus the [_L] lemmas) because we have [X ≡ Y ↔ X = Y].
   This is not the case for other implementations of sets, like
