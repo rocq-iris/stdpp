@@ -159,6 +159,14 @@ Global Hint Extern 0 (_ ##ₘ _) => symmetry; eassumption : core.
 Notation "( m ##ₘ.)" := (map_disjoint m) (only parsing) : stdpp_scope.
 Notation "(.##ₘ m )" := (λ m2, m2 ##ₘ m) (only parsing) : stdpp_scope.
 
+(** All maps in the list [ms] are pair-wise disjoint *)
+Definition map_disjoint_list `{∀ A, Lookup K A (M A)} {A} (ms : list (M A)) : Prop :=
+  ∀ j1 j2 m1 m2,
+    j1 ≠ j2 →
+    ms !! j1 = Some m1 →
+    ms !! j2 = Some m2 →
+    m1 ##ₘ m2.
+
 Global Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
   map_included (λ _, (=)).
 
@@ -3122,6 +3130,43 @@ Lemma map_fold_disj_union {A B} (f : K → A → B → B) (b : B) m1 m2 :
   map_fold f b (m1 ∪ m2) = map_fold f (map_fold f b m2) m1.
 Proof. intros. apply (map_fold_disj_union_strong _); [solve_proper|auto..]. Qed.
 
+(** ** Properties of [map_disjoint_list]. *)
+Lemma map_disjoint_list_nil {A} : map_disjoint_list ([] : list (M A)).
+Proof. done. Qed.
+
+Lemma map_disjoint_list_cons {A} (ms : list (M A)) m :
+  map_disjoint_list (m :: ms) ↔ Forall (.##ₘ m) ms ∧ map_disjoint_list ms.
+Proof.
+  rewrite Forall_lookup. split.
+  - intros Hdisj. split.
+    + intros j m' ?. by apply (Hdisj (S j) 0).
+    + intros j1 j2 m1 m2 ???. apply (Hdisj (S j1) (S j2)); naive_solver.
+  - intros [Hall Hms] [|j1] [|j2] m1 m2 Hj ??; simplify_eq/=;
+      first [by eauto|by symmetry; eauto].
+Qed.
+Lemma map_disjoint_list_cons_2 {A} (ms : list (M A)) m :
+  Forall (.##ₘ m) ms →
+  map_disjoint_list ms →
+  map_disjoint_list (m :: ms).
+Proof. rewrite map_disjoint_list_cons; auto. Qed.
+Lemma map_disjoint_list_cons_1 {A} (ms : list (M A)) m :
+  map_disjoint_list (m :: ms) →
+  Forall (.##ₘ m) ms ∧ map_disjoint_list ms.
+Proof. apply map_disjoint_list_cons. Qed.
+
+Lemma map_disjoint_list_Permutation {A} (ms1 ms2 : list (M A)) :
+  map_disjoint_list ms1 → ms1 ≡ₚ ms2 → map_disjoint_list ms2.
+Proof.
+  pose proof Permutation_Forall as Hhelp. unfold Proper, respectful in Hhelp.
+  intros Hdisj Hperm. revert Hdisj.
+  induction Hperm; rewrite ?map_disjoint_list_cons, ?Forall_cons; naive_solver.
+Qed.
+Global Instance map_disjoint_list_Permutation_proper {A} :
+  Proper ((≡ₚ) ==> iff) (map_disjoint_list (K:=K) (M:=M) (A:=A)).
+Proof.
+  intros ms1 ms2 ?; split; intros ?; by eapply map_disjoint_list_Permutation.
+Qed.
+
 (** ** Properties of the [union_list] operation *)
 Lemma map_disjoint_union_list_l {A} (ms : list (M A)) (m : M A) :
   ⋃ ms ##ₘ m ↔ Forall (.##ₘ m) ms.
@@ -3140,6 +3185,57 @@ Proof. by rewrite map_disjoint_union_list_l. Qed.
 Lemma map_disjoint_union_list_r_2 {A} (ms : list (M A)) (m : M A) :
   Forall (.##ₘ m) ms → m ##ₘ ⋃ ms.
 Proof. by rewrite map_disjoint_union_list_r. Qed.
+
+Lemma lookup_union_list_None {A} (ms : list (M A)) i :
+  ⋃ ms !! i = None ↔ Forall (λ m, m !! i = None) ms.
+Proof.
+  induction ms as [|m ms IH]; simpl.
+  { by rewrite lookup_empty, Forall_nil. }
+  rewrite lookup_union_None, Forall_cons. naive_solver.
+Qed.
+Lemma lookup_union_list_None_1 {A} (ms : list (M A)) i :
+  ⋃ ms !! i = None → Forall (λ m, m !! i = None) ms.
+Proof. apply lookup_union_list_None. Qed.
+Lemma lookup_union_list_None_2 {A} (ms : list (M A)) i :
+  Forall (λ m, m !! i = None) ms → ⋃ ms !! i = None.
+Proof. apply lookup_union_list_None. Qed.
+
+Lemma lookup_union_list_Some_1 {A} (ms : list (M A)) i x :
+  ⋃ ms !! i = Some x → ∃ m, m ∈ ms ∧ m !! i = Some x.
+Proof.
+  rewrite <-Exists_exists. induction ms as [|m ms IH]; simpl.
+  { by rewrite lookup_empty, Exists_nil. }
+  rewrite lookup_union_Some_raw, Exists_cons. naive_solver.
+Qed.
+Lemma lookup_union_list_Some_2 {A} (ms : list (M A)) m i x :
+  m ∈ ms →
+  map_disjoint_list ms →
+  m !! i = Some x →
+  ⋃ ms !! i = Some x.
+Proof.
+  induction ms as [|m' ms IH]; simpl; [by rewrite elem_of_nil|].
+  intros ?%elem_of_cons [?%map_disjoint_union_list_r ?]%map_disjoint_list_cons ?.
+  rewrite lookup_union_Some by done. naive_solver.
+Qed.
+Lemma lookup_union_list_Some {A} (ms : list (M A)) i x :
+  map_disjoint_list ms →
+  ⋃ ms !! i = Some x ↔ ∃ m, m ∈ ms ∧ m !! i = Some x.
+Proof.
+  naive_solver eauto using lookup_union_list_Some_1, lookup_union_list_Some_2.
+Qed.
+
+Lemma map_union_list_Permutation {A} (ms1 ms2 : list (M A)) :
+  ms1 ≡ₚ ms2 →
+  map_disjoint_list ms1 →
+  ⋃ ms1 = ⋃ ms2.
+Proof.
+  induction 1 as [|m ms1 ms2 ? IH|m1 m2 ms|ms1 ms2 ms3 ? IH1 ? IH2]; simpl.
+  - done.
+  - intros [??]%map_disjoint_list_cons. f_equal; auto.
+  - intros [[??]%Forall_cons [??]%map_disjoint_list_cons]%map_disjoint_list_cons.
+    by rewrite !(assoc_L _), (map_union_comm m1) by done.
+  - intros. trans (⋃ ms2); eauto using map_disjoint_list_Permutation.
+Qed.
 
 (** ** Properties of the folding the [delete] function *)
 Lemma lookup_foldr_delete {A} (m : M A) is j :
