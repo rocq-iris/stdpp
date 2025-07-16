@@ -23,6 +23,7 @@ API-breaking change is listed.
 - Add `app_nil_r_inv` and `app_nil_l_inv` lemmas. (by Kimaya Bedarkar)
 - Add definition `powermset` and associated lemmas. (by Marijn van Wezel)
 - Add lemmas `interleave_middle` and `elem_of_interleave`. (by Marijn van Wezel)
+- Add lemma `map_to_list_update`. (by Rudy Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
