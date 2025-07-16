@@ -31,24 +31,24 @@ Check {[ {[ 10 ]} ]} : gset (gset nat).
 
 Check (λ X : gset nat, X ∪ {[ 10 ]}).
 
-(** And let write some lemmas. The most useful tactic is [set_solver]. *)
+(** And let us write some lemmas. The most useful tactic is [set_solver]. *)
 
 Lemma some_stuff (X Y Z : gset nat) :
   X ∪ Y ∩ X ∪ Z ∩ X = (Y ∪ X ∪ Z ∖ ∅ ∪ X) ∩ X.
 Proof. set_solver. Qed.
 
-Lemma some_stuff_poly `{Countable A} (X Y Z : gset nat) :
+Lemma some_stuff_poly `{Countable A} (X Y Z : gset A) :
   X ∪ Y ∩ X ∪ Z ∩ X = (Y ∪ X ∪ Z ∖ ∅ ∪ X) ∩ X.
 Proof. set_solver. Qed.
 
-(** If you want to search for lemmas, search for the operations, not [gset]
+(** If you want to search for lemmas, search for the operations (using their typeclass names), not [gset]
 since all lemmas are overloaded. *)
 
 Search difference intersection.
 
 (** Some important notes:
 
-- The lemmas look a bit dounting because of the additional arguments due to
+- The lemmas look a bit daunting because of the additional arguments due to
   type classes, but these arguments can mostly be ignored
 - There are both lemmas about Leibniz equality [=] and setoid equality [≡].
   The first ones are suffixed [_L]. For [gset] you always want to use [=] (and
@@ -88,7 +88,7 @@ Eval vm_compute in bool_decide (10 ∈ evens {[ 10; 11 ]}).
 Eval vm_compute in (bool_decide ({[ 10; 14; 17 ]} ⊂ until_n 40)).
 Eval vm_compute in (bool_decide (set_Forall (λ x, (2 | x)) (evens (until_n 40)))).
 
-(** Want to know more:
+(** Want to know more?
 
 - Look up the definitions of the type classes for [union], [intersection], etc.,
   interfaces [SimpleSet], [Set_], etc. in [theories/base.v].
