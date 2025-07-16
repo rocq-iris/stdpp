@@ -132,6 +132,9 @@ API-breaking change is listed.
 - Rename `map_disjoint_difference_l` (and `_r`) into `map_disjoint_difference_l1`
   for consistency with the `disjoint_difference_l1` lemma on sets.
 - Add lemmas `Forall_exists_Forall2_{l,r}`. (by Rudy Peterson)
+- Add lemmas `zip_with_nil_l`, `NoDup_zip_with_{l,r}_strong`,
+  `NoDup_zip_with_{l,r}`, `zip_nil_{l,r}`, `prod_map_zip` and `NoDup_zip_{l,r}`.
+  (by Rudy Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
