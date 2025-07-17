@@ -292,7 +292,7 @@ Section set_unfold_list.
     SetUnfoldElemOf x (cprod l k) (P ∧ Q).
   Proof.
     intros ??; constructor.
-    by rewrite elem_of_list_cprod, (set_unfold_elem_of x.1 l P),
+    by rewrite list_elem_of_cprod, (set_unfold_elem_of x.1 l P),
       (set_unfold_elem_of x.2 k Q).
   Qed.
 
@@ -312,7 +312,7 @@ Section set_unfold_list.
     (∀ x, SetUnfoldElemOf x l (P x)) →
     SetUnfoldElemOf y (f <$> l) (∃ x, y = f x ∧ P x).
   Proof.
-    constructor. rewrite elem_of_list_fmap. f_equiv; intros x.
+    constructor. rewrite list_elem_of_fmap. f_equiv; intros x.
     by rewrite (set_unfold_elem_of x l (P x)).
   Qed.
   Global Instance set_unfold_rotate x l P n:
@@ -322,7 +322,7 @@ Section set_unfold_list.
   Global Instance set_unfold_list_bind {B} (f : A → list B) l P Q y :
     (∀ x, SetUnfoldElemOf x l (P x)) → (∀ x, SetUnfoldElemOf y (f x) (Q x)) →
     SetUnfoldElemOf y (l ≫= f) (∃ x, Q x ∧ P x).
-  Proof. constructor. rewrite elem_of_list_bind. naive_solver. Qed.
+  Proof. constructor. rewrite list_elem_of_bind. naive_solver. Qed.
 End set_unfold_list.
 
 Tactic Notation "set_unfold" :=
@@ -1163,7 +1163,7 @@ Section pred_finite_infinite.
     intros Hf HP xs. destruct (HP (f <$> xs)) as [x [HPx Hx]].
     destruct (Hf _ HPx) as [y Hf']. exists y. split.
     - simpl. rewrite Hf'. done.
-    - intros Hy. apply Hx. apply elem_of_list_fmap. eauto.
+    - intros Hy. apply Hx. apply list_elem_of_fmap. eauto.
   Qed.
 
   Lemma pred_not_infinite_finite {A} (P : A → Prop) :
@@ -1177,7 +1177,7 @@ Section pred_finite_infinite.
 
   Lemma pred_finite_lt n : pred_finite (flip lt n).
   Proof.
-    exists (seq 0 n); intros i Hi. apply (elem_of_list_lookup_2 _ i).
+    exists (seq 0 n); intros i Hi. apply (list_elem_of_lookup_2 _ i).
     by rewrite lookup_seq.
   Qed.
   Lemma pred_infinite_lt n : pred_infinite (lt n).
@@ -1266,7 +1266,7 @@ Lemma dec_pred_finite_alt {A} (P : A → Prop) `{!∀ x, Decision (P x)} :
   pred_finite P ↔ ∃ xs : list A, ∀ x, P x ↔ x ∈ xs.
 Proof.
   split; intros [xs ?].
-  - exists (filter P xs). intros x. rewrite elem_of_list_filter. naive_solver.
+  - exists (filter P xs). intros x. rewrite list_elem_of_filter. naive_solver.
   - exists xs. naive_solver.
 Qed.
 
@@ -1274,21 +1274,21 @@ Lemma finite_sig_pred_finite {A} (P : A → Prop) `{Finite (sig P)} :
   pred_finite P.
 Proof.
   exists (proj1_sig <$> enum _). intros x px.
-  apply elem_of_list_fmap_1_alt with (x ↾ px); [apply elem_of_enum|]; done.
+  apply list_elem_of_fmap_2' with (x ↾ px); [apply elem_of_enum|]; done.
 Qed.
 
 Lemma pred_finite_arg2 {A B} (P : A → B → Prop) x :
   pred_finite (uncurry P) → pred_finite (P x).
 Proof.
   intros [xys ?]. exists (xys.*2). intros y ?.
-  apply elem_of_list_fmap_1_alt with (x, y); by auto.
+  apply list_elem_of_fmap_2' with (x, y); by auto.
 Qed.
 
 Lemma pred_finite_arg1 {A B} (P : A → B → Prop) y :
   pred_finite (uncurry P) → pred_finite (flip P y).
 Proof.
   intros [xys ?]. exists (xys.*1). intros x ?.
-  apply elem_of_list_fmap_1_alt with (x, y); by auto.
+  apply list_elem_of_fmap_2' with (x, y); by auto.
 Qed.
 
 (** Sets of sequences of natural numbers *)

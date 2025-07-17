@@ -182,7 +182,7 @@ Lemma size_singleton_inv X x y : size X = 1 → x ∈ X → y ∈ X → x = y.
 Proof.
   unfold size, set_size. simpl. rewrite <-!elem_of_elements.
   generalize (elements X). intros [|? l]; intro; simplify_eq/=.
-  rewrite (nil_length_inv l), !elem_of_list_singleton by done; congruence.
+  rewrite (nil_length_inv l), !list_elem_of_singleton by done; congruence.
 Qed.
 Lemma size_1_elem_of X : size X = 1 → ∃ x, X ≡ {[ x ]}.
 Proof.
@@ -344,8 +344,8 @@ Proof.
   trans (foldr f b (elements (Y ∖ X) ++ elements (X ∩ Y) ++ elements (X ∖ Y))).
   { apply (foldr_permutation R f b).
     - intros j1 x1 j2 x2 b' Hj Hj1 Hj2. apply Hfcomm.
-      + apply elem_of_list_lookup_2 in Hj1. set_solver.
-      + apply elem_of_list_lookup_2 in Hj2. set_solver.
+      + apply list_elem_of_lookup_2 in Hj1. set_solver.
+      + apply list_elem_of_lookup_2 in Hj2. set_solver.
       + intros ->. pose proof (NoDup_elements (X ∪ Y)).
         by eapply Hj, NoDup_lookup.
     - rewrite <-!elements_disj_union by set_solver. f_equiv; intros x.
@@ -354,17 +354,17 @@ Proof.
     (elements (Y ∖ X) ++ elements (X ∩ Y))).
   { rewrite !foldr_app. apply Hff. apply (foldr_idemp_strong (flip R)).
     - solve_proper.
-    - intros j a b' ?%elem_of_list_lookup_2. apply Hfidemp. set_solver.
+    - intros j a b' ?%list_elem_of_lookup_2. apply Hfidemp. set_solver.
     - intros j1 x1 j2 x2 b' Hj Hj1 Hj2. apply Hfcomm.
-      + apply elem_of_list_lookup_2 in Hj2. set_solver.
-      + apply elem_of_list_lookup_2 in Hj1. set_solver.
+      + apply list_elem_of_lookup_2 in Hj2. set_solver.
+      + apply list_elem_of_lookup_2 in Hj1. set_solver.
       + intros ->. pose proof (NoDup_elements (X ∩ Y)).
         by eapply Hj, NoDup_lookup. }
   trans (foldr f (foldr f b (elements (X ∩ Y) ++ elements (X ∖ Y))) (elements Y)).
   { apply (foldr_permutation R f _).
     - intros j1 x1 j2 x2 b' Hj Hj1 Hj2. apply Hfcomm.
-      + apply elem_of_list_lookup_2 in Hj1. set_solver.
-      + apply elem_of_list_lookup_2 in Hj2. set_solver.
+      + apply list_elem_of_lookup_2 in Hj1. set_solver.
+      + apply list_elem_of_lookup_2 in Hj2. set_solver.
       + intros ->. assert (NoDup (elements (Y ∖ X) ++ elements (X ∩ Y))).
         { rewrite <-elements_disj_union by set_solver. apply NoDup_elements. }
         by eapply Hj, NoDup_lookup.
@@ -372,8 +372,8 @@ Proof.
       destruct (decide (x ∈ X)); set_solver. }
   apply Hff. apply (foldr_permutation R f _).
   - intros j1 x1 j2 x2 b' Hj Hj1 Hj2. apply Hfcomm.
-    + apply elem_of_list_lookup_2 in Hj1. set_solver.
-    + apply elem_of_list_lookup_2 in Hj2. set_solver.
+    + apply list_elem_of_lookup_2 in Hj1. set_solver.
+    + apply list_elem_of_lookup_2 in Hj2. set_solver.
     + intros ->. assert (NoDup (elements (X ∩ Y) ++ elements (X ∖ Y))).
       { rewrite <-elements_disj_union by set_solver. apply NoDup_elements. }
       by eapply Hj, NoDup_lookup.
@@ -465,7 +465,7 @@ Lemma elem_of_filter (P : A → Prop) `{!∀ x, Decision (P x)} X x :
   x ∈ filter P X ↔ P x ∧ x ∈ X.
 Proof.
   unfold filter, set_filter.
-  by rewrite elem_of_list_to_set, elem_of_list_filter, elem_of_elements.
+  by rewrite elem_of_list_to_set, list_elem_of_filter, elem_of_elements.
 Qed.
 Global Instance set_unfold_filter (P : A → Prop) `{!∀ x, Decision (P x)} X Q x :
   SetUnfoldElemOf x X Q → SetUnfoldElemOf x (filter P X) (P x ∧ Q).
@@ -521,7 +521,7 @@ Section map.
   Lemma elem_of_map (f : A → B) (X : C) y :
     y ∈ set_map (D:=D) f X ↔ ∃ x, y = f x ∧ x ∈ X.
   Proof.
-    unfold set_map. rewrite elem_of_list_to_set, elem_of_list_fmap.
+    unfold set_map. rewrite elem_of_list_to_set, list_elem_of_fmap.
     by setoid_rewrite elem_of_elements.
   Qed.
   Global Instance set_unfold_map (f : A → B) (X : C) (P : A → Prop) y :
@@ -631,7 +631,7 @@ Section set_omap.
 
   Lemma elem_of_set_omap f X y : y ∈ set_omap f X ↔ ∃ x, x ∈ X ∧ f x = Some y.
   Proof.
-    unfold set_omap. rewrite elem_of_list_to_set, elem_of_list_omap.
+    unfold set_omap. rewrite elem_of_list_to_set, list_elem_of_omap.
     by setoid_rewrite elem_of_elements.
   Qed.
 

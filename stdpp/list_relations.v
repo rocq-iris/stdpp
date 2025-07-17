@@ -118,14 +118,14 @@ Proof.
   intros Hl. revert i j. induction Hl as [|x' l Hx Hl IH].
   { intros; simplify_eq. }
   intros [|i] [|j] ??; simplify_eq/=; eauto with f_equal;
-    exfalso; eauto using elem_of_list_lookup_2.
+    exfalso; eauto using list_elem_of_lookup_2.
 Qed.
 Lemma NoDup_alt l :
   NoDup l ↔ ∀ i j x, l !! i = Some x → l !! j = Some x → i = j.
 Proof.
   split; eauto using NoDup_lookup.
   induction l as [|x l IH]; intros Hl; constructor.
-  - rewrite elem_of_list_lookup. intros [i ?].
+  - rewrite list_elem_of_lookup. intros [i ?].
     opose proof* (Hl (S i) 0); by auto.
   - apply IH. intros i j x' ??. by apply (inj S), (Hl (S i) (S j) x').
 Qed.
@@ -134,7 +134,7 @@ Lemma NoDup_filter (P : A → Prop) `{∀ x, Decision (P x)} l :
   NoDup l → NoDup (filter P l).
 Proof.
   induction 1; rewrite ?filter_cons; repeat case_decide;
-    rewrite ?NoDup_nil, ?NoDup_cons, ?elem_of_list_filter; tauto.
+    rewrite ?NoDup_nil, ?NoDup_cons, ?list_elem_of_filter; tauto.
 Qed.
 
 Section no_dup_dec.
@@ -169,20 +169,20 @@ Section no_dup_dec.
     induction 1; simpl; try case_decide.
     - constructor.
     - done.
-    - constructor; [|done]. rewrite elem_of_list_difference; intuition.
+    - constructor; [|done]. rewrite list_elem_of_difference; intuition.
   Qed.
   Lemma NoDup_list_union l k : NoDup l → NoDup k → NoDup (list_union l k).
   Proof.
     intros. apply NoDup_app. repeat split.
     - by apply NoDup_list_difference.
-    - intro. rewrite elem_of_list_difference. intuition.
+    - intro. rewrite list_elem_of_difference. intuition.
     - done.
   Qed.
   Lemma NoDup_list_intersection l k : NoDup l → NoDup (list_intersection l k).
   Proof.
     induction 1; simpl; try case_decide.
     - constructor.
-    - constructor; [|done]. rewrite elem_of_list_intersection; intuition.
+    - constructor; [|done]. rewrite list_elem_of_intersection; intuition.
     - done.
   Qed.
 
@@ -259,7 +259,7 @@ Qed.
 Lemma elem_of_Permutation l x : x ∈ l ↔ ∃ k, l ≡ₚ x :: k.
 Proof.
   split.
-  - intros [i ?]%elem_of_list_lookup. eexists. by apply delete_Permutation.
+  - intros [i ?]%list_elem_of_lookup. eexists. by apply delete_Permutation.
   - intros [k ->]. by left.
 Qed.
 
@@ -267,7 +267,7 @@ Lemma Permutation_cons_inv_r l k x :
   k ≡ₚ x :: l → ∃ k1 k2, k = k1 ++ x :: k2 ∧ l ≡ₚ k1 ++ k2.
 Proof.
   intros Hk. assert (∃ i, k !! i = Some x) as [i Hi].
-  { apply elem_of_list_lookup. rewrite Hk, elem_of_cons; auto. }
+  { apply list_elem_of_lookup. rewrite Hk, elem_of_cons; auto. }
   exists (take i k), (drop (S i) k). split.
   - by rewrite take_drop_middle.
   - rewrite <-delete_take_drop. apply (inj (x ::.)).
@@ -323,9 +323,9 @@ Proof.
       repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try lia.
       apply (inj S), (inj f); lia.
     + intros i. unfold g. destruct (lt_eq_lt_dec _ _) as [[?|?]|?].
-      * by rewrite lookup_delete_lt, <-Hl.
+      * by rewrite list_lookup_delete_lt, <-Hl.
       * simplify_eq.
-      * rewrite lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
+      * rewrite list_lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
         by rewrite Nat.sub_0_r, <-Hl.
 Qed.
 
@@ -791,8 +791,8 @@ Lemma singleton_sublist_l l x :
   [x] `sublist_of` l ↔ x ∈ l.
 Proof.
   split.
-  - intros Hl. eapply elem_of_sublist, Hl. by apply elem_of_list_singleton.
-  - intros (l1&l2&->)%elem_of_list_split.
+  - intros Hl. eapply elem_of_sublist, Hl. by apply list_elem_of_singleton.
+  - intros (l1&l2&->)%list_elem_of_split.
     apply sublist_inserts_l, sublist_skip, sublist_nil_l.
 Qed.
 Lemma sublist_NoDup l1 l2 :
@@ -908,8 +908,8 @@ Lemma lookup_submseteq l k i x :
   ∃ j, k !! j = Some x.
 Proof.
   intros Hsub Hlook.
-  eapply elem_of_list_lookup_1, elem_of_submseteq;
-    eauto using elem_of_list_lookup_2.
+  eapply list_elem_of_lookup_1, elem_of_submseteq;
+    eauto using list_elem_of_lookup_2.
 Qed.
 
 Lemma submseteq_take l i : take i l ⊆+ l.
@@ -1009,7 +1009,7 @@ Lemma NoDup_submseteq l k : NoDup l → (∀ x, x ∈ l → x ∈ k) → l ⊆+ 
 Proof.
   intros Hl. revert k. induction Hl as [|x l Hx ? IH].
   { intros k Hk. by apply submseteq_nil_l. }
-  intros k Hlk. destruct (elem_of_list_split k x) as (l1&l2&?); subst.
+  intros k Hlk. destruct (list_elem_of_split k x) as (l1&l2&?); subst.
   { apply Hlk. by constructor. }
   rewrite <-Permutation_middle. apply submseteq_skip, IH.
   intros y Hy. rewrite elem_of_app.
@@ -1040,13 +1040,13 @@ Lemma singleton_submseteq_l l x :
 Proof.
   split.
   - intros Hsub. eapply elem_of_submseteq; [|done].
-    apply elem_of_list_singleton. done.
-  - intros (l1&l2&->)%elem_of_list_split.
+    apply list_elem_of_singleton. done.
+  - intros (l1&l2&->)%list_elem_of_split.
     apply submseteq_cons_middle, submseteq_nil_l.
 Qed.
 Lemma singleton_submseteq x y :
   [x] ⊆+ [y] ↔ x = y.
-Proof. rewrite singleton_submseteq_l. apply elem_of_list_singleton. Qed.
+Proof. rewrite singleton_submseteq_l. apply list_elem_of_singleton. Qed.
 
 Section submseteq_dec.
   Context `{!EqDecision A}.
@@ -1169,7 +1169,7 @@ Section Forall_Exists.
 
   Lemma Forall_lookup l : Forall P l ↔ ∀ i x, l !! i = Some x → P x.
   Proof.
-    rewrite Forall_forall. setoid_rewrite elem_of_list_lookup. naive_solver.
+    rewrite Forall_forall. setoid_rewrite list_elem_of_lookup. naive_solver.
   Qed.
   Lemma Forall_lookup_total `{!Inhabited A} l :
     Forall P l ↔ ∀ i, i < length l → P (l !!! i).
@@ -1263,7 +1263,7 @@ Section Forall_Exists.
     Forall P l → Forall P (list_difference l k).
   Proof.
     rewrite !Forall_forall.
-    intros ? x; rewrite elem_of_list_difference; naive_solver.
+    intros ? x; rewrite list_elem_of_difference; naive_solver.
   Qed.
   Lemma Forall_list_union `{!EqDecision A} l k :
     Forall P l → Forall P k → Forall P (list_union l k).
@@ -1272,7 +1272,7 @@ Section Forall_Exists.
     Forall P l → Forall P (list_intersection l k).
   Proof.
     rewrite !Forall_forall.
-    intros ? x; rewrite elem_of_list_intersection; naive_solver.
+    intros ? x; rewrite list_elem_of_intersection; naive_solver.
   Qed.
 
   Context {dec : ∀ x, Decision (P x)}.

@@ -108,5 +108,5 @@ Section binder_delete_insert.
   Proof. intros. destruct b; simpl; by rewrite ?delete_insert_ne by congruence. Qed.
   Lemma binder_delete_delete {A} b s (m : M A) :
     binder_delete b (delete s m) = delete s (binder_delete b m).
-  Proof. destruct b; simpl; by rewrite 1?delete_commute. Qed.
+  Proof. destruct b; simpl; by rewrite 1?delete_delete. Qed.
 End binder_delete_insert.

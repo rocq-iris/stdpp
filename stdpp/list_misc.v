@@ -138,7 +138,7 @@ Section find.
   Proof.
     rewrite eq_None_not_Some, Forall_forall. split.
     - intros Hl x Hx HP. destruct Hl. eauto using list_find_elem_of.
-    - intros HP [[i x] (?%elem_of_list_lookup_2&?&?)%list_find_Some]; naive_solver.
+    - intros HP [[i x] (?%list_elem_of_lookup_2&?&?)%list_find_Some]; naive_solver.
   Qed.
 
   Lemma list_find_app_None l1 l2 :
@@ -199,11 +199,11 @@ Section find.
        destruct (lookup_lt_is_Some_2 l i) as [z ?]; [lia|].
        destruct (decide (P z)).
        { right. exists z. split_and!; [done| |done..|].
-         + apply (Hleast i); [|done]. by rewrite list_lookup_insert by lia.
+         + apply (Hleast i); [|done]. by rewrite list_lookup_insert_eq by lia.
          + intros k z' ???.
            apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia. }
        left. split_and!; [done|..|naive_solver].
-       + apply (Hleast i); [|done]. by rewrite list_lookup_insert by lia.
+       + apply (Hleast i); [|done]. by rewrite list_lookup_insert_eq by lia.
        + apply list_find_Some. split_and!; [by auto..|]. intros k z' ??.
          destruct (decide (k = i)) as [->|]; [naive_solver|].
          apply (Hleast k); [|lia]. by rewrite list_lookup_insert_ne by lia.
@@ -212,7 +212,7 @@ Section find.
        + apply list_find_Some in Hl as (?&?&Hleast).
          rewrite list_lookup_insert_ne by lia. split_and!; [done..|].
          intros k z [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
-       + rewrite list_lookup_insert by done. split_and!; [by auto..|].
+       + rewrite list_lookup_insert_eq by done. split_and!; [by auto..|].
          intros k z [(->&->&?)|[??]]%list_lookup_insert_Some; eauto with lia.
        + apply list_find_Some in Hl as (?&?&Hleast).
          rewrite list_lookup_insert_ne by lia. split_and!; [done..|].
@@ -320,7 +320,7 @@ Proof. rewrite drop_resize_le by lia. f_equal. lia. Qed.
 Lemma lookup_resize l n x i : i < n → i < length l → resize n x l !! i = l !! i.
 Proof.
   intros ??. destruct (decide (n < length l)).
-  - by rewrite resize_le, lookup_take by lia.
+  - by rewrite resize_le, lookup_take_lt by lia.
   - by rewrite resize_ge, lookup_app_l by lia.
 Qed.
 Lemma lookup_total_resize `{!Inhabited A} l n x i :
@@ -375,7 +375,7 @@ Proof.
   remember (n `mod` length l) as n'.
   case_decide.
   - by rewrite lookup_app_l, lookup_drop by (rewrite length_drop; lia).
-  - rewrite lookup_app_r, lookup_take, length_drop by (rewrite length_drop; lia).
+  - rewrite lookup_app_r, lookup_take_lt, length_drop by (rewrite length_drop; lia).
     f_equal. lia.
 Qed.
 
@@ -410,11 +410,8 @@ Proof.
   intros Hlen. pose proof (Nat.mod_upper_bound n (length l)) as ?. unfold rotate.
   rewrite length_insert, rotate_nat_add_add_mod, rotate_nat_add_alt by lia.
   remember (n `mod` length l) as n'.
-  case_decide.
-  - rewrite take_insert, drop_insert_le, insert_app_l
-      by (rewrite ?length_drop; lia). do 2 f_equal. lia.
-  - rewrite take_insert_lt, drop_insert_gt, insert_app_r_alt, length_drop
-      by (rewrite ?length_drop; lia). do 2 f_equal. lia.
+  rewrite take_insert, drop_insert, insert_app, length_drop.
+  repeat case_decide; auto with f_equal lia.
 Qed.
 
 Lemma rotate_insert_r l n i x:
@@ -433,7 +430,7 @@ Lemma rotate_take_insert l s e i x:
     <[rotate_nat_sub s i (length l):=x]> (rotate_take s e l) else rotate_take s e l.
 Proof.
   intros ?. unfold rotate_take. rewrite rotate_insert_r, length_insert by done.
-  case_decide; [rewrite take_insert_lt | rewrite take_insert]; naive_solver lia.
+  rewrite take_insert; case_decide; naive_solver lia.
 Qed.
 
 Lemma rotate_take_add l b i :
@@ -487,7 +484,7 @@ Proof.
   unfold sublist_lookup in *; simplify_option_eq;
     [|by rewrite !lookup_ge_None_2 by auto].
   apply (f_equal (.!! i `mod` n)) in Hlookup.
-  by rewrite !lookup_take, !lookup_drop, <-!Nat.div_mod in Hlookup
+  by rewrite !lookup_take_lt, !lookup_drop, <-!Nat.div_mod in Hlookup
     by (auto using Nat.mod_upper_bound with lia).
 Qed.
 Lemma sublist_eq_same_length l k j n :
@@ -553,8 +550,8 @@ Proof.
   unfold sublist_alter; simplify_option_eq; f_equal; rewrite Hk.
   apply list_eq; intros ii.
   destruct (decide (ii < length (f k))); [|by rewrite !lookup_take_ge by lia].
-  rewrite !lookup_take, !lookup_drop by done. destruct (decide (i + ii < j)).
-  { by rewrite lookup_app_l, lookup_take by (rewrite ?length_take; lia). }
+  rewrite !lookup_take_lt, !lookup_drop by done. destruct (decide (i + ii < j)).
+  { by rewrite lookup_app_l, lookup_take_lt by (rewrite ?length_take; lia). }
   rewrite lookup_app_r by (rewrite length_take; lia).
   rewrite length_take_le, lookup_app_r, lookup_drop by lia. f_equal; lia.
 Qed.

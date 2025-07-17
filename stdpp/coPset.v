@@ -292,13 +292,13 @@ Proof.
       by apply (infinite_is_fresh l), Hl. }
     intros [ll Hll]; rewrite andb_True; split.
     + apply IHl; exists (omap (maybe (~0)) ll); intros i.
-      rewrite elem_of_list_omap; intros; exists (i~0); auto.
+      rewrite list_elem_of_omap; intros; exists (i~0); auto.
     + apply IHr; exists (omap (maybe (~1)) ll); intros i.
-      rewrite elem_of_list_omap; intros; exists (i~1); auto.
+      rewrite list_elem_of_omap; intros; exists (i~1); auto.
   - induction t as [b|b l IHl r IHr]; simpl; [by exists []; destruct b|].
     rewrite andb_True; intros [??]; destruct IHl as [ll ?], IHr as [rl ?]; auto.
     exists ([1] ++ ((~0) <$> ll) ++ ((~1) <$> rl))%list; intros [i|i|]; simpl;
-      rewrite elem_of_cons, elem_of_app, !elem_of_list_fmap; naive_solver.
+      rewrite elem_of_cons, elem_of_app, !list_elem_of_fmap; naive_solver.
 Qed.
 (** Thus, finiteness is decidable. *)
 Global Instance coPset_finite_dec (X : coPset) : Decision (set_finite X).

@@ -57,7 +57,7 @@ Inductive zipped_Forall {A} (P : list A → list A → A → Prop) :
 Global Arguments zipped_Forall_nil {_ _} _ : assert.
 Global Arguments zipped_Forall_cons {_ _} _ _ _ _ _ : assert.
 
-(** The Cartesian product on lists satisfies (lemma [elem_of_list_cprod]):
+(** The Cartesian product on lists satisfies (lemma [list_elem_of_cprod]):
 
   x ∈ cprod l k ↔ x.1 ∈ l ∧ x.2 ∈ k
 
@@ -97,10 +97,10 @@ the [CProd] class for the interface, nor the monad classes for the definition *)
 Lemma list_cprod_list_prod {B} l (k : list B) : cprod l k = list_prod l k.
 Proof. unfold cprod, list_cprod. induction l; f_equal/=; auto. Qed.
 
-Lemma elem_of_list_cprod {B} l (k : list B) (x : A * B) :
+Lemma list_elem_of_cprod {B} l (k : list B) (x : A * B) :
   x ∈ cprod l k ↔ x.1 ∈ l ∧ x.2 ∈ k.
 Proof.
-  rewrite list_cprod_list_prod, !elem_of_list_In.
+  rewrite list_cprod_list_prod, !list_elem_of_In.
   destruct x. apply in_prod_iff.
 Qed.
 
@@ -173,26 +173,29 @@ Section fmap.
   Lemma const_fmap (l : list A) (y : B) :
     (∀ x, f x = y) → f <$> l = replicate (length l) y.
   Proof. intros; induction l; f_equal/=; auto. Qed.
+
   Lemma list_lookup_fmap l i : (f <$> l) !! i = f <$> (l !! i).
   Proof. revert i. induction l; intros [|n]; by try revert n. Qed.
-  Lemma list_lookup_fmap_Some l i x :
-    (f <$> l) !! i =  Some x ↔ ∃ y, l !! i = Some y ∧ x = f y.
-  Proof. by rewrite list_lookup_fmap, fmap_Some. Qed.
   Lemma list_lookup_total_fmap `{!Inhabited A, !Inhabited B} l i :
     i < length l → (f <$> l) !!! i = f (l !!! i).
   Proof.
     intros [x Hx]%lookup_lt_is_Some_2.
     by rewrite !list_lookup_total_alt, list_lookup_fmap, Hx.
   Qed.
-  Lemma list_lookup_fmap_inv l i x :
-    (f <$> l) !! i = Some x → ∃ y, x = f y ∧ l !! i = Some y.
-  Proof.
-    intros Hi. rewrite list_lookup_fmap in Hi.
-    destruct (l !! i) eqn:?; simplify_eq/=; eauto.
-  Qed.
+
+  Lemma list_lookup_fmap_Some l i y :
+    (f <$> l) !! i = Some y ↔ ∃ x, y = f x ∧ l !! i = Some x.
+  Proof. rewrite list_lookup_fmap, fmap_Some. naive_solver. Qed.
+  Lemma list_lookup_fmap_Some_1 l i y :
+    (f <$> l) !! i = Some y → ∃ x, y = f x ∧ l !! i = Some x.
+  Proof. by rewrite list_lookup_fmap_Some. Qed.
+  Lemma list_lookup_fmap_Some_2 l i x :
+    l !! i = Some x → (f <$> l) !! i = Some (f x).
+  Proof. rewrite list_lookup_fmap_Some. naive_solver. Qed.
+
   Lemma list_fmap_insert l i x: f <$> <[i:=x]>l = <[i:=f x]>(f <$> l).
   Proof. revert i. by induction l; intros [|i]; f_equal/=. Qed.
-  Lemma list_alter_fmap (g : A → A) (h : B → B) l i :
+  Lemma list_fmap_alter (g : A → A) (h : B → B) l i :
     Forall (λ x, f (g x) = h (f x)) l → f <$> alter g i l = alter h i (f <$> l).
   Proof. intros Hl. revert i. by induction Hl; intros [|i]; f_equal/=. Qed.
   Lemma list_fmap_delete l i : f <$> (delete i l) = delete i (f <$> l).
@@ -201,28 +204,22 @@ Section fmap.
     naive_solver congruence.
   Qed.
 
-  Lemma elem_of_list_fmap_1 l x : x ∈ l → f x ∈ f <$> l.
-  Proof. induction 1; csimpl; rewrite elem_of_cons; intuition. Qed.
-  Lemma elem_of_list_fmap_1_alt l x y : x ∈ l → y = f x → y ∈ f <$> l.
-  Proof. intros. subst. by apply elem_of_list_fmap_1. Qed.
-  Lemma elem_of_list_fmap_2 l x : x ∈ f <$> l → ∃ y, x = f y ∧ y ∈ l.
+  Lemma list_elem_of_fmap l y : y ∈ f <$> l ↔ ∃ x, y = f x ∧ x ∈ l.
   Proof.
-    induction l as [|y l IH]; simpl; inv 1.
-    - exists y. split; [done | by left].
-    - destruct IH as [z [??]]; [done|]. exists z. split; [done | by right].
+    setoid_rewrite list_elem_of_lookup. setoid_rewrite list_lookup_fmap_Some.
+    naive_solver.
   Qed.
-  Lemma elem_of_list_fmap l x : x ∈ f <$> l ↔ ∃ y, x = f y ∧ y ∈ l.
-  Proof.
-    naive_solver eauto using elem_of_list_fmap_1_alt, elem_of_list_fmap_2.
-  Qed.
-  Lemma elem_of_list_fmap_2_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l → x ∈ l.
-  Proof.
-    intros (y, (E, I))%elem_of_list_fmap_2. by rewrite (inj f) in I.
-  Qed.
-  Lemma elem_of_list_fmap_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l ↔ x ∈ l.
-  Proof.
-    naive_solver eauto using elem_of_list_fmap_1, elem_of_list_fmap_2_inj.
-  Qed.
+  Lemma list_elem_of_fmap_1 l x : x ∈ f <$> l → ∃ y, x = f y ∧ y ∈ l.
+  Proof. by rewrite list_elem_of_fmap. Qed.
+  Lemma list_elem_of_fmap_2 l x : x ∈ l → f x ∈ f <$> l.
+  Proof. rewrite list_elem_of_fmap. naive_solver. Qed.
+  Lemma list_elem_of_fmap_2' l x y : x ∈ l → y = f x → y ∈ f <$> l.
+  Proof. intros ? ->. by apply list_elem_of_fmap_2. Qed.
+
+  Lemma list_elem_of_fmap_inj `{!Inj (=) (=) f} l x : f x ∈ f <$> l ↔ x ∈ l.
+  Proof. rewrite list_elem_of_fmap. naive_solver. Qed.
+  Lemma list_elem_of_fmap_inj_2 `{!Inj (=) (=) f} l x : f x ∈ f <$> l → x ∈ l.
+  Proof. by rewrite list_elem_of_fmap_inj. Qed.
 
   Lemma list_fmap_inj R1 R2 :
     Inj R1 R2 f → Inj (Forall2 R1) (Forall2 R2) (fmap f).
@@ -248,7 +245,7 @@ Section fmap.
     NoDup (f <$> l).
   Proof.
     intros Hinj. induction 1 as [|x l ?? IH]; simpl; constructor.
-    - intros [y [Hxy ?]]%elem_of_list_fmap.
+    - intros [y [Hxy ?]]%list_elem_of_fmap.
       apply Hinj in Hxy; [by subst|by constructor..].
     - apply IH. clear- Hinj.
       intros x' y Hx' Hy. apply Hinj; by constructor.
@@ -257,7 +254,7 @@ Section fmap.
   Lemma NoDup_fmap_1 l : NoDup (f <$> l) → NoDup l.
   Proof.
     induction l; simpl; inv 1; constructor; auto.
-    rewrite elem_of_list_fmap in *. naive_solver.
+    rewrite list_elem_of_fmap in *. naive_solver.
   Qed.
   Lemma NoDup_fmap_2 `{!Inj (=) (=) f} l : NoDup l → NoDup (f <$> l).
   Proof. apply NoDup_fmap_2_strong. intros ?? _ _. apply (inj f). Qed.
@@ -327,14 +324,11 @@ Section ext.
   Qed.
 End ext.
 
-Lemma list_alter_fmap_mono {A} (f : A → A) (g : A → A) l i :
-  Forall (λ x, f (g x) = g (f x)) l → f <$> alter g i l = alter g i (f <$> l).
-Proof. auto using list_alter_fmap. Qed.
 Lemma NoDup_fmap_fst {A B} (l : list (A * B)) :
   (∀ x y1 y2, (x,y1) ∈ l → (x,y2) ∈ l → y1 = y2) → NoDup l → NoDup (l.*1).
 Proof.
   intros Hunique. induction 1 as [|[x1 y1] l Hin Hnodup IH]; csimpl; constructor.
-  - rewrite elem_of_list_fmap.
+  - rewrite list_elem_of_fmap.
     intros [[x2 y2] [??]]; simpl in *; subst. destruct Hin.
     rewrite (Hunique x2 y1 y2); rewrite ?elem_of_cons; auto.
   - apply IH. intros. eapply Hunique; rewrite ?elem_of_cons; eauto.
@@ -364,7 +358,7 @@ Section omap.
     induction 1 as [|x y l l' Hfg ? IH]; [done|].
     csimpl. rewrite Hfg. destruct (g y); [|done]. by f_equal.
   Qed.
-  Lemma elem_of_list_omap l y : y ∈ omap f l ↔ ∃ x, x ∈ l ∧ f x = Some y.
+  Lemma list_elem_of_omap l y : y ∈ omap f l ↔ ∃ x, x ∈ l ∧ f x = Some y.
   Proof.
     split.
     - induction l as [|x l]; csimpl; repeat case_match;
@@ -423,7 +417,7 @@ Section bind.
   Proof. csimpl. by rewrite (right_id_L _ (++)). Qed.
   Lemma bind_app l1 l2 : (l1 ++ l2) ≫= f = (l1 ≫= f) ++ (l2 ≫= f).
   Proof. by induction l1; csimpl; rewrite <-?(assoc_L (++)); f_equal. Qed.
-  Lemma elem_of_list_bind (x : B) (l : list A) :
+  Lemma list_elem_of_bind (x : B) (l : list A) :
     x ∈ l ≫= f ↔ ∃ y, x ∈ f y ∧ y ∈ l.
   Proof.
     split.
@@ -450,10 +444,10 @@ Section bind.
   Proof.
     intros Hinj Hf. induction 1 as [|x l ?? IH]; csimpl; [constructor|].
     apply NoDup_app. split_and!.
-    - eauto 10 using elem_of_list_here.
-    - intros y ? (x'&?&?)%elem_of_list_bind.
-      destruct (Hinj x x' y); auto using elem_of_list_here, elem_of_list_further.
-    - eauto 10 using elem_of_list_further.
+    - eauto 10 using list_elem_of_here.
+    - intros y ? (x'&?&?)%list_elem_of_bind.
+      destruct (Hinj x x' y); auto using list_elem_of_here, list_elem_of_further.
+    - eauto 10 using list_elem_of_further.
   Qed.
 End bind.
 
@@ -468,11 +462,11 @@ Section ret_join.
   Proof. by induction ls; f_equal/=. Qed.
   Global Instance join_Permutation : Proper ((≡ₚ@{list A}) ==> (≡ₚ)) mjoin.
   Proof. intros ?? E. by rewrite !list_join_bind, E. Qed.
-  Lemma elem_of_list_ret (x y : A) : x ∈ @mret list _ A y ↔ x = y.
-  Proof. apply elem_of_list_singleton. Qed.
-  Lemma elem_of_list_join (x : A) (ls : list (list A)) :
+  Lemma list_elem_of_ret (x y : A) : x ∈ @mret list _ A y ↔ x = y.
+  Proof. apply list_elem_of_singleton. Qed.
+  Lemma list_elem_of_join (x : A) (ls : list (list A)) :
     x ∈ mjoin ls ↔ ∃ l : list A, x ∈ l ∧ l ∈ ls.
-  Proof. by rewrite list_join_bind, elem_of_list_bind. Qed.
+  Proof. by rewrite list_join_bind, list_elem_of_bind. Qed.
   Lemma join_nil (ls : list (list A)) : mjoin ls = [] ↔ Forall (.= []) ls.
   Proof.
     split; [|by induction 1 as [|[|??] ?]].
@@ -628,12 +622,12 @@ Section imap.
   Lemma elem_of_lookup_imap_1 l x :
     x ∈ imap f l → ∃ i y, x = f i y ∧ l !! i = Some y.
   Proof.
-    intros [i Hin]%elem_of_list_lookup. rewrite list_lookup_imap in Hin.
+    intros [i Hin]%list_elem_of_lookup. rewrite list_lookup_imap in Hin.
     simplify_option_eq; naive_solver.
   Qed.
   Lemma elem_of_lookup_imap_2 l x i : l !! i = Some x → f i x ∈ imap f l.
   Proof.
-    intros Hl. rewrite elem_of_list_lookup.
+    intros Hl. rewrite list_elem_of_lookup.
     exists i. by rewrite list_lookup_imap, Hl.
   Qed.
   Lemma elem_of_lookup_imap l x :
@@ -654,14 +648,14 @@ Section permutations.
   Proof.
     split.
     - revert l1. induction l2 as [|y l IH]; intros l1; simpl.
-      { intros ->%elem_of_list_singleton. by exists [], []. }
+      { intros ->%list_elem_of_singleton. by exists [], []. }
       intros [->|H]%elem_of_cons; [by exists [], (y :: l)|].
-      apply elem_of_list_fmap in H as [? [-> H]].
+      apply list_elem_of_fmap in H as [? [-> H]].
       apply IH in H as (l' & l'' & -> & ->).
       exists (y :: l'), l''. eauto.
     - intros (l & l' & -> & ->).
       induction l as [|y l IH]; simpl; [apply interleave_cons|].
-      apply elem_of_list_further. by apply elem_of_list_fmap_1.
+      apply list_elem_of_further. by apply list_elem_of_fmap_2.
   Qed.
   Lemma interleave_Permutation x l l' : l' ∈ interleave x l → l' ≡ₚ x :: l.
   Proof.
@@ -670,57 +664,57 @@ Section permutations.
 
   Lemma permutations_refl l : l ∈ permutations l.
   Proof.
-    induction l; simpl; [by apply elem_of_list_singleton|].
-    apply elem_of_list_bind. eauto using interleave_cons.
+    induction l; simpl; [by apply list_elem_of_singleton|].
+    apply list_elem_of_bind. eauto using interleave_cons.
   Qed.
   Lemma permutations_skip x l l' :
     l ∈ permutations l' → x :: l ∈ permutations (x :: l').
-  Proof. intro. apply elem_of_list_bind; eauto using interleave_cons. Qed.
+  Proof. intro. apply list_elem_of_bind; eauto using interleave_cons. Qed.
   Lemma permutations_swap x y l : y :: x :: l ∈ permutations (x :: y :: l).
   Proof.
-    simpl. apply elem_of_list_bind. exists (y :: l). split; simpl.
+    simpl. apply list_elem_of_bind. exists (y :: l). split; simpl.
     - destruct l; csimpl; rewrite !elem_of_cons; auto.
-    - apply elem_of_list_bind. simpl.
+    - apply list_elem_of_bind. simpl.
       eauto using interleave_cons, permutations_refl.
   Qed.
   Lemma permutations_nil l : l ∈ permutations [] ↔ l = [].
-  Proof. simpl. by rewrite elem_of_list_singleton. Qed.
+  Proof. simpl. by rewrite list_elem_of_singleton. Qed.
   Lemma interleave_interleave_toggle x1 x2 l1 l2 l3 :
     l1 ∈ interleave x1 l2 → l2 ∈ interleave x2 l3 → ∃ l4,
       l1 ∈ interleave x2 l4 ∧ l4 ∈ interleave x1 l3.
   Proof.
     revert l1 l2. induction l3 as [|y l3 IH]; intros l1 l2; simpl.
-    { rewrite !elem_of_list_singleton. intros ? ->. exists [x1].
+    { rewrite !list_elem_of_singleton. intros ? ->. exists [x1].
       change (interleave x2 [x1]) with ([[x2; x1]] ++ [[x1; x2]]).
-      by rewrite (comm (++)), elem_of_list_singleton. }
-    rewrite elem_of_cons, elem_of_list_fmap.
+      by rewrite (comm (++)), list_elem_of_singleton. }
+    rewrite elem_of_cons, list_elem_of_fmap.
     intros Hl1 [? | [l2' [??]]]; simplify_eq/=.
-    - rewrite !elem_of_cons, elem_of_list_fmap in Hl1.
+    - rewrite !elem_of_cons, list_elem_of_fmap in Hl1.
       destruct Hl1 as [? | [? | [l4 [??]]]]; subst.
       + exists (x1 :: y :: l3). csimpl. rewrite !elem_of_cons. tauto.
       + exists (x1 :: y :: l3). csimpl. rewrite !elem_of_cons. tauto.
       + exists l4. simpl. rewrite elem_of_cons. auto using interleave_cons.
-    - rewrite elem_of_cons, elem_of_list_fmap in Hl1.
+    - rewrite elem_of_cons, list_elem_of_fmap in Hl1.
       destruct Hl1 as [? | [l1' [??]]]; subst.
       + exists (x1 :: y :: l3). csimpl.
-        rewrite !elem_of_cons, !elem_of_list_fmap.
+        rewrite !elem_of_cons, !list_elem_of_fmap.
         split; [| by auto]. right. right. exists (y :: l2').
-        rewrite elem_of_list_fmap. naive_solver.
+        rewrite list_elem_of_fmap. naive_solver.
       + destruct (IH l1' l2') as [l4 [??]]; auto. exists (y :: l4). simpl.
-        rewrite !elem_of_cons, !elem_of_list_fmap. naive_solver.
+        rewrite !elem_of_cons, !list_elem_of_fmap. naive_solver.
   Qed.
   Lemma permutations_interleave_toggle x l1 l2 l3 :
     l1 ∈ permutations l2 → l2 ∈ interleave x l3 → ∃ l4,
       l1 ∈ interleave x l4 ∧ l4 ∈ permutations l3.
   Proof.
     revert l1 l2. induction l3 as [|y l3 IH]; intros l1 l2; simpl.
-    { rewrite elem_of_list_singleton. intros Hl1 ->. eexists [].
-      by rewrite elem_of_list_singleton. }
-    rewrite elem_of_cons, elem_of_list_fmap.
+    { rewrite list_elem_of_singleton. intros Hl1 ->. eexists [].
+      by rewrite list_elem_of_singleton. }
+    rewrite elem_of_cons, list_elem_of_fmap.
     intros Hl1 [? | [l2' [? Hl2']]]; simplify_eq/=.
-    - rewrite elem_of_list_bind in Hl1.
+    - rewrite list_elem_of_bind in Hl1.
       destruct Hl1 as [l1' [??]]. by exists l1'.
-    - rewrite elem_of_list_bind in Hl1. setoid_rewrite elem_of_list_bind.
+    - rewrite list_elem_of_bind in Hl1. setoid_rewrite list_elem_of_bind.
       destruct Hl1 as [l1' [??]]. destruct (IH l1' l2') as (l1''&?&?); auto.
       destruct (interleave_interleave_toggle y x l1 l1' l1'') as (?&?&?); eauto.
   Qed.
@@ -728,17 +722,17 @@ Section permutations.
     l1 ∈ permutations l2 → l2 ∈ permutations l3 → l1 ∈ permutations l3.
   Proof.
     revert l1 l2. induction l3 as [|x l3 IH]; intros l1 l2; simpl.
-    - rewrite !elem_of_list_singleton. intros Hl1 ->; simpl in *.
-      by rewrite elem_of_list_singleton in Hl1.
-    - rewrite !elem_of_list_bind. intros Hl1 [l2' [Hl2 Hl2']].
+    - rewrite !list_elem_of_singleton. intros Hl1 ->; simpl in *.
+      by rewrite list_elem_of_singleton in Hl1.
+    - rewrite !list_elem_of_bind. intros Hl1 [l2' [Hl2 Hl2']].
       destruct (permutations_interleave_toggle x l1 l2 l2') as [? [??]]; eauto.
   Qed.
   Lemma permutations_Permutation l l' : l' ∈ permutations l ↔ l ≡ₚ l'.
   Proof.
     split.
     - revert l'. induction l; simpl; intros l''.
-      + rewrite elem_of_list_singleton. by intros ->.
-      + rewrite elem_of_list_bind. intros [l' [Hl'' ?]].
+      + rewrite list_elem_of_singleton. by intros ->.
+      + rewrite list_elem_of_bind. intros [l' [Hl'' ?]].
         rewrite (interleave_Permutation _ _ _ Hl''). constructor; auto.
     - induction 1; eauto using permutations_refl,
         permutations_skip, permutations_swap, permutations_trans.
@@ -755,14 +749,14 @@ Section powermset.
   Proof.
    split.
    - revert l; induction l' as [|x l' IH]; simpl; intros l.
-     { by intros ->%elem_of_list_singleton. }
-     intros [(k & Hl & Hk)%elem_of_list_bind|?]%elem_of_app.
+     { by intros ->%list_elem_of_singleton. }
+     intros [(k & Hl & Hk)%list_elem_of_bind|?]%elem_of_app.
      + apply IH in Hk. apply interleave_Permutation in Hl as ->.
        by apply submseteq_skip.
      + by apply submseteq_cons, IH.
    - revert l; induction l' as [|x l' IH]; simpl; intros l.
-     { intros ->%submseteq_nil_r. apply elem_of_list_here. }
-     rewrite elem_of_app, elem_of_list_bind.
+     { intros ->%submseteq_nil_r. apply list_elem_of_here. }
+     rewrite elem_of_app, list_elem_of_bind.
      intros [H|(k & Hperm & Hsub)]%submseteq_cons_r; [by eauto|].
      apply Permutation_cons_inv_r in Hperm as (k1 & k2 & -> & Hperm).
      left. exists (k1 ++ k2). split.
@@ -772,7 +766,7 @@ Section powermset.
   Lemma powermset_refl l : l ∈ powermset l.
   Proof. by rewrite powermset_submseteq. Qed.
   Lemma powermset_nil l : l ∈ powermset [] ↔ l = [].
-  Proof. simpl. by rewrite elem_of_list_singleton. Qed.
+  Proof. simpl. by rewrite list_elem_of_singleton. Qed.
   Lemma powermset_permutations l l' : l ∈ permutations l' → l ∈ powermset l'.
   Proof.
     rewrite powermset_submseteq, permutations_Permutation. by intros ->.
@@ -900,8 +894,8 @@ Lemma foldr_comm_acc_strong {A B} (R : relation B) `{!PreOrder R}
   R (foldr f (g b) l) (g (foldr f b l)).
 Proof.
   intros ? Hcomm. induction l as [|x l IH]; simpl; [done|].
-  rewrite <-Hcomm by eauto using elem_of_list_here.
-  by rewrite IH by eauto using elem_of_list_further.
+  rewrite <-Hcomm by eauto using list_elem_of_here.
+  by rewrite IH by eauto using list_elem_of_further.
 Qed.
 Lemma foldr_comm_acc {A B} (f : A → B → B) (g : B → B) (b : B) l :
   (∀ x y, f x (g y) = g (f x y)) →
@@ -1102,14 +1096,14 @@ Section zip_with.
   Lemma elem_of_lookup_zip_with_1 l k (z : C) :
     z ∈ zip_with f l k → ∃ i x y, z = f x y ∧ l !! i = Some x ∧ k !! i = Some y.
   Proof.
-    intros [i Hin]%elem_of_list_lookup. rewrite lookup_zip_with in Hin.
+    intros [i Hin]%list_elem_of_lookup. rewrite lookup_zip_with in Hin.
     simplify_option_eq; naive_solver.
   Qed.
 
   Lemma elem_of_lookup_zip_with_2 l k x y (z : C) i :
     l !! i = Some x → k !! i = Some y → f x y ∈ zip_with f l k.
   Proof.
-    intros Hl Hk. rewrite elem_of_list_lookup.
+    intros Hl Hk. rewrite list_elem_of_lookup.
     exists i. by rewrite lookup_zip_with, Hl, Hk.
   Qed.
 
@@ -1124,7 +1118,7 @@ Section zip_with.
     z ∈ zip_with f l k → ∃ x y, z = f x y ∧ x ∈ l ∧ y ∈ k.
   Proof.
     intros ?%elem_of_lookup_zip_with.
-    naive_solver eauto using elem_of_list_lookup_2.
+    naive_solver eauto using list_elem_of_lookup_2.
   Qed.
 
 End zip_with.

@@ -33,10 +33,10 @@ Local Instance listset_nodup_set: Set_ A C.
 Proof.
   split; [split | | ].
   - by apply not_elem_of_nil.
-  - by apply elem_of_list_singleton.
-  - intros [??] [??] ?. apply elem_of_list_union.
-  - intros [??] [??] ?. apply elem_of_list_intersection.
-  - intros [??] [??] ?. apply elem_of_list_difference.
+  - by apply list_elem_of_singleton.
+  - intros [??] [??] ?. apply list_elem_of_union.
+  - intros [??] [??] ?. apply list_elem_of_intersection.
+  - intros [??] [??] ?. apply list_elem_of_difference.
 Qed.
 
 Global Instance listset_nodup_elems: Elements A C := listset_nodup_car.

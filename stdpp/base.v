@@ -1549,12 +1549,12 @@ Global Hint Mode Elements - ! : typeclass_instances.
 Global Instance: Params (@elements) 3 := {}.
 
 (** We redefine the standard library's [In] and [NoDup] using type classes. *)
-Inductive elem_of_list {A} : ElemOf A (list A) :=
-  | elem_of_list_here (x : A) l : x ∈ x :: l
-  | elem_of_list_further (x y : A) l : x ∈ l → x ∈ y :: l.
-Global Existing Instance elem_of_list.
+Inductive list_elem_of {A} : ElemOf A (list A) :=
+  | list_elem_of_here (x : A) l : x ∈ x :: l
+  | list_elem_of_further (x y : A) l : x ∈ l → x ∈ y :: l.
+Global Existing Instance list_elem_of.
 
-Lemma elem_of_list_In {A} (l : list A) x : x ∈ l ↔ In x l.
+Lemma list_elem_of_In {A} (l : list A) x : x ∈ l ↔ In x l.
 Proof.
   split.
   - induction 1; simpl; auto.
@@ -1568,8 +1568,8 @@ Inductive NoDup {A} : list A → Prop :=
 Lemma NoDup_ListNoDup {A} (l : list A) : NoDup l ↔ List.NoDup l.
 Proof.
   split.
-  - induction 1; constructor; rewrite <-?elem_of_list_In; auto.
-  - induction 1; constructor; rewrite ?elem_of_list_In; auto.
+  - induction 1; constructor; rewrite <-?list_elem_of_In; auto.
+  - induction 1; constructor; rewrite ?list_elem_of_In; auto.
 Qed.
 
 (** Decidability of equality of the carrier set is admissible, but we add it

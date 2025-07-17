@@ -29,6 +29,103 @@ API-breaking change is listed.
   disjoint from each other, add some lemmas about this definition. (by Rudy
   Peterson)
 - Add `Hint Mode` for `Cancel` class.
+- Adjust the `lookup` and `lookup_total` lemmas for lists and maps to cover the
+  "eq" and "ne" case in a single lemma statement.
+  + The new lemmas are of the form
+    `lookup_op : op .. i !! j = if decide (i = j) then .. else ..`, e.g.,
+    `lookup_delete : delete i m !! j = if decide (i = j) then None else m !! j`.
+    These lemmas are convenient because proofs of the form:
+    `destruct (decide (i = j)). { rewrite lookup_op_eq .. } { rewrite lookup_op_ne .. }`
+    can often be shortened to `rewrite lookup_op; case_decide`.
+  + The original lemma `lookup_op : op .. i !! i = ...` is renamed into
+    `lookup_op_eq`. For example, `lookup_delete` becomes `lookup_delete_eq`.
+    A full list of renames can be found in the `sed` script.
+  + The original lemma `lookup_op_ne : op .. i !! j = ...` is unaffected.
+- Rename `multiplicity_singleton` → `multiplicity_singleton_eq` and
+  `multiplicity_singleton'` → `multiplicity_singleton`. That is, the lemma
+  `multiplicity_singleton` becomes the version with `decide` in order to be
+  consistent with the `lookup` lemmas.
+- Adjust the "commuting" lemmas for lists and maps to cover the "eq" and "ne"
+  case in a single lemma statement.
+  + The new lemmas are of the form
+    `op1_op2 : op1 .. i (op2 .. j) = if decide (i = j) then .. else ..`, e.g.,
+   `insert_delete <[i:=x]> (delete j m) = if decide (i = j) then <[i:=x]> m else delete j (<[i:=x]> m)`.
+  + Consistently provide versions `op1_op2_eq` and `op1_op2_ne`. For example,
+    `insert_delete_eq : <[i:=x]> (delete i m) = <[i:=x]> m` and
+    `insert_delete_ne : i ≠ j → <[i:=x]> (delete j m) = delete j (<[i:=x]> m)`.
+  + For maps, lemmas have been added for all combinations of `op1` being
+    `partial_alter`, `alter`, `delete` and `insert`; and `op2` being any of the
+    aforementioned operations or `singleton`.
+  + Existing lemmas have been renamed to follow the new scheme:
+    `partial_alter_compose` → `partial_alter_partial_alter_eq` (direction also
+    changed),
+    `partial_alter_commute` → `partial_alter_partial_alter_ne`,
+    `alter_compose` → `alter_alter_eq` (direction also changed),
+    `alter_commute` → `alter_alter_ne`.
+    `delete_commute` → `delete_delete` (no `_ne` suffix because the lemmas holds
+    without `≠` premise),
+    `delete_idemp` → `delete_delete_eq`,
+    `insert_insert` → `insert_insert_eq`,
+    `insert_commute` → `insert_insert_ne`,
+    `alter_insert` → `alter_insert_eq`,
+    `delete_insert_delete` → `delete_insert_eq`,
+    `delete_alter` → `delete_alter_eq`,
+    `insert_delete_insert` → `insert_delete_eq`,
+    `delete_insert_delete` → `delete_insert_eq`,
+    `delete_alter` → `delete_alter_eq`,
+    `insert_delete_insert` → `insert_delete_eq`,
+    `delete_alter` → `delete_alter_eq`,
+    `alter_singleton` → `alter_singleton_eq`,
+    `delete_singleton` → `delete_singleton_eq`,
+    `insert_singleton` → `insert_singleton_eq`,
+    `foldr_delete_commute` → `delete_foldr_delete`,
+    `list_insert_insert` → `list_insert_insert_eq`,
+    `list_insert_commute` → `list_insert_insert_ne`,
+    `list_alter_compose` → `list_alter_alter_eq` (direction also changed),
+    `list_alter_commute` → `list_alter_alter_eq`,
+    `take_insert` → `take_insert_ge`,
+    `take_alter` → `take_alter_ge`,
+    `drop_alter` → `drop_alter_lt`.
+  + Add `alter_app` and `insert_app`.
+  + Other related renames:
+    `foldr_delete_insert` → `foldr_delete_insert_in`
+    `foldr_delete_insert_ne` → `foldr_delete_insert_notin`.
+- The names `op1_op2` were sometimes used for lemmas of the shape
+  `.. → op1 .. (op2 .. m) = m`. These lemmas are now called `op1_op2_id`
+  (because they are the "identity", but that requires preconditions to hold):
+  `partial_alter_self_alt` → `partial_alter_id` (also became stronger, but
+  should be backwards compatible),
+  `delete_notin` → `delete_id`,
+  `delete_insert` → `delete_insert_id`,
+  `insert_delete` → `insert_delete_id`,
+  `foldr_delete_notin` → `foldr_delete_id`.
+- Add lemma `partial_alter_id`.
+- Rename `lookup_delete_lt` → `list_lookup_delete_lt`,
+  `lookup_delete_ge` → `list_lookup_delete_ge`,
+  `lookup_total_delete_lt` → `list_lookup_total_delete_lt`
+  `lookup_total_delete_ge` → `list_lookup_total_delete_ge`.
+  The `list_` suffix is needed to avoid conflicts with the map lemmas.
+- Add lemmas `list_lookup_delete` and `list_lookup_total_delete` that combine
+  both versions.
+- Rename `drop_insert_le` → `drop_insert_gt` and `drop_insert_gt` →
+  `drop_insert_lt` to make the direction of the inequality consistent with the
+  `take` lemmas.
+- Add lemmas `lookup_singleton_is_Some`, `list_lookup_insert_is_Some`,
+  `list_lookup_insert_None`.
+- Rename lemmas `elem_of_list_X` into `list_elem_of_X` to be consistent with
+  the `list_lookup_X` lemmas. The `sed` script contains all renames, the
+  following renames were special since they fix other inconsistencies:
+  `list_elem_of_fmap_1` → `list_elem_of_fmap_2`,
+  `list_elem_of_fmap_1_alt` → `list_elem_of_fmap_2'`,
+  `list_elem_of_fmap_2` → `list_elem_of_fmap_1`,
+  `list_lookup_fmap_inv` → `list_lookup_fmap_Some_1`,
+  `list_elem_of_fmap_2_inj` → `list_elem_of_fmap_inj_2`.
+- Change the order of the conjunction in `list_lookup_fmap_Some`. The new
+  version is `(f <$> l) !! i = Some y ↔ ∃ x, y = f x ∧ l !! i = Some x`, which
+  makes it consistent with `list_elem_of_fmap` and the corresponding lemmas for
+  sets and maps.
+- Rename `list_alter_fmap` → `list_fmap_alter`.
+- Remove `list_alter_fmap_mono`, use `list_fmap_alter` instead.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -44,6 +141,111 @@ s/\blookup_gmap_curry_None\b/lookup_map_curry_None/g
 s/\bgmap_uncurry_curry\b/map_uncurry_curry/g
 s/\bgmap_curry_non_empty\b/map_curry_non_empty/g
 s/\bgmap_curry_uncurry_non_empty\b/map_curry_uncurry_non_empty/g
+
+# map _eq lookup lemmas
+s/\blookup_partial_alter\b/lookup_partial_alter_eq/g
+s/\blookup_total_partial_alter\b/lookup_total_partial_alter_eq/g
+s/\blookup_alter\b/lookup_alter_eq/g # total_lookup_version was missing, added
+s/\blookup_delete\b/lookup_delete_eq/g
+s/\blookup_total_delete\b/lookup_total_delete_eq/g
+s/\blookup_insert\b/lookup_insert_eq/g
+s/\blookup_total_insert\b/lookup_total_insert_eq/g
+s/\blookup_singleton\b/lookup_singleton_eq/g
+s/\blookup_total_singleton\b/lookup_total_singleton_eq/g
+
+# map _eq commute lemmas
+s/\bpartial_alter_compose\b/partial_alter_partial_alter_eq/g # direction changed
+s/\bpartial_alter_commute\b/partial_alter_partial_alter_ne/g
+s/\balter_compose\b/alter_alter_eq/g # direction changed
+s/\balter_commute\b/alter_alter_ne/g
+s/\bdelete_commute\b/delete_delete/g # no _ne since no ≠ premise is needed
+s/\bdelete_idemp\b/delete_delete_eq/g
+s/\binsert_insert\b/insert_insert_eq/g
+s/\binsert_commute\b/insert_insert_ne/g
+s/\balter_insert\b/alter_insert_eq/g
+s/\bdelete_insert\b/delete_insert_id/g # Has m !! i = None premise, and gives .. = m
+s/\bdelete_insert_delete\b/delete_insert_eq/g
+s/\bdelete_alter\b/delete_alter_eq/g
+s/\binsert_delete_insert\b/insert_delete_eq/g
+s/\binsert_delete\b/insert_delete_id/g # Has m !! i = Some .. premise, and gives .. = m
+s/\bdelete_alter\b/delete_alter_eq/g
+s/\balter_singleton\b/alter_singleton_eq/g
+s/\bdelete_singleton\b/delete_singleton_eq/g
+s/\binsert_singleton\b/insert_singleton_eq/g
+s/\bfoldr_delete_commute\b/delete_foldr_delete/g
+s/\bfoldr_delete_notin\b/foldr_delete_id/g
+s/\bfoldr_delete_insert\b/foldr_delete_insert_in/g
+s/\bfoldr_delete_insert_ne\b/foldr_delete_insert_notin/g
+
+# map misc changes
+s/\bdelete_notin\b/delete_id/g # instance of partial_alter_id
+s/\bpartial_alter_self_alt\b/partial_alter_id/g # also became stronger, but should be backwards compatible
+
+# _eq lemmas for multiset
+s/\bmultiplicity_singleton\b/multiplicity_singleton_eq/g
+s/\bmultiplicity_singleton'\b/multiplicity_singleton/g
+
+# list _eq lookup lemmas
+s/\blist_lookup_insert\b/list_lookup_insert_eq/g
+s/\blist_lookup_total_insert\b/list_lookup_total_insert_eq/g
+s/\blist_lookup_alter\b/list_lookup_alter_eq/g
+s/\blist_lookup_total_alter\b/list_lookup_total_alter_eq/g
+s/\blookup_delete_lt\b/list_lookup_delete_lt/g
+s/\blookup_delete_ge\b/list_lookup_delete_ge/g
+s/\blookup_total_delete_lt\b/list_lookup_total_delete_lt/g
+s/\blookup_total_delete_ge\b/list_lookup_total_delete_ge/g
+s/\blookup_take\b/lookup_take_lt/g
+s/\blookup_total_take\b/lookup_total_take_lt/g
+
+# list _eq commute lemmas
+s/\blist_insert_insert\b/list_insert_insert_eq/g
+s/\blist_insert_commute\b/list_insert_insert_ne/g
+s/\blist_alter_compose\b/list_alter_alter_eq/g # direction changed
+s/\blist_alter_commute\b/list_alter_alter_eq/g
+s/\btake_insert\b/take_insert_ge/g
+s/\btake_alter\b/take_alter_ge/g
+s/\bdrop_alter\b/drop_alter_lt/g
+s/\bdrop_insert_le\b/drop_insert_gt/g # make inequality consistent with take lemma
+s/\bdrop_insert_gt\b/drop_insert_lt/g # make inequality consistent with take lemma
+
+# list_elem_of
+s/\bdecompose_elem_of_list\b/decompose_list_elem_of/g
+s/\belem_of_list\b/list_elem_of/g
+s/\belem_of_list_here\b/list_elem_of_here/g
+s/\belem_of_list_further\b/list_elem_of_further/g
+s/\belem_of_list_In\b/list_elem_of_In/g
+s/\belem_of_list_singleton\b/list_elem_of_singleton/g
+s/\belem_of_list_lookup_1\b/list_elem_of_lookup_1/g
+s/\belem_of_list_lookup_total_1\b/list_elem_of_lookup_total_1/g
+s/\belem_of_list_lookup_2\b/list_elem_of_lookup_2/g
+s/\belem_of_list_lookup_total_2\b/list_elem_of_lookup_total_2/g
+s/\belem_of_list_lookup\b/list_elem_of_lookup/g
+s/\belem_of_list_lookup_total\b/list_elem_of_lookup_total/g
+s/\belem_of_list_split_length\b/list_elem_of_split_length/g
+s/\belem_of_list_split\b/list_elem_of_split/g
+s/\belem_of_list_split_l\b/list_elem_of_split_l/g
+s/\belem_of_list_split_r\b/list_elem_of_split_r/g
+s/\belem_of_list_intersection_with\b/list_elem_of_intersection_with/g
+s/\belem_of_list_difference\b/list_elem_of_difference/g
+s/\belem_of_list_union\b/list_elem_of_union/g
+s/\belem_of_list_intersection\b/list_elem_of_intersection/g
+s/\belem_of_list_filter\b/list_elem_of_filter/g
+s/\belem_of_list_fmap\b/list_elem_of_fmap/g
+s/\belem_of_list_fmap_1\b/list_elem_of_fmap_2/g
+s/\belem_of_list_fmap_2\b/list_elem_of_fmap_1/g
+s/\belem_of_list_fmap_1_alt\b/list_elem_of_fmap_2'/g
+s/\belem_of_list_fmap_inj\b/list_elem_of_fmap_inj/g
+s/\belem_of_list_fmap_2_inj\b/list_elem_of_fmap_inj_2/g
+s/\belem_of_list_omap\b/list_elem_of_omap/g
+s/\belem_of_list_bind\b/list_elem_of_bind/g
+s/\belem_of_list_ret\b/list_elem_of_ret/g
+s/\belem_of_list_join\b/list_elem_of_join/g
+s/\belem_of_list_dec\b/list_elem_of_dec/g
+
+# list fmap lemmas
+s/\blist_lookup_fmap_inv\b/list_lookup_fmap_Some_1/g
+s/\blist_alter_fmap\b/list_fmap_alter/g
+s/\blist_alter_fmap_mono\b/list_fmap_alter/g
 EOF
 ```
 

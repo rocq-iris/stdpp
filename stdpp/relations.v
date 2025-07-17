@@ -422,7 +422,7 @@ Section properties.
     revert x xs Hn Hfin.
     induction (lt_wf n) as [n _ IH]; intros x xs -> Hfin.
     constructor; simpl; intros x' Hxx'.
-    assert (x' ∈ xs) as (xs1&xs2&->)%elem_of_list_split by eauto using tc_once.
+    assert (x' ∈ xs) as (xs1&xs2&->)%list_elem_of_split by eauto using tc_once.
     refine (IH (length xs1 + length xs2) _ _ (xs1 ++ xs2) _ _);
       [rewrite length_app; simpl; lia..|].
     intros x'' Hx'x''. opose proof* (Hfin x'') as Hx''; [by econstructor|].

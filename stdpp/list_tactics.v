@@ -103,7 +103,7 @@ Ltac solve_submseteq :=
   quote_submseteq; apply rlist.eval_submseteq;
   compute_done.
 
-Ltac decompose_elem_of_list := repeat
+Ltac decompose_list_elem_of := repeat
   match goal with
   | H : ?x ∈ [] |- _ => by destruct (not_elem_of_nil x)
   | H : _ ∈ _ :: _ |- _ => apply elem_of_cons in H; destruct H

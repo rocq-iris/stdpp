@@ -122,10 +122,10 @@ Proof.
 Qed.
 Lemma delete_partial_alter_dom {A} (m : M A) i f :
   i ∉ dom m → delete i (partial_alter f i m) = m.
-Proof. rewrite not_elem_of_dom. apply delete_partial_alter. Qed.
+Proof. rewrite not_elem_of_dom. apply delete_partial_alter_id. Qed.
 Lemma delete_insert_dom {A} (m : M A) i x :
   i ∉ dom m → delete i (<[i:=x]>m) = m.
-Proof. rewrite not_elem_of_dom. apply delete_insert. Qed.
+Proof. rewrite not_elem_of_dom. apply delete_insert_id. Qed.
 Lemma map_disjoint_dom {A} (m1 m2 : M A) : m1 ##ₘ m2 ↔ dom m1 ## dom m2.
 Proof.
   rewrite map_disjoint_spec, elem_of_disjoint.
@@ -216,10 +216,10 @@ Proof.
   rewrite map_to_list_insert_first_key in Hj by done. destruct j; simplify_eq/=.
   - assert (map_first_key (<[i':=x2]> m) i').
     { eapply map_first_key_dom; last done. by rewrite !dom_insert. }
-    by rewrite insert_insert, !map_to_list_insert_first_key by done.
+    by rewrite insert_insert_eq, !map_to_list_insert_first_key by done.
   - assert (m !! i' = Some x1) as Hi'.
-    { by apply elem_of_list_lookup_2, elem_of_map_to_list in Hj. }
-    rewrite insert_commute by naive_solver. rewrite <-IH by done.
+    { by apply list_elem_of_lookup_2, elem_of_map_to_list in Hj. }
+    rewrite insert_insert_ne by naive_solver. rewrite <-IH by done.
     apply map_to_list_insert_first_key.
     { rewrite lookup_insert_ne; naive_solver. }
     eapply map_first_key_dom; last done.
@@ -243,8 +243,9 @@ Proof.
   rewrite dom_insert in Hdom.
   assert (i ∉ dom m2) by (by apply not_elem_of_dom).
   assert (i ∈ dom m1) as [x' Hx']%elem_of_dom by set_solver.
-  rewrite <-(insert_delete m1 i x') by done.
-  rewrite !map_size_insert_None, <-Nat.succ_le_mono by (by rewrite ?lookup_delete).
+  rewrite <-(insert_delete_id m1 i x') by done.
+  rewrite !map_size_insert_None, <-Nat.succ_le_mono
+    by (by rewrite ?lookup_delete_eq).
   apply IH. rewrite dom_delete. set_solver.
 Qed.
 Lemma dom_subset_size {A} (m1 m2 : M A) : dom m2 ⊂ dom m1 → size m2 < size m1.
@@ -256,8 +257,9 @@ Proof.
   rewrite dom_insert in Hdom.
   assert (i ∉ dom m2) by (by apply not_elem_of_dom).
   assert (i ∈ dom m1) as [x' Hx']%elem_of_dom by set_solver.
-  rewrite <-(insert_delete m1 i x') by done.
-  rewrite !map_size_insert_None, <-Nat.succ_lt_mono by (by rewrite ?lookup_delete).
+  rewrite <-(insert_delete_id m1 i x') by done.
+  rewrite !map_size_insert_None, <-Nat.succ_lt_mono
+    by (by rewrite ?lookup_delete_eq).
   apply IH. rewrite dom_delete. split; [set_solver|].
   intros ?. destruct Hdom as [? []].
   intros j. destruct (decide (i = j)); set_solver.
