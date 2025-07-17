@@ -928,6 +928,8 @@ Section zip_with.
   Implicit Types l : list A.
   Implicit Types k : list B.
 
+  Lemma zip_with_nil_l k : zip_with f [] k = [].
+  Proof. done. Qed.
   Lemma zip_with_nil_r l : zip_with f l [] = [].
   Proof. by destruct l. Qed.
   Lemma zip_with_app l1 l2 k1 k2 :
@@ -1127,10 +1129,53 @@ Lemma zip_with_diag {A C} (f : A → A → C) l :
   zip_with f l l = (λ x, f x x) <$> l.
 Proof. induction l as [|?? IH]; [done|]. simpl. rewrite IH. done. Qed.
 
+(** The lemmas below are outside the section so the [_r] version can be derived
+from the [_l] version. *)
+Lemma NoDup_zip_with_l_strong {A B C} (f : A → B → C) l k :
+  (∀ i1 i2 x1 x2 y1 y2,
+    l !! i1 = Some x1 → k !! i1 = Some y1 →
+    l !! i2 = Some x2 → k !! i2 = Some y2 →
+    f x1 y1 = f x2 y2 → x1 = x2) →
+  NoDup l →
+  NoDup (zip_with f l k).
+Proof.
+  intros Hinj.
+  induction 1 as [|x l Hxl Hl IHl] in k, Hinj |- *; [constructor|].
+  destruct k as [|y k]; simpl; [by constructor|]. constructor.
+  - intros (i & x' & y' & Hf & Hx & Hy)%elem_of_lookup_zip_with_1.
+    assert (x = x') as -> by (by eapply (Hinj 0 (S i))).
+    by apply list_elem_of_lookup_2 in Hx.
+  - apply IHl. intros i1 i2 x1 x2 y1 y2 Hl1 Hk1 Hl2 Hk2 Hf.
+    by eapply (Hinj (S i1) (S i2)).
+Qed.
+Lemma NoDup_zip_with_r_strong {A B C} (f : A → B → C) l k :
+  (∀ i1 i2 x1 x2 y1 y2,
+    l !! i1 = Some x1 → k !! i1 = Some y1 →
+    l !! i2 = Some x2 → k !! i2 = Some y2 →
+    f x1 y1 = f x2 y2 → y1 = y2) →
+  NoDup k →
+  NoDup (zip_with f l k).
+Proof.
+  intros Hinj. rewrite <-zip_with_flip.
+  apply NoDup_zip_with_l_strong. naive_solver.
+Qed.
+
+Lemma NoDup_zip_with_l {A B C} (f : A → B → C) `{!Inj2 (=) (=) (=) f} l k :
+  NoDup l → NoDup (zip_with f l k).
+Proof. apply NoDup_zip_with_l_strong. naive_solver. Qed.
+Lemma NoDup_zip_with_r {A B C} (f : A → B → C) `{!Inj2 (=) (=) (=) f} l k :
+  NoDup k → NoDup (zip_with f l k).
+Proof. apply NoDup_zip_with_r_strong. naive_solver. Qed.
+
 Section zip.
   Context {A B : Type}.
   Implicit Types l : list A.
   Implicit Types k : list B.
+
+  Lemma zip_nil_l k : zip [] k =@{list (A * B)} [].
+  Proof. apply zip_with_nil_l. Qed.
+  Lemma zip_nil_r l : zip l [] =@{list (A * B)} [].
+  Proof. apply zip_with_nil_r. Qed.
 
   Lemma fst_zip l k : length l ≤ length k → (zip l k).*1 = l.
   Proof. by apply fmap_zip_with_l. Qed.
@@ -1171,6 +1216,18 @@ Section zip.
   Lemma lookup_zip_None l k i :
     zip l k !! i = None ↔ l !! i = None ∨ k !! i = None.
   Proof. by rewrite lookup_zip_with_None. Qed.
+
+  Lemma prod_map_zip {A' B'} (f : A → A') (g : B → B') l k :
+    prod_map f g <$> zip l k = zip (f <$> l) (g <$> k).
+  Proof.
+    rewrite zip_with_fmap_l, zip_with_fmap_r, (zip_with_zip (λ x z, (f x, g z))).
+    apply list_fmap_ext. by intros i [x1 x2] _.
+  Qed.
+
+  Lemma NoDup_zip_l l k : NoDup l → NoDup (zip l k).
+  Proof. apply (NoDup_zip_with_l _). Qed.
+  Lemma NoDup_zip_r l k : NoDup k → NoDup (zip l k).
+  Proof. apply (NoDup_zip_with_r _). Qed.
 End zip.
 
 Lemma zip_diag {A} (l : list A) :
