@@ -59,6 +59,10 @@ Proof.
   destruct Hss2; eauto. by simplify_map_eq.
 Qed.
 
+Lemma alter_id_dom {A} (f : A → A) (m : M A) i :
+  i ∉ dom m → alter f i m = m.
+Proof. rewrite not_elem_of_dom. apply alter_id'. Qed.
+
 Lemma dom_filter {A} (P : K * A → Prop) `{!∀ x, Decision (P x)} (m : M A) (X : D) :
   (∀ i, i ∈ X ↔ ∃ x, m !! i = Some x ∧ P (i, x)) →
   dom (filter P m) ≡ X.

@@ -579,9 +579,13 @@ Qed.
 Lemma alter_ext {A} (f g : A → A) (m : M A) i :
   (∀ x, m !! i = Some x → f x = g x) → alter f i m = alter g i m.
 Proof. intro. apply partial_alter_ext. intros [x|] ?; f_equal/=; auto. Qed.
+
 Lemma alter_id {A} (f : A → A) (m : M A) i :
   (∀ x, m !! i = Some x → f x = x) → alter f i m = m.
 Proof. intros. apply partial_alter_id. destruct (m !! i); f_equal/=; auto. Qed.
+Lemma alter_id' {A} (f : A → A) (m : M A) i :
+  m !! i = None → alter f i m = m.
+Proof. intros. apply alter_id. naive_solver. Qed.
 
 Lemma alter_partial_alter {A} f g (m : M A) i j :
   alter f i (partial_alter g j m) =
@@ -852,6 +856,17 @@ Lemma insert_insert_ne {A} (m : M A) i j x y :
   i ≠ j → <[i:=x]> (<[j:=y]> m) = <[j:=y]> (<[i:=x]> m).
 Proof. intros. by rewrite insert_insert, decide_False. Qed.
 
+Lemma alter_alt {A} (f : A → A) (m : M A) i :
+  alter f i m = match m !! i with Some x => <[i:=f x]> m | None => m end.
+Proof.
+  apply map_eq; intros j. rewrite lookup_alter. destruct (m !! i) eqn:?; simpl.
+  - by rewrite lookup_insert.
+  - destruct (decide _); naive_solver.
+Qed.
+Lemma alter_alt_Some {A} (f : A → A) (m : M A) i x :
+  m !! i = Some x → alter f i m = <[i:=f x]> m.
+Proof. intros Hi. by rewrite alter_alt, Hi. Qed.
+
 Lemma insert_subseteq {A} (m : M A) i x : m !! i = None → m ⊆ <[i:=x]>m.
 Proof. apply partial_alter_subseteq. Qed.
 Lemma insert_subset {A} (m : M A) i x : m !! i = None → m ⊂ <[i:=x]>m.
@@ -1040,6 +1055,16 @@ Proof.
 Qed.
 Lemma fmap_empty_inv {A B} (f : A → B) m : f <$> m =@{M B} ∅ → m = ∅.
 Proof. apply fmap_empty_iff. Qed.
+
+Lemma fmap_alter {A B} (f : A → B) (g : A → A) (h : B → B) (m : M A) i :
+  (∀ x, m !! i = Some x → f (g x) = h (f x)) →
+  f <$> alter g i m = alter h i (f <$> m).
+Proof.
+  intros Hlookup. apply map_eq. intros j.
+  rewrite lookup_fmap, !lookup_alter, !lookup_fmap.
+  destruct (decide (i = j)) as [<-|Hij]; [|done].
+  destruct (m !! i) as [x |]; f_equal/=; eauto.
+Qed.
 
 Lemma fmap_delete {A B} (f: A → B) (m : M A) i :
   f <$> delete i m = delete i (f <$> m).

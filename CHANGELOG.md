@@ -136,6 +136,7 @@ API-breaking change is listed.
   `NoDup_zip_with_{l,r}`, `zip_nil_{l,r}`, `prod_map_zip` and `NoDup_zip_{l,r}`.
   (by Rudy Peterson)
 - Provide support for `is_Some None` in the tactics `done` and `naive_solver`.
+- Add lemmas `alter_id'`, `alter_id_dom`, `alter_alt`, `alter_alt_Some` and
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
