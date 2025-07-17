@@ -709,6 +709,8 @@ Section set.
   Proof. set_solver. Qed.
   Lemma difference_empty X : X ∖ ∅ ≡ X.
   Proof. set_solver. Qed.
+  Lemma empty_difference X : ∅ ∖ X ≡ ∅.
+  Proof. set_solver. Qed.
   Lemma difference_union_distr_l X Y Z : (X ∪ Y) ∖ Z ≡ X ∖ Z ∪ Y ∖ Z.
   Proof. set_solver. Qed.
   Lemma difference_union_distr_r X Y Z : Z ∖ (X ∪ Y) ≡ (Z ∖ X) ∩ (Z ∖ Y).
@@ -791,6 +793,8 @@ Section set.
     Proof. unfold_leibniz. apply difference_diag. Qed.
     Lemma difference_empty_L X : X ∖ ∅ = X.
     Proof. unfold_leibniz. apply difference_empty. Qed.
+    Lemma empty_difference_L X : ∅ ∖ X = ∅.
+    Proof. unfold_leibniz. apply empty_difference. Qed.
     Lemma difference_union_distr_l_L X Y Z : (X ∪ Y) ∖ Z = X ∖ Z ∪ Y ∖ Z.
     Proof. unfold_leibniz. apply difference_union_distr_l. Qed.
     Lemma difference_union_distr_r_L X Y Z : Z ∖ (X ∪ Y) = (Z ∖ X) ∩ (Z ∖ Y).
