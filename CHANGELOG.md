@@ -140,6 +140,11 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Provide support for `is_Some None` in the tactics `done` and `naive_solver`.
 - Add lemmas `alter_id'`, `alter_id_dom`, `alter_alt`, `alter_alt_Some` and
 - Generalize assumption of lemma `const_fmap`. (by Kimaya Bedarkar)
+- Add lemmas `list_elem_of_delete_inv`, `list_elem_of_foldr_delete_inv`,
+  `sublist_app_cons_r`, `sublist_app_cons_l`, `sublist_subseteq` and
+  `sublist_filter`. (by Jonas Kastberg Hinrichsen)
+- Rename `list_delete_subseteq` → `list_subseteq_delete` and
+  `list_filter_subseteq` → `list_subseteq_filter`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -264,6 +269,10 @@ s/\blist_alter_fmap_mono\b/list_fmap_alter/g
 # map_disjoint_difference_{l|r}
 s/\bmap_disjoint_difference_l\b/map_disjoint_difference_l1/g
 s/\bmap_disjoint_difference_r\b/map_disjoint_difference_r1/g
+
+# list subseteq
+s/\blist_delete_subseteq\b/list_subseteq_delete/g
+s/\blist_filter_subseteq\b/list_subseteq_filter/g
 EOF
 ```
 
