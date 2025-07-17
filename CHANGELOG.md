@@ -131,6 +131,7 @@ API-breaking change is listed.
 - Add set lemma `empty_difference`. (by Johannes Hostert)
 - Rename `map_disjoint_difference_l` (and `_r`) into `map_disjoint_difference_l1`
   for consistency with the `disjoint_difference_l1` lemma on sets.
+- Add lemmas `Forall_exists_Forall2_{l,r}`. (by Rudy Peterson)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

@@ -1595,7 +1595,6 @@ Section Forall2.
   Lemma Forall2_last l k : Forall2 P l k → option_Forall2 P (last l) (last k).
   Proof. induction 1 as [|????? []]; simpl; repeat constructor; auto. Qed.
 
-
   Global Instance Forall2_dec `{dec : ∀ x y, Decision (P x y)} :
     RelDecision (Forall2 P).
   Proof.
@@ -1608,6 +1607,17 @@ Section Forall2.
     end); clear dec go; abstract first [by constructor | by inv 1].
   Defined.
 End Forall2.
+
+Lemma Forall_exists_Forall2_l {A B} (R : A → B → Prop) (l : list A) :
+  Forall (λ x, ∃ y, R x y) l ↔ ∃ k, Forall2 R l k.
+Proof.
+  split.
+  - induction 1; naive_solver.
+  - intros [k HRlk]. induction HRlk; eauto.
+Qed.
+Lemma Forall_exists_Forall2_r {A B} (R : A → B → Prop) (k : list B) :
+  Forall (λ y, ∃ x, R x y) k ↔ ∃ l, Forall2 R l k.
+Proof. setoid_rewrite Forall2_flip. apply Forall_exists_Forall2_l. Qed.
 
 Section Forall2_proper.
   Context  {A} (R : relation A).
