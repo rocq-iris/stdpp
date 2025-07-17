@@ -253,8 +253,8 @@ s/\blist_alter_fmap\b/list_fmap_alter/g
 s/\blist_alter_fmap_mono\b/list_fmap_alter/g
 
 # map_disjoint_difference_{l|r}
-s/\map_disjoint_difference_l\b/map_disjoint_difference_l1/g
-s/\map_disjoint_difference_r\b/map_disjoint_difference_r1/g
+s/\bmap_disjoint_difference_l\b/map_disjoint_difference_l1/g
+s/\bmap_disjoint_difference_r\b/map_disjoint_difference_r1/g
 EOF
 ```
 
