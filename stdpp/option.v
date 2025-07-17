@@ -41,12 +41,6 @@ Lemma option_eq_1_alt {A} (mx my : option A) x :
   mx = my → my = Some x → mx = Some x.
 Proof. congruence. Qed.
 
-Definition is_Some {A} (mx : option A) := ∃ x, mx = Some x.
-Global Instance: Params (@is_Some) 1 := {}.
-
-(** We avoid calling [done] recursively as that can lead to an unresolved evar. *)
-Global Hint Extern 0 (is_Some _) => eexists; fast_done : core.
-
 Lemma is_Some_alt {A} (mx : option A) :
   is_Some mx ↔ match mx with Some _ => True | None => False end.
 Proof. unfold is_Some. destruct mx; naive_solver. Qed.

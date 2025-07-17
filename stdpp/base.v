@@ -986,6 +986,11 @@ Global Typeclasses Opaque sum_equiv.
 (** ** Option *)
 Global Instance option_inhabited {A} : Inhabited (option A) := populate None.
 
+(** Not in [option.v] so that [done] and [naive_solver] in [tactics.v] can
+provide special support for it. *)
+Definition is_Some {A} (mx : option A) := ∃ x, mx = Some x.
+Global Instance: Params (@is_Some) 1 := {}.
+
 (** ** Sigma types *)
 Global Arguments existT {_ _} _ _ : assert.
 Global Arguments projT1 {_ _} _ : assert.
