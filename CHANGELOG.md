@@ -107,7 +107,7 @@ API-breaking change is listed.
   The `list_` suffix is needed to avoid conflicts with the map lemmas.
 - Add lemmas `list_lookup_delete` and `list_lookup_total_delete` that combine
   both versions.
-- Rename `drop_insert_le` → `drop_insert_gt` and `drop_insert_gt` →
+- Rename `drop_insert_le` → `drop_insert_ge` and `drop_insert_gt` →
   `drop_insert_lt` to make the direction of the inequality consistent with the
   `take` lemmas.
 - Add lemmas `lookup_singleton_is_Some`, `list_lookup_insert_is_Some`,
@@ -210,7 +210,7 @@ s/\blist_alter_commute\b/list_alter_alter_eq/g
 s/\btake_insert\b/take_insert_ge/g
 s/\btake_alter\b/take_alter_ge/g
 s/\bdrop_alter\b/drop_alter_lt/g
-s/\bdrop_insert_le\b/drop_insert_gt/g # make inequality consistent with take lemma
+s/\bdrop_insert_le\b/drop_insert_ge/g # make inequality consistent with take lemma
 s/\bdrop_insert_gt\b/drop_insert_lt/g # make inequality consistent with take lemma
 
 # list_elem_of
