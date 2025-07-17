@@ -54,6 +54,9 @@ Tactic Notation "fast_by" tactic(tac) :=
 Class TCFastDone (P : Prop) : Prop := tc_fast_done : P.
 Global Hint Extern 1 (TCFastDone ?P) => (change P; fast_done) : typeclass_instances.
 
+(** We avoid calling [done] recursively as that can lead to an unresolved evar. *)
+Global Hint Extern 0 (is_Some _) => eexists; fast_done : core.
+
 (** A slightly modified version of Ssreflect's finishing tactic [done]. It
 also performs [reflexivity] and uses symmetry of negated equalities. Compared
 to Ssreflect's [done], it does not compute the goal's [hnf] so as to avoid
@@ -72,7 +75,9 @@ Ltac done :=
     | discriminate
     | contradiction
     | split
-    | match goal with H : ¬_ |- _ => case H; clear H; fast_done end ]
+    | match goal with H : is_Some None |- _ => destruct H as [? [=]] end
+    | match goal with H : ¬_ |- _ => case H; clear H; fast_done end
+    ]
   ].
 Tactic Notation "by" tactic(tac) :=
   tac; done.
@@ -864,6 +869,7 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | |- ∀ _, _ => intro
   (**i simplification of assumptions *)
   | H : False |- _ => destruct H
+  | H : is_Some None |- _ => destruct H as [? [=]]
   | H : _ ∧ _ |- _ =>
      (* Work around bug https://coq.inria.fr/bugs/show_bug.cgi?id=2901 *)
      let H1 := fresh in let H2 := fresh in

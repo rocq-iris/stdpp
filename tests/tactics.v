@@ -411,3 +411,13 @@ Requires a bunch of other tactics to work so it comes last in this file. *)
 Lemma naive_solver_issue_115 (P : nat → Prop) (x : nat) :
   (∀ x', P x' → x' = 10) → P x → x + 1 = 11.
 Proof. naive_solver. Qed.
+
+Example done_issue_221_1 : is_Some (Some 10).
+Proof. done. Qed.
+Example done_issue_221_2 : is_Some (None : option nat) → False.
+Proof. done. Qed.
+
+Example naive_solver_issue_180_1 : is_Some (Some 10).
+Proof. naive_solver. Qed.
+Example naive_solver_issue_180_2 : is_Some (None : option nat) → False.
+Proof. naive_solver. Qed.
