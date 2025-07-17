@@ -126,12 +126,11 @@ API-breaking change is listed.
   sets and maps.
 - Rename `list_alter_fmap` → `list_fmap_alter`.
 - Remove `list_alter_fmap_mono`, use `list_fmap_alter` instead.
-- Add several useful lemmata for `map_difference` that already existed for
+- Add several lemmas for `map_difference` that already existed for
   sets. (by Johannes Hostert)
 - Add set lemma `empty_difference`. (by Johannes Hostert)
 - Rename `map_disjoint_difference_l` (and `_r`) into `map_disjoint_difference_l1`
   for consistency with the `disjoint_difference_l1` lemma on sets.
-  (by Robbert Krebbers)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
