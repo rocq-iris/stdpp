@@ -20,6 +20,8 @@ The key features of this library are as follows:
   `set_solver` for goals involving set operations.
 - It is entirely dependency- and axiom-free.
 
+A quick start guide for sets in std++ can be found in (docs/sets.v)[docs/sets.v].
+
 ## Side-effects
 
 Importing std++ has some side effects as the library sets some global options.
