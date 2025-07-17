@@ -59,7 +59,7 @@ Proof.
   destruct Hss2; eauto. by simplify_map_eq.
 Qed.
 
-Lemma alter_not_elem_of_dom {A : Type} (i : K) (f : A → A) (m : M A) :
+Lemma alter_id_dom {A} (f : A → A) (m : M A) i :
   i ∉ dom m → alter f i m = m.
 Proof. rewrite not_elem_of_dom. apply alter_id'. Qed.
 
