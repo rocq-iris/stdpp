@@ -23,9 +23,10 @@ style: $(VFILES) coq-lint.sh
 
 # the test suite
 TESTFILES:=$(shell find tests -name "*.v")
+DOCFILES:=$(shell find docs -name "*.v")
 NORMALIZER:=test-normalizer.sed
 
-test: $(TESTFILES:.v=.vo)
+test: $(TESTFILES:.v=.vo) $(DOCFILES:.v=.vo)
 .PHONY: test
 
 COQ_TEST=$(COQTOP) $(COQDEBUG) -batch -test-mode
@@ -34,6 +35,10 @@ tests/.coqdeps.d: $(TESTFILES)
 	$(SHOW)'COQDEP TESTFILES'
 	$(HIDE)$(COQDEP) -dyndep var $(COQMF_COQLIBS_NOML) $^ $(redir_if_ok)
 -include tests/.coqdeps.d
+docs/.coqdeps.d: $(DOCFILES)
+	$(SHOW)'COQDEP DOCFILES'
+	$(HIDE)$(COQDEP) -dyndep var $(COQMF_COQLIBS_NOML) $^ $(redir_if_ok)
+-include docs/.coqdeps.d
 
 # Main test script (comments out-of-line because macOS otherwise barfs?!?)
 # - Determine reference file (`REF`).
@@ -56,4 +61,11 @@ $(TESTFILES:.v=.vo): %.vo: %.v $(if $(MAKE_REF),,%.ref) $(NORMALIZER)
 	    true \
 	  ) && \
 	  rm -f "$$TMPFILE" && \
+	  touch $@
+# Doctests are simpler because we do not check the output.
+$(DOCFILES:.v=.vo): %.vo: %.v
+	$(HIDE)echo "DOCTEST $<" && \
+	  TMPFILE="$$(mktemp)" && \
+	  unset OCAMLRUNPARAM && \
+	  $(TIMER) $(COQ_TEST) $(COQFLAGS) $(COQLIBS) -load-vernac-source $< > "$$TMPFILE" && \
 	  touch $@
