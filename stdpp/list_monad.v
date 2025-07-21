@@ -170,9 +170,11 @@ Section fmap.
   Proof. revert n. by induction l; intros [|?]; f_equal/=. Qed.
   Lemma fmap_drop n l : f <$> drop n l = drop n (f <$> l).
   Proof. revert n. by induction l; intros [|?]; f_equal/=. Qed.
+
   Lemma const_fmap (l : list A) (y : B) :
-    (∀ x, f x = y) → f <$> l = replicate (length l) y.
-  Proof. intros; induction l; f_equal/=; auto. Qed.
+    (∀ i x, l !! i = Some x → f x = y) →
+    f <$> l = replicate (length l) y.
+  Proof. rewrite <-Forall_lookup. induction 1; f_equal/=; auto. Qed.
 
   Lemma list_lookup_fmap l i : (f <$> l) !! i = f <$> (l !! i).
   Proof. revert i. induction l; intros [|n]; by try revert n. Qed.

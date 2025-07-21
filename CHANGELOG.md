@@ -137,6 +137,7 @@ API-breaking change is listed.
   (by Rudy Peterson)
 - Provide support for `is_Some None` in the tactics `done` and `naive_solver`.
 - Add lemmas `alter_id'`, `alter_id_dom`, `alter_alt`, `alter_alt_Some` and
+- Generalize assumption of lemma `const_fmap`. (by Kimaya Bedarkar)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
