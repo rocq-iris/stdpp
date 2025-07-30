@@ -30,11 +30,11 @@ echo "# Flags"
 # Adding "-arg " prefix to all non-empty, non-comment lines of [config/flags].
 cat config/flags | grep "^[^#]\+" | sed "s/^/-arg /"
 
-# Potential extra flags.
-if [ -f config/local-flags ]; then
+# Potential extra local configuration.
+if [ -f config/local ]; then
   echo
   # We take the whole file; no need to strip comments.
-  cat config/local-flags
+  cat config/local
 fi
 
 # The list of source files is only needed for [coq_makefile] builds.
