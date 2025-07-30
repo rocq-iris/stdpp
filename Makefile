@@ -13,7 +13,7 @@ dune:
 -include Makefile.local
 
 # Generate the _CoqProject file.
-_CoqProject: gen_CoqProject.sh config/paths config/flags config/source-list $(wildcard config/local-flags)
+_CoqProject: gen_CoqProject.sh config/paths config/flags config/source-list $(wildcard config/local)
 	@./$< > $@
 
 # Forward most targets to Coq makefile (with some trick to make this phony)

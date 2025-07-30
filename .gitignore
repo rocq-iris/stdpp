@@ -25,4 +25,4 @@ builddep/
 _opam
 _build/
 *.install
-config/local-flags
+config/local
