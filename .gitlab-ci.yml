@@ -68,12 +68,11 @@ build-coq.9.0.0-mr:
     MANGLE_NAMES: "1"
 
 # Also ensure Dune works (broken on older Coq versions due to Stdlib split).
-# NOTE: disabled due to https://gitlab.mpi-sws.org/iris/stdpp/-/issues/236.
-#build-coq.9.0.0-dune:
-#  <<: *template
-#  variables:
-#    OPAM_PINS: "coq version 9.0.0   dune version 3.18.1"
-#    MAKE_TARGET: "dune"
+build-coq.9.1.dev-dune:
+  <<: *template
+  variables:
+    OPAM_PINS: "coq version 9.1.dev   dune version 3.18.1"
+    MAKE_TARGET: "dune"
 
 build-coq.8.20.1:
   <<: *template
