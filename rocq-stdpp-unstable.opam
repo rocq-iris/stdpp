@@ -17,8 +17,8 @@ tags: [
 ]
 
 depends: [
-  "coq-stdpp" {= version}
-  "coq-stdpp-bitvector" {= version}
+  "rocq-stdpp" {= version}
+  "rocq-stdpp-bitvector" {= version}
 ]
 
 build: ["./make-package" "stdpp_unstable" "-j%{jobs}%"]

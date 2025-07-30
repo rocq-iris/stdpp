@@ -7,7 +7,7 @@ bug-reports: "https://gitlab.mpi-sws.org/iris/stdpp/issues"
 dev-repo: "git+https://gitlab.mpi-sws.org/iris/stdpp.git"
 version: "dev"
 
-synopsis: "An extended \"Standard Library\" for Coq"
+synopsis: "An extended \"Standard Library\" for Rocq"
 description: """
 The key features of this library are as follows:
 

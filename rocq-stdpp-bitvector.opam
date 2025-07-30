@@ -19,7 +19,7 @@ tags: [
 ]
 
 depends: [
-  "coq-stdpp" {= version}
+  "rocq-stdpp" {= version}
 ]
 
 build: ["./make-package" "stdpp_bitvector" "-j%{jobs}%"]
