@@ -62,4 +62,4 @@ build-dep: builddep
 
 # Some files that do *not* need to be forwarded to Makefile.coq.
 # ("::" lets Makefile.local overwrite this.)
-Makefile Makefile.local config/paths config/flags config/source-list config/local-flags $(OPAMFILES):: ;
+Makefile Makefile.local config/paths config/flags config/source-list config/local $(OPAMFILES):: ;

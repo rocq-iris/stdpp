@@ -28,7 +28,7 @@ of `coqtop`, but that is non-trivial for most editors.
 
 ### Extra `_CoqProject` flags
 
-If file `config/local-flags` exists, then its contents is added at the end of
+If file `config/local` exists, then its contents is added at the end of
 the generated `_CoqProject` file. This can be useful when the library is built
 together with its dependencies (e.g., the Rocq standard library) as part of a
 dune workspace build. Note that the file can be generated with a dune rule.
