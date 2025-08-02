@@ -14,7 +14,8 @@
   bv_wrap 64
     (bv_unsigned xs +
      (bv_unsigned l + bv_wrap 64 (bv_unsigned r - bv_unsigned l) `div` 2 ^ 1) *
-     8) < 2 ^ 52
+     8) <
+  2 ^ 52
 2 goals
   
   l, r : bv 64
@@ -36,7 +37,8 @@
 goal 2 is:
  bv_wrap 64
    (bv_wrap 64 (bv_unsigned r - bv_unsigned l) `div` 2 ^ 1 + bv_unsigned l +
-    0) ≤ Z.of_nat (length data)
+    0)
+ ≤ Z.of_nat (length data)
 1 goal
   
   r1 : bv 64
