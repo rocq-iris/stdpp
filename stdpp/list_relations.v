@@ -686,6 +686,7 @@ Lemma sublist_inserts_l k l1 l2 : l1 `sublist_of` l2 → l1 `sublist_of` k ++ l2
 Proof. induction k; try constructor; auto. Qed.
 Lemma sublist_inserts_r k l1 l2 : l1 `sublist_of` l2 → l1 `sublist_of` l2 ++ k.
 Proof. induction 1; simpl; try constructor; auto using sublist_nil_l. Qed.
+
 Lemma sublist_cons_r x l k :
   l `sublist_of` x :: k ↔ l `sublist_of` k ∨ ∃ l', l = x :: l' ∧ l' `sublist_of` k.
 Proof. split; [inv 1; eauto|]. intros [?|(?&->&?)]; constructor; auto. Qed.
@@ -698,6 +699,7 @@ Proof.
     + destruct IH as (k1&k2&->&?); auto. by exists (y :: k1), k2.
   - intros (k1&k2&->&?). by apply sublist_inserts_l, sublist_skip.
 Qed.
+
 Lemma sublist_app_r l k1 k2 :
   l `sublist_of` k1 ++ k2 ↔
     ∃ l1 l2, l = l1 ++ l2 ∧ l1 `sublist_of` k1 ∧ l2 `sublist_of` k2.
@@ -725,6 +727,7 @@ Proof.
     auto using sublist_inserts_l, sublist_skip.
   - intros (?&?&?&?&?); subst. auto using sublist_app.
 Qed.
+
 Lemma sublist_app_inv_l k l1 l2 : k ++ l1 `sublist_of` k ++ l2 → l1 `sublist_of` l2.
 Proof.
   induction k as [|y k IH]; simpl; [done |].
@@ -743,6 +746,30 @@ Proof.
   rewrite (assoc_L (++)) in E; simplify_list_eq.
   eauto using sublist_inserts_r.
 Qed.
+
+Lemma sublist_app_cons_r x l k1 k2 :
+  l `sublist_of` k1 ++ x :: k2 ↔
+    l `sublist_of` k1 ++ k2 ∨
+    ∃ l1 l2, l = l1 ++ x :: l2 ∧ l1 `sublist_of` k1 ∧ l2 `sublist_of` k2.
+Proof.
+  split.
+  - intros (l1 & l2 & -> & ? & [?|(l1'&->&?)]%sublist_cons_r)%sublist_app_r;
+      by eauto 10 using sublist_app.
+  - intros [(l1 & l1' & -> & ? & ?)%sublist_app_r|(l1 & l2 & -> & ? & ?)].
+    + by apply sublist_app, sublist_cons.
+    + by apply sublist_app, sublist_skip.
+Qed.
+Lemma sublist_app_cons_l x l1 l2 k :
+  l1 ++ x :: l2 `sublist_of` k ↔
+    ∃ k1 k2, k = k1 ++ x :: k2 ∧ l1 `sublist_of` k1 ∧ l2 `sublist_of` k2.
+Proof.
+  split.
+  - intros (k1 & k2 & -> & ? & (k1' & k2' & -> & ?)%sublist_cons_l)%sublist_app_l.
+    exists (k1 ++ k1'), k2'. rewrite !(assoc_L (++)).
+    eauto using sublist_inserts_r.
+  - intros (k1 & k2 & -> & ? & ?). by apply sublist_app, sublist_skip.
+Qed.
+
 Global Instance: PartialOrder (@sublist A).
 Proof.
   split; [split|].
@@ -781,12 +808,11 @@ Proof.
     rewrite fold_right_app. simpl. by rewrite delete_middle.
 Qed.
 
-Lemma elem_of_sublist l1 l2 x :
-  x ∈ l1 → l1 `sublist_of` l2 → x ∈ l2.
-Proof.
-  intros Hx Hl. revert Hx.
-  induction Hl; rewrite ?elem_of_nil, ?elem_of_cons; naive_solver.
-Qed.
+Lemma sublist_subseteq l1 l2 : l1 `sublist_of` l2 → l1 ⊆ l2.
+Proof. intros [is ->]%sublist_alt x. apply list_elem_of_foldr_delete_inv. Qed.
+Lemma elem_of_sublist l1 l2 x : x ∈ l1 → l1 `sublist_of` l2 → x ∈ l2.
+Proof. intros. by eapply sublist_subseteq. Qed.
+
 Lemma singleton_sublist_l l x :
   [x] `sublist_of` l ↔ x ∈ l.
 Proof.
@@ -800,6 +826,13 @@ Lemma sublist_NoDup l1 l2 :
 Proof.
   intros Hdup. revert l1.
   induction Hdup; inv 1; try constructor; eauto using elem_of_sublist.
+Qed.
+
+Lemma sublist_filter P `{! ∀ x : A, Decision (P x)} l :
+  filter P l `sublist_of` l.
+Proof.
+  induction l as [|x l IHl]; [done|]. rewrite filter_cons.
+  destruct (decide (P x)); auto using sublist_skip, sublist_cons.
 Qed.
 
 Lemma Permutation_sublist l1 l2 l3 :
@@ -1796,19 +1829,11 @@ Lemma list_subseteq_cons_iff x l1 l2 :
   x :: l1 ⊆ l2 ↔ x ∈ l2 ∧ l1 ⊆ l2.
 Proof. unfold subseteq, list_subseteq. setoid_rewrite elem_of_cons. naive_solver. Qed.
 
-Lemma list_delete_subseteq i l : delete i l ⊆ l.
-Proof.
-  revert i. induction l as [|x l IHl]; intros i; [done|].
-  destruct i as [|i];
-    [by apply list_subseteq_cons|by apply list_subseteq_skip].
-Qed.
-Lemma list_filter_subseteq P `{!∀ x : A, Decision (P x)} l :
-  filter P l ⊆ l.
-Proof.
-  induction l as [|x l IHl]; [done|]. rewrite filter_cons.
-  destruct (decide (P x));
-    [by apply list_subseteq_skip|by apply list_subseteq_cons].
-Qed.
+Lemma list_subseteq_delete i l : delete i l ⊆ l.
+Proof. apply sublist_subseteq, sublist_delete. Qed.
+Lemma list_subseteq_filter P `{!∀ x : A, Decision (P x)} l : filter P l ⊆ l.
+Proof. apply sublist_subseteq. apply sublist_filter. Qed.
+
 Lemma subseteq_drop n l : drop n l ⊆ l.
 Proof. rewrite <-(take_drop n l) at 2. apply list_subseteq_app_r. done. Qed.
 Lemma subseteq_take n l : take n l ⊆ l.
