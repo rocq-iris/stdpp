@@ -16,3 +16,5 @@
 -deprecated-from-Coq
 -w
 -deprecated-dirpath-Coq
+-w
+-deprecated-reference-since-9.1
