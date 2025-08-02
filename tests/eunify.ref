@@ -6,7 +6,8 @@ No matching clauses for match.
     match n with
     | 0 => m
     | S p => S (add p m)
-    end) x y)
+    end)
+   x y)
 "eunify_test_evars"
      : string
 The command has indeed failed with message:
