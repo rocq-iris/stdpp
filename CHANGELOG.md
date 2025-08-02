@@ -3,6 +3,8 @@ API-breaking change is listed.
 
 ## std++ master
 
+The opam packages have been renamed from `coq-*` to `rocq-*`.
+
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)

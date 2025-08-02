@@ -1,6 +1,6 @@
-# Coq-std++ [[coqdoc]](https://plv.mpi-sws.org/coqdoc/stdpp/)
+# Rocq-std++ [[rocqdoc]](https://plv.mpi-sws.org/coqdoc/stdpp/)
 
-This project contains an extended "Standard Library" for Coq called coq-std++.
+This project contains an extended "Standard Library" for Rocq called rocq-std++.
 The key features of this library are as follows:
 
 - It provides a great number of definitions and lemmas for common data
@@ -29,7 +29,7 @@ Notably:
 
 * `Generalizable All Variables`: This option enables implicit generalization in
   arguments of the form `` `{...}`` (i.e., anonymous arguments) and in terms of
-  shape `` `{}``/`` `[]``/`` `()``. See [Coq's
+  shape `` `{}``/`` `[]``/`` `()``. See [Rocq's
   manual](https://coq.inria.fr/distrib/current/refman/language/extensions/implicit-arguments.html#implicit-generalization)
   for further details.
 * The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
@@ -45,19 +45,19 @@ Notably:
 
 This version is known to compile with:
 
- - Coq version 8.18.0 / 8.19.1 / 8.20.1 / 9.0.0
+ - Coq version 8.18.0 / 8.19.1 / 8.20.1 / Rocq 9.0.0
 
-Generally we always aim to support the last two stable Coq releases. Support for
+Generally we always aim to support the last two stable Rocq releases. Support for
 older versions will be dropped when it is convenient.
 
 ## Installing via opam
 
 To obtain the latest stable release via opam (2.0.0 or newer), you have to add
-the Coq opam repository:
+the Rocq opam repository:
 
-    opam repo add coq-released https://coq.inria.fr/opam/released
+    opam repo add rocq-released https://rocq-prover.github.io/opam/released/
 
-Then you can do `opam install coq-stdpp`.
+Then you can do `opam install rocq-stdpp`.
 
 To obtain a development version, add the Iris opam repository:
 
@@ -72,7 +72,7 @@ of your CPU cores.  Then run `make install` to install the library.
 
 The `stdpp_unstable` folder contains a set of libraries that are not
 deemed stable enough to be included in the main std++ library. These
-libraries are available via the `coq-stdpp-unstable` opam package. For
+libraries are available via the `rocq-stdpp-unstable` opam package. For
 each library, there is a corresponding "tracking issue" in the std++
 issue tracker (also linked from the library itself) which tracks the
 work that still needs to be done before moving the library to std++.
@@ -92,7 +92,7 @@ tab).
 To contribute code, please send your MPI-SWS GitLab username to
 [Ralf Jung](https://gitlab.mpi-sws.org/jung) to enable personal projects for
 your account.  Then you can fork the
-[Coq-std++ git repository](https://gitlab.mpi-sws.org/iris/stdpp), make your
+[Rocq-std++ git repository](https://gitlab.mpi-sws.org/iris/stdpp), make your
 changes in your fork, and create a merge request.
 
 Please refer to [our style guide](https://gitlab.mpi-sws.org/iris/iris/-/blob/master/docs/style_guide.md)
