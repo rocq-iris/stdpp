@@ -194,17 +194,6 @@ Module Nat.
   Lemma iter_ind {A} (P : A → Prop) f x k :
     P x → (∀ y, P y → P (f y)) → P (Nat.iter k f x).
   Proof. induction k; simpl; auto. Qed.
-
-  (** FIXME: Coq 8.17 deprecated some lemmas in https://github.com/coq/coq/pull/16203.
-  We cannot use the intended replacements since we support Coq 8.16. We also do
-  not want to disable [deprecated-syntactic-definition] everywhere, so instead
-  we provide non-deprecated duplicates of those deprecated lemmas that we need
-  in std++ and Iris. *)
-  Local Set Warnings "-deprecated-syntactic-definition".
-  Lemma add_mod_idemp_l a b n : n ≠ 0 → (a mod n + b) mod n = (a + b) mod n.
-  Proof. auto using add_mod_idemp_l. Qed.
-  Lemma div_lt_upper_bound a b q : b ≠ 0 → a < b * q → a / b < q.
-  Proof. auto using div_lt_upper_bound. Qed.
 End Nat.
 
 (** * Notations and properties of [positive] *)
@@ -493,17 +482,6 @@ Module N.
 
   Lemma lt_wf_0_projected {B} (f : B → N) : well_founded (λ x y, f x < f y).
   Proof. by apply (wf_projected (<) f), lt_wf_0. Qed.
-
-  (** FIXME: Coq 8.17 deprecated some lemmas in https://github.com/coq/coq/pull/16203.
-  We cannot use the intended replacements since we support Coq 8.16. We also do
-  not want to disable [deprecated-syntactic-definition] everywhere, so instead
-  we provide non-deprecated duplicates of those deprecated lemmas that we need
-  in std++ and Iris. *)
-  Local Set Warnings "-deprecated-syntactic-definition".
-  Lemma add_mod_idemp_l a b n : n ≠ 0 → (a mod n + b) mod n = (a + b) mod n.
-  Proof. auto using add_mod_idemp_l. Qed.
-  Lemma div_lt_upper_bound a b q : b ≠ 0 → a < b * q → a / b < q.
-  Proof. auto using div_lt_upper_bound. Qed.
 End N.
 
 Local Close Scope N_scope.
@@ -1635,7 +1613,7 @@ Lemma rotate_nat_add_add base offset len n:
 Proof.
   intros ?. unfold rotate_nat_add.
   rewrite !Z2Nat.inj_mod, !Z2Nat.inj_add, !Nat2Z.id by lia.
-  by rewrite Nat.add_assoc, Nat.add_mod_idemp_l by lia.
+  by rewrite Nat.add_assoc, Nat.Div0.add_mod_idemp_l by lia.
 Qed.
 
 Lemma rotate_nat_add_S base offset len:

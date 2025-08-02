@@ -96,7 +96,7 @@ Proof.
   { intros <- Hlen. edestruct help; rewrite <-Hlen; simpl; lia. }
   intros Hs Hlen.
   apply IH in Hs as [? [= Hchar]];
-    [|auto using N.div_lt_upper_bound with lia|simpl; lia].
+    [|auto using N.Div0.div_lt_upper_bound with lia|simpl; lia].
   split; [|done].
   apply pretty_N_char_inj in Hchar; [|by auto using N.mod_lt..].
   rewrite (N.div_mod x 10), (N.div_mod y 10) by done. lia.
