@@ -10,19 +10,33 @@ variables:
   COQEXTRAFLAGS: "-native-compiler no"
 
 .only_branches: &only_branches
-  only:
-  - /^master/@iris/stdpp
-  - /^ci/@iris/stdpp
+  rules:
+  - if: $CI_PROJECT_NAMESPACE != "iris"
+    when: never
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
 
 .only_mr: &only_mr
-  only:
-  - merge_requests
+  rules:
+  - if: $CI_PROJECT_NAMESPACE != "iris"
+    when: never
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 .branches_and_mr: &branches_and_mr
-  only:
-  - /^master/@iris/stdpp
-  - /^ci/@iris/stdpp
-  - merge_requests
+  rules:
+  - if: $CI_PROJECT_NAMESPACE != "iris"
+    when: never
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+.branches_and_dune_label: &branches_and_dune_label
+  rules:
+  - if: $CI_PROJECT_NAMESPACE != "iris"
+    when: never
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
+  - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /.*CI-dune-job.*/
 
 .template: &template
   <<: *only_branches
@@ -37,10 +51,6 @@ variables:
     key: "$CI_JOB_NAME"
     paths:
     - _opam/
-  except:
-  - triggers
-  - schedules
-  - api
 
 ## Build jobs
 
@@ -70,6 +80,7 @@ build-rocq.9.0.0-mr:
 # Also ensure Dune works (broken on older Rocq versions due to Stdlib split).
 build-rocq.9.1.dev-dune:
   <<: *template
+  <<: *branches_and_dune_label
   variables:
     OPAM_PINS: "dune version 3.19.1   rocq-core version 9.1.dev   rocq-stdlib version dev"
     MAKE_TARGET: "dune"
