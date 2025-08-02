@@ -475,7 +475,7 @@ Proof.
     n ≠ 0 → (n | length l) → ¬n * i `div` n + n ≤ length l → length l ≤ i).
   { intros l i ? [j ->] Hjn. apply Nat.nlt_ge; contradict Hjn.
     rewrite <-Nat.mul_succ_r, (Nat.mul_comm n).
-    apply Nat.mul_le_mono_r, Nat.le_succ_l, Nat.div_lt_upper_bound; lia. }
+    apply Nat.mul_le_mono_r, Nat.le_succ_l, Nat.Div0.div_lt_upper_bound; lia. }
   intros l k Hl Hk Hlookup. destruct (decide (n = 0)) as [->|].
   { by rewrite (nil_length_inv l),
       (nil_length_inv k) by eauto using Nat.divide_0_l. }
