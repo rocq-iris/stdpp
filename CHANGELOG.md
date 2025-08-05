@@ -145,6 +145,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `sublist_filter`. (by Jonas Kastberg Hinrichsen)
 - Rename `list_delete_subseteq` → `list_subseteq_delete` and
   `list_filter_subseteq` → `list_subseteq_filter`.
+- Add `Hint Mode` with `!` for `Reflexive`, `Symmetric`, `Transitive`,
+  `PreOrder` and `Equivalence`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
