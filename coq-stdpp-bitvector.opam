@@ -10,5 +10,6 @@ version: "dev"
 synopsis: "Compatibility package for rocq-stdpp-bitvector"
 
 depends: [
+  "coq-stdpp" {= version}
   "rocq-stdpp-bitvector" {= version}
 ]
