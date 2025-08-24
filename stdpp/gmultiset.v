@@ -69,6 +69,10 @@ Section definitions.
         (λ x n, partial_alter (Some ∘ from_option (Pos.add n) n) (f x))
         ∅
         X.
+
+  Global Instance gmultiset_filter : Filter A (gmultiset A) :=
+    λ P _ '(GMultiSet m), GMultiSet (map_filter (P ∘ fst) _ m).
+
 End definitions.
 
 Global Typeclasses Opaque gmultiset_elem_of gmultiset_subseteq.
@@ -453,6 +457,9 @@ Section more_lemmas.
     rewrite !multiplicity_singleton in Hx. repeat case_decide; done || lia.
   Qed.
   Lemma gmultiset_non_empty_singleton x : {[+ x +]} ≠@{gmultiset A} ∅.
+  Proof. multiset_solver. Qed.
+  Lemma not_elem_of_multiplicity a X :
+    a ∉ X ↔ multiplicity a X = 0.
   Proof. multiset_solver. Qed.
 
   (** Scalar *)
@@ -868,6 +875,154 @@ Section map.
     intros ? [HX]; constructor. by rewrite multiplicity_gmultiset_map, HX.
   Qed.
 End map.
+
+(** * Multiset filtering *)
+Section filter.
+  Context `{Countable A}.
+  Implicit Types X Y : gmultiset A.
+  Context (P : A → Prop) `{∀ x, Decision (P x)}.
+
+  Lemma gmultiset_multiplicity_filter X x :
+    multiplicity x (filter P X) = if decide (P x) then multiplicity x X else 0.
+  Proof.
+    destruct X as [ms]. unfold multiplicity. simpl.
+    pose proof (map_lookup_filter (P ∘ fst) ms x) as FLT.
+    unfold filter in FLT. rewrite FLT. 
+    destruct (ms !! x), decide; try multiset_solver; simpl. 
+    - by rewrite option_guard_True.
+    - by rewrite option_guard_False.
+  Qed. 
+
+  Lemma gmultiset_elem_of_filter X x : x ∈ filter P X ↔ x ∈ X ∧ P x.
+  Proof.
+    unfold elem_of, gmultiset_elem_of.
+    rewrite gmultiset_multiplicity_filter.
+    destruct decide.
+    - tauto. 
+    - split; [lia| tauto].
+  Qed.
+
+  Lemma gmultiset_filter_empty : filter P ∅ =@{gmultiset A} ∅. 
+  Proof. multiset_solver. Qed.
+  
+  Lemma gmultiset_filter_disj_union X Y : filter P (X ⊎ Y) = filter P X ⊎ filter P Y.
+  Proof.
+    apply gmultiset_eq. intros a.
+    repeat (rewrite ?multiplicity_disj_union, ?gmultiset_multiplicity_filter).
+    destruct decide; lia. 
+  Qed.
+
+  Lemma gmultiset_filter_difference X Y : filter P (X ∖ Y) = filter P X ∖ filter P Y.
+  Proof.
+    apply gmultiset_eq. intros a.
+    rewrite !multiplicity_difference, !gmultiset_multiplicity_filter, !multiplicity_difference.
+    destruct decide; multiset_solver. 
+  Qed.
+
+  Lemma gmultiset_filter_union X Y : filter P (X ∪ Y) = filter P X ∪ filter P Y.
+  Proof.
+    apply gmultiset_eq. intros a.
+    rewrite !multiplicity_union, !gmultiset_multiplicity_filter, !multiplicity_union.
+    destruct decide; multiset_solver. 
+  Qed.
+
+  Lemma gmultiset_filter_intersection X Y : filter P (X ∩ Y) = filter P X ∩ filter P Y.
+  Proof.
+    apply gmultiset_eq. intros a.
+    rewrite !multiplicity_intersection, !gmultiset_multiplicity_filter, !multiplicity_intersection.
+    destruct decide; multiset_solver. 
+  Qed.
+
+  Lemma gmultiset_filter_singleton x :
+    filter P {[+ x +]} =@{gmultiset A} if decide (P x) then {[+ x +]} else ∅.
+  Proof.
+    apply gmultiset_eq. intros b.
+    rewrite gmultiset_multiplicity_filter.
+    rewrite multiplicity_singleton.
+    repeat destruct decide; try multiset_solver.
+    rewrite multiplicity_singleton_ne; multiset_solver.
+  Qed.
+
+  Lemma gmultiset_filter_singleton_True x :
+    P x → filter P {[+ x +]} =@{gmultiset A} {[+ x +]}. 
+  Proof.
+    intros. rewrite gmultiset_filter_singleton.
+    by rewrite decide_True. 
+  Qed.
+
+  Lemma gmultiset_filter_singleton_False x :
+    ¬ P x → filter P {[+ x +]} =@{gmultiset A} ∅. 
+  Proof.
+    intros. rewrite gmultiset_filter_singleton.
+    by rewrite decide_False.
+  Qed.
+
+  Lemma gmultiset_filter_id X :
+    (∀ x, x ∈ X → P x) → filter P X = X.
+  Proof.
+    intros. 
+    apply gmultiset_eq. intros a.
+    rewrite gmultiset_multiplicity_filter.
+    destruct decide; [done| ].
+    symmetry. apply not_elem_of_multiplicity.
+    intuition. 
+  Qed. 
+
+  Lemma gmultiset_empty_filter X :
+    filter P X = ∅ ↔ (∀ x, x ∈ X → ¬ P x). 
+  Proof.
+    rewrite gmultiset_eq. apply forall_proper. intros a.
+    rewrite gmultiset_multiplicity_filter, multiplicity_empty. 
+    destruct decide; [| done].
+    rewrite <- not_elem_of_multiplicity.
+    tauto. 
+  Qed.
+
+  Lemma gmultiset_filter_scalar_mul_comm X n : filter P (n *: X) = n *: filter P X.
+  Proof.
+    apply gmultiset_eq. intros ?.
+    rewrite multiplicity_scalar_mul.
+    rewrite !gmultiset_multiplicity_filter.
+    destruct decide; try multiset_solver. 
+    by rewrite multiplicity_scalar_mul.
+  Qed.
+ 
+  Lemma gmultiset_filter_subseteq X : filter P X ⊆ X.
+  Proof.
+    do 2 red. intros. rewrite gmultiset_multiplicity_filter.
+    destruct decide; lia.
+  Qed.
+
+End filter.
+
+
+Section multiset_filter_ext.
+  Context `{Countable A} (P Q : A -> Prop).
+  Context `{∀ x, Decision (P x)} `{∀ x, Decision (Q x)}.
+
+  Lemma gmultiset_filter_strong_subseteq_ext X Y :
+    filter P X ⊆ filter Q Y ↔ ∀ x, x ∈ X → P x → Q x ∧ multiplicity x X ≤ multiplicity x Y.
+  Proof. 
+    unfold subseteq, gmultiset_subseteq.
+    apply forall_proper. intros a.
+    repeat rewrite gmultiset_multiplicity_filter.
+    destruct decide.
+    2: { split; [tauto | lia]. }
+    destruct decide.
+    2: { rewrite Nat.le_0_r. rewrite <- not_elem_of_multiplicity. tauto. }
+    split; [tauto | ].
+    intros. destruct (decide (a ∈ X)).
+    - tauto.
+    - rewrite (proj1 (not_elem_of_multiplicity a X)); [lia | done].
+  Qed.
+
+End multiset_filter_ext. 
+
+Lemma gmultiset_filter_subseteq_mono `{Countable A} (P : A -> Prop) `{∀ x, Decision (P x)}
+  (X Y : gmultiset A) :
+  X ⊆ Y → filter P X ⊆ filter P Y.
+Proof. by rewrite gmultiset_filter_strong_subseteq_ext. Qed.
+
 
 (** * Big disjoint unions *)
 Section disj_union_list.
