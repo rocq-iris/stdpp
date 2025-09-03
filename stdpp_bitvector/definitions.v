@@ -1324,6 +1324,9 @@ Record bvn := bv_to_bvn {
 Global Arguments bv_to_bvn {_} _.
 Add Printing Constructor bvn.
 
+Global Instance bv_to_bvn_inj {n} : Inj (=) (=) (@bv_to_bvn n).
+Proof. intros Hb. naive_solver. Qed.
+
 Definition bvn_unsigned (b : bvn) := bv_unsigned (b.(bvn_val)).
 
 Lemma bvn_eq (b1 b2 : bvn) :
