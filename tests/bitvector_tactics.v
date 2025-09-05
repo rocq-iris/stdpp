@@ -100,3 +100,9 @@ reduce_closed (Z_to_bv 64 8).
 bv_simplify.
 match goal with |- ?x = ?x => reflexivity end.
 Qed.
+
+Goal ∀ v : bv 8, bv_zero_extend 16 v = bv_sign_extend 16 (bv_zero_extend 9 v).
+intros.
+bv_simplify.
+bitblast.
+Qed.
