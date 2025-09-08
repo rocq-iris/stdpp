@@ -336,6 +336,19 @@ Proof.
     repeat (simpl; repeat case_decide); by econstructor.
 Qed.
 
+(** ** Properties of the [filter] function that need permutation *)
+Section filter.
+  Context (P : A → Prop) `{∀ x, Decision (P x)}.
+  Local Arguments filter {_ _ _} _ {_} !_ /.
+
+  Lemma filter_app_complement l : filter P l ++ filter (λ x, ¬P x) l ≡ₚ l.
+  Proof.
+    induction l as [|x l IH]; simpl; [done|]. case_decide.
+    - rewrite decide_False by naive_solver. simpl. by rewrite IH.
+    - rewrite decide_True by done. by rewrite <-Permutation_middle, IH.
+  Qed.
+End filter.
+
 (** ** Properties of the [prefix] and [suffix] predicates *)
 Global Instance: PartialOrder (@prefix A).
 Proof.
