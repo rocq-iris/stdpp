@@ -359,6 +359,12 @@ Global Instance equiv_default_relation `{Equiv A} :
 Global Hint Extern 0 (_ ≡ _) => reflexivity : core.
 Global Hint Extern 0 (_ ≡ _) => symmetry; assumption : core.
 
+(** These [Hint Mode] declarations are missing in the stdlib *)
+Global Hint Mode Reflexive ! ! : typeclass_instances.
+Global Hint Mode Symmetric ! ! : typeclass_instances.
+Global Hint Mode Transitive ! ! : typeclass_instances.
+Global Hint Mode PreOrder ! ! : typeclass_instances.
+Global Hint Mode Equivalence ! ! : typeclass_instances.
 
 (** * Type classes *)
 (** ** Decidable propositions *)

@@ -90,3 +90,10 @@ Abort.
 Lemma test_prod_equivalence (X1 X2 X3 Y : propset nat * propset nat) :
   X3 ≡ X2 → X2 ≡ X1 → (X1,Y) ≡ (X3,Y).
 Proof. intros H1 H2. by rewrite H1, <-H2. Qed.
+
+Goal ∃ R : relation nat, Equivalence R.
+Proof.
+  (* This should fail, and not find some bogus instance. The [Hint Mode] for
+  [Equivalence] should prevent finding such instances. *)
+  eexists. Fail apply _.
+Abort.

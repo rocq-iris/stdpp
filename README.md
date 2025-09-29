@@ -25,7 +25,7 @@ A quick start guide for sets in std++ can be found in (docs/sets.v)[docs/sets.v]
 ## Side-effects
 
 Importing std++ has some side effects as the library sets some global options.
-Notably:
+This list is incomplete, but notable side-effects include:
 
 * `Generalizable All Variables`: This option enables implicit generalization in
   arguments of the form `` `{...}`` (i.e., anonymous arguments) and in terms of
@@ -40,6 +40,10 @@ Notably:
   expose the internals of said operations (e.g. try `simpl` on `Z.of_nat (S n) + y`).
 * It sets `intuition_solver` to `auto`. The default is `auto with *`, which is
   very expensive.
+* Set `Hint Mode` for type classes such as `Reflexive`, `Equivalence`, etc.
+  This side-effect typically makes sure that type class search fails early on
+  underconstrained goals (particularly, it makes sure that "input" evars are not
+  instantiated unexpectedly).
 
 ## Prerequisites
 
