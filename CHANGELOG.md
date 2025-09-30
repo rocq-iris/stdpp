@@ -147,6 +147,10 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `list_filter_subseteq` → `list_subseteq_filter`.
 - Add `Hint Mode` with `!` for `Reflexive`, `Symmetric`, `Transitive`,
   `PreOrder` and `Equivalence`.
+- Add lemmas `sum_list_with_foldr`/`max_list_with_foldr` that show
+  correspondence between `sum_list`/`max_list` and `foldr`. (by Sanjit Bhat)
+- Add `Proper` instances for `sum_list`/`max_list` under `Permutation`.
+  (by Sanjit Bhat)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

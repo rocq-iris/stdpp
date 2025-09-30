@@ -819,6 +819,7 @@ Lemma foldr_permutation_proper {A B} (R : relation B) `{!PreOrder R}
     (Hf : ∀ a1 a2 b, R (f a1 (f a2 b)) (f a2 (f a1 b))) :
   Proper ((≡ₚ) ==> R) (foldr f b).
 Proof. intros l1 l2 Hl. apply foldr_permutation; auto. Qed.
+
 Global Instance foldr_permutation_proper' {A} (R : relation A) `{!PreOrder R}
     (f : A → A → A) (a : A) `{!∀ a, Proper (R ==> R) (f a), !Assoc R f, !Comm R f} :
   Proper ((≡ₚ) ==> R) (foldr f a).

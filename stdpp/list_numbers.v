@@ -218,28 +218,45 @@ Section sum_list.
   Context {A : Type}.
   Implicit Types x y z : A.
   Implicit Types l k : list A.
-  Lemma sum_list_with_app (f : A → nat) l k :
+  Implicit Types f : A → nat.
+
+  Lemma sum_list_with_foldr f :
+    sum_list_with f = foldr (λ a b, f a + b) 0.
+  Proof. done. Qed.
+
+  Global Instance sum_list_with_Permutation_proper f :
+    Proper ((≡ₚ) ==> (=)) (@sum_list_with A f).
+  Proof.
+    rewrite sum_list_with_foldr.
+    apply foldr_permutation_proper; [apply _..|lia].
+  Qed.
+
+  Lemma sum_list_with_reverse f l :
+    sum_list_with f (reverse l) = sum_list_with f l.
+  Proof. by rewrite reverse_Permutation. Qed.
+
+  Lemma sum_list_with_app f l k :
     sum_list_with f (l ++ k) = sum_list_with f l + sum_list_with f k.
   Proof. induction l; simpl; lia. Qed.
-  Lemma sum_list_with_reverse (f : A → nat) l :
-    sum_list_with f (reverse l) = sum_list_with f l.
-  Proof.
-    induction l; simpl; rewrite ?reverse_cons, ?sum_list_with_app; simpl; lia.
-  Qed.
-  Lemma sum_list_with_in x (f : A → nat) ls : x ∈ ls → f x ≤ sum_list_with f ls.
+
+  Lemma sum_list_with_in x f ls : x ∈ ls → f x ≤ sum_list_with f ls.
   Proof. induction 1; simpl; lia. Qed.
+
   Lemma join_reshape szs l :
     sum_list szs = length l → mjoin (reshape szs l) = l.
   Proof.
     revert l. induction szs as [|sz szs IH]; simpl; intros l Hl; [by destruct l|].
     by rewrite IH, take_drop by (rewrite length_drop; lia).
   Qed.
+
   Lemma sum_list_replicate n m : sum_list (replicate m n) = m * n.
   Proof. induction m; simpl; auto. Qed.
+
   Lemma sum_list_fmap_same n l f :
     Forall (λ x, f x = n) l →
     sum_list (f <$> l) = length l * n.
   Proof. induction 1; csimpl; lia. Qed.
+
   Lemma sum_list_fmap_const l n :
     sum_list ((λ _, n) <$> l) = length l * n.
   Proof. by apply sum_list_fmap_same, Forall_true. Qed.
@@ -297,6 +314,22 @@ End mjoin.
 (** ** Properties of the [max_list] function *)
 Section max_list.
   Context {A : Type}.
+  Implicit Types f : A → nat.
+
+  Lemma max_list_with_foldr f :
+    max_list_with f = foldr (λ a b, f a `max` b) 0.
+  Proof. done. Qed.
+
+  Global Instance max_list_with_Permutation_proper f :
+    Proper ((≡ₚ) ==> (=)) (@max_list_with A f).
+  Proof.
+    rewrite max_list_with_foldr.
+    apply foldr_permutation_proper; [apply _..|lia].
+  Qed.
+
+  Lemma max_list_with_reverse f l :
+    max_list_with f (reverse l) = max_list_with f l.
+  Proof. by rewrite reverse_Permutation. Qed.
 
   Lemma max_list_elem_of_le n ns :
     n ∈ ns → n ≤ max_list ns.
