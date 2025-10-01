@@ -152,6 +152,9 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add `Proper` instances for `sum_list`/`max_list` under `Permutation`.
   (by Sanjit Bhat)
 - Make `sum_list_with` and `max_list_with` opaque for type classes.
+- Make `list_union` and `list_dist_union` opaque for type classes.
+- Rename instance `gmultiset_disj_union_list_proper` →
+  `gmultiset_disj_union_list_permutation_proper` to ensure consistency with sets.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -280,6 +283,9 @@ s/\bmap_disjoint_difference_r\b/map_disjoint_difference_r1/g
 # list subseteq
 s/\blist_delete_subseteq\b/list_subseteq_delete/g
 s/\blist_filter_subseteq\b/list_subseteq_filter/g
+
+# gmultiset disj union proper
+s/\bgmultiset_disj_union_list_proper\b/gmultiset_disj_union_list_permutation_proper/g
 EOF
 ```
 

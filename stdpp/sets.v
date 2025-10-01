@@ -547,6 +547,10 @@ Section semi_set.
     - induction 1 as [|?? E1 ? E2]; simpl; [done|]. by apply empty_union.
   Qed.
 
+  Global Instance union_list_permutation_proper :
+    Proper ((≡ₚ) ==> (≡)) (union_list (A:=C)).
+  Proof. apply (foldr_permutation_proper' _); apply _. Qed.
+
   Section leibniz.
     Context `{!LeibnizEquiv C}.
 
@@ -612,6 +616,10 @@ Section semi_set.
 
     Lemma empty_union_list_L Xs : ⋃ Xs = ∅ ↔ Forall (.= ∅) Xs.
     Proof. unfold_leibniz. apply empty_union_list. Qed.
+
+    Global Instance union_list_permutation_proper_L `{!LeibnizEquiv C} :
+      Proper ((≡ₚ) ==> (=)) (union_list (A:=C)).
+    Proof. apply (foldr_permutation_proper' _); apply _. Qed.
   End leibniz.
 
   Lemma not_elem_of_iff `{!RelDecision (∈@{C})} X Y x :

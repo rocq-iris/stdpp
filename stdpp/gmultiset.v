@@ -904,7 +904,7 @@ Section disj_union_list.
     by rewrite multiplicity_disj_union, IH.
   Qed.
 
-  Global Instance gmultiset_disj_union_list_proper :
+  Global Instance gmultiset_disj_union_list_permutation_proper :
     Proper ((≡ₚ) ==> (=)) (@disj_union_list (gmultiset A) _ _).
-  Proof. induction 1; multiset_solver. Qed.
+  Proof. apply (foldr_permutation_proper' _); apply _. Qed.
 End disj_union_list.
