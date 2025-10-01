@@ -101,3 +101,13 @@ Section test.
     P x ∧ (∀ y, y ∈ X → P y) ↔ (∀ y, y ∈ {[+ x +]} ⊎ X → P y).
   Proof. multiset_solver. Qed.
 End test.
+
+(** Test cases from https://github.com/mit-pdos/perennial/pull/369 and
+https://gitlab.mpi-sws.org/iris/stdpp/-/issues/243 ported to gmultiset *)
+Section perennial_369_gmultiset.
+  Context `{Countable V}.
+
+  Lemma dist_union_list_map_to_list_proper_gmultiset (m1 m2 : list (nat * gmultiset V)) :
+    m1 ≡ₚ m2 → ⋃+ m1.*2 =@{gmultiset V} ⋃+ m2.*2.
+  Proof. intros Hm. by rewrite Hm. Qed.
+End perennial_369_gmultiset.
