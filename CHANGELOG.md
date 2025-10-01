@@ -145,7 +145,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `sublist_filter`. (by Jonas Kastberg Hinrichsen)
 - Rename `list_delete_subseteq` → `list_subseteq_delete` and
   `list_filter_subseteq` → `list_subseteq_filter`.
-- Add `Hint Mode` with `!` for `Reflexive`, `Symmetric`, `Transitive`,
+- Add `Hint Mode` with `- !` for `Reflexive`, `Symmetric`, `Transitive`,
   `PreOrder` and `Equivalence`.
 - Add lemmas `sum_list_with_foldr`/`max_list_with_foldr` that show
   correspondence between `sum_list`/`max_list` and `foldr`. (by Sanjit Bhat)
