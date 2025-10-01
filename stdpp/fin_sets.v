@@ -478,9 +478,13 @@ Section filter.
 
   Lemma filter_empty : filter P (∅:C) ≡ ∅.
   Proof. set_solver. Qed.
-  Lemma filter_singleton x : P x → filter P ({[ x ]} : C) ≡ {[ x ]}.
+
+  Lemma filter_singleton x :
+    filter P ({[ x ]} : C) ≡ if decide (P x) then {[ x ]} else ∅.
+  Proof. case_decide; set_solver. Qed.
+  Lemma filter_singleton_True x : P x → filter P ({[ x ]} : C) ≡ {[ x ]}.
   Proof. set_solver. Qed.
-  Lemma filter_singleton_not x : ¬P x → filter P ({[ x ]} : C) ≡ ∅.
+  Lemma filter_singleton_False x : ¬P x → filter P ({[ x ]} : C) ≡ ∅.
   Proof. set_solver. Qed.
 
   Lemma filter_empty_not_elem_of X x : filter P X ≡ ∅ → P x → x ∉ X.
@@ -499,10 +503,14 @@ Section filter.
     Context `{!LeibnizEquiv C}.
     Lemma filter_empty_L : filter P (∅:C) = ∅.
     Proof. unfold_leibniz. apply filter_empty. Qed.
-    Lemma filter_singleton_L x : P x → filter P ({[ x ]} : C) = {[ x ]}.
+
+    Lemma filter_singleton_L x :
+      filter P ({[ x ]} : C) = if decide (P x) then {[ x ]} else ∅.
     Proof. unfold_leibniz. apply filter_singleton. Qed.
-    Lemma filter_singleton_not_L x : ¬P x → filter P ({[ x ]} : C) = ∅.
-    Proof. unfold_leibniz. apply filter_singleton_not. Qed.
+    Lemma filter_singleton_True_L x : P x → filter P ({[ x ]} : C) = {[ x ]}.
+    Proof. unfold_leibniz. apply filter_singleton_True. Qed.
+    Lemma filter_singleton_False_L x : ¬P x → filter P ({[ x ]} : C) = ∅.
+    Proof. unfold_leibniz. apply filter_singleton_False. Qed.
 
     Lemma filter_empty_not_elem_of_L X x : filter P X = ∅ → P x → x ∉ X.
     Proof. unfold_leibniz. apply filter_empty_not_elem_of. Qed.

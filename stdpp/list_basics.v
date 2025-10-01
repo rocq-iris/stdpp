@@ -1330,6 +1330,7 @@ Section filter.
 
   Lemma filter_nil : filter P [] = [].
   Proof. done. Qed.
+
   Lemma filter_cons x l :
     filter P (x :: l) = if decide (P x) then x :: filter P l else filter P l.
   Proof. done. Qed.
@@ -1337,6 +1338,13 @@ Section filter.
   Proof. intros. by rewrite filter_cons, decide_True. Qed.
   Lemma filter_cons_False x l : ¬P x → filter P (x :: l) = filter P l.
   Proof. intros. by rewrite filter_cons, decide_False. Qed.
+
+  Lemma filter_singleton x l : filter P [x] = if decide (P x) then [x] else [].
+  Proof. done. Qed.
+  Lemma filter_singleton_True x l : P x → filter P [x] = [x].
+  Proof. intros. by rewrite filter_singleton, decide_True. Qed.
+  Lemma filter_singleton_False x l : ¬P x → filter P [x] = [].
+  Proof. intros. by rewrite filter_singleton, decide_False. Qed.
 
   Lemma filter_app l1 l2 : filter P (l1 ++ l2) = filter P l1 ++ filter P l2.
   Proof.
