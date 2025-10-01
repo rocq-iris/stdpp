@@ -1050,8 +1050,10 @@ Notation "(.∪ x )" := (λ y, union y x) (only parsing) : stdpp_scope.
 Infix "∪*" := (zip_with (∪)) (at level 50, left associativity) : stdpp_scope.
 Notation "(∪*)" := (zip_with (∪)) (only parsing) : stdpp_scope.
 
-Definition union_list `{Empty A} `{Union A} : list A → A := fold_right (∪) ∅.
+Definition union_list `{Empty A, Union A} : list A → A := fold_right (∪) ∅.
 Global Arguments union_list _ _ _ !_ / : assert.
+Global Typeclasses Opaque union_list.
+Global Instance: Params (@union_list) 3 := {}.
 Notation "⋃ l" := (union_list l) (at level 20, format "⋃  l") : stdpp_scope.
 
 Class Intersection A := intersection: A → A → A.
@@ -1144,8 +1146,10 @@ Notation "(⊎)" := disj_union (only parsing) : stdpp_scope.
 Notation "( x ⊎.)" := (disj_union x) (only parsing) : stdpp_scope.
 Notation "(.⊎ x )" := (λ y, disj_union y x) (only parsing) : stdpp_scope.
 
-Definition disj_union_list `{Empty A} `{DisjUnion A} : list A → A := fold_right (⊎) ∅.
+Definition disj_union_list `{Empty A, DisjUnion A} : list A → A := fold_right (⊎) ∅.
 Global Arguments disj_union_list _ _ _ !_ / : assert.
+Global Typeclasses Opaque disj_union_list.
+Global Instance: Params (@disj_union_list) 3 := {}.
 (* There is no "big" version of [⊎] in unicode, we thus use [⋃+]. *)
 Notation "⋃+ l" := (disj_union_list l) (at level 20, format "⋃+  l") : stdpp_scope.
 
