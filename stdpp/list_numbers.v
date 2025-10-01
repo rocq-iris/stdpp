@@ -19,6 +19,10 @@ Definition sum_list_with {A} (f : A → nat) : list A → nat :=
   | x :: l => f x + go l
   end.
 Notation sum_list := (sum_list_with id).
+Global Instance: Params (@sum_list_with) 1 := {}.
+(** Opacity avoids TC search to accidentally unify [sum_list_with] with
+[foldr]. *)
+Global Typeclasses Opaque sum_list_with.
 
 Definition max_list_with {A} (f : A → nat) : list A → nat :=
   fix go l :=
@@ -27,6 +31,10 @@ Definition max_list_with {A} (f : A → nat) : list A → nat :=
   | x :: l => f x `max` go l
   end.
 Notation max_list := (max_list_with id).
+Global Instance: Params (@max_list_with) 1 := {}.
+(** Opacity avoids TC search to accidentally unify [max_list_with] with
+[foldr]. *)
+Global Typeclasses Opaque max_list_with.
 
 (** ** Conversion of integers to and from little endian *)
 (** [Z_to_little_endian m n z] converts [z] into a list of [m] [n]-bit
