@@ -359,10 +359,12 @@ Global Instance equiv_default_relation `{Equiv A} :
 Global Hint Extern 0 (_ ≡ _) => reflexivity : core.
 Global Hint Extern 0 (_ ≡ _) => symmetry; assumption : core.
 
-(** These [Hint Mode] declarations are missing in the stdlib. These
-hint modes prevent instantiating [?R] with an arbitrary relation when
-searching for [@Reflexive ?A ?R], but allow finding an instance for
-[@Reflexive ?A (@eq ?A)]. *)
+(** These [Hint Mode] declarations are missing in the stdlib. They prevent
+instantiating [?R] with an arbitrary relation when searching for
+[@Reflexive ?A ?R], but allow finding an instance for [@Reflexive ?A (@eq ?A)].
+The latter would not be allowed when using mode [! !], a mode which is too
+restrictive to allow [equivalence_rewrite_relation] to be applied in some cases,
+see https://gitlab.mpi-sws.org/iris/stdpp/-/issues/242#note_114914. *)
 Global Hint Mode Reflexive - ! : typeclass_instances.
 Global Hint Mode Symmetric - ! : typeclass_instances.
 Global Hint Mode Transitive - ! : typeclass_instances.
