@@ -151,6 +151,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   correspondence between `sum_list`/`max_list` and `foldr`. (by Sanjit Bhat)
 - Add `Proper` instances for `sum_list`/`max_list` under `Permutation`.
   (by Sanjit Bhat)
+- Make `sum_list_with` and `max_list_with` opaque for type classes.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
