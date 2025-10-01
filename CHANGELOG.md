@@ -155,6 +155,12 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Make `list_union` and `list_dist_union` opaque for type classes.
 - Rename instance `gmultiset_disj_union_list_proper` →
   `gmultiset_disj_union_list_permutation_proper` to ensure consistency with sets.
+- Add lemmas `list_filter_singleton`, `list_filter_singleton_True` and
+  `list_filter_singleton_False`.
+- Rename lemmas `filter_singleton` → `filter_singleton_True` and
+  `filter_singleton_not` → `filter_singleton_False`, and add unified lemma
+  `filter_singleton` based on `decide`. This makes the filter lemmas for
+  singleton sets consistent with those for maps and lists.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
@@ -286,6 +292,10 @@ s/\blist_filter_subseteq\b/list_subseteq_filter/g
 
 # gmultiset disj union proper
 s/\bgmultiset_disj_union_list_proper\b/gmultiset_disj_union_list_permutation_proper/g
+
+# filter
+s/\bfilter_singleton\b/filter_singleton_True/g
+s/\bfilter_singleton_not\b/filter_singleton_False/g
 EOF
 ```
 
