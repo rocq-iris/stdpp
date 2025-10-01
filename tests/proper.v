@@ -97,3 +97,9 @@ Proof.
   [Equivalence] should prevent finding such instances. *)
   eexists. Fail apply _.
 Abort.
+
+Goal ∃ A : Type, Equivalence (@eq A).
+Proof.
+  (* The [Hint Mode] for [Equivalence] should allow finding this instance. *)
+  eexists. apply _.
+Abort.
