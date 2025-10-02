@@ -56,7 +56,6 @@ stdpp/binders.v
 stdpp/ssreflect.v
 
 stdpp_bitvector/definitions.v
-stdpp_bitvector/bv_swrap.v
 stdpp_bitvector/tactics.v
 stdpp_bitvector/bitvector.v
 

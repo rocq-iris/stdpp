@@ -663,6 +663,106 @@ Module Z.
     - etrans; [|apply Z.pow_pos_nonneg]; lia.
   Qed.
 
+  Lemma add_addcarries a b :
+    a + b = Z.lxor (Z.lxor a b) (Z.addcarries a b).
+  Proof.
+    unfold Z.addcarries.
+    by rewrite Z.lxor_comm, Z.lxor_assoc, Z.lxor_nilpotent, Z.lxor_0_r.
+  Qed.
+
+  Lemma add_spec a b i :
+    Z.testbit (a + b) i =
+      xorb (xorb (Z.testbit a i) (Z.testbit b i))
+        (Z.testbit (Z.addcarries a b) i).
+  Proof. by rewrite Z.add_addcarries, !Z.lxor_spec. Qed.
+
+  Lemma addcarries_spec a b i :
+    Z.testbit (Z.addcarries a b) i =
+      orb
+        (andb (Z.testbit a (i-1)) (Z.testbit b (i-1)))
+        (andb (orb (Z.testbit a (i-1)) (Z.testbit b (i-1)))
+           (negb (Z.testbit (a+b) (i-1)))).
+  Proof.
+    destruct (decide (0 < i)). 2: {
+      rewrite !(Z.testbit_neg_r _ (i - 1)) by lia; simpl.
+      destruct (decide (i = 0)); subst.
+      - apply Z.testbit_addcarries_0.
+      - by rewrite Z.testbit_neg_r by lia.
+    }
+    rewrite Z.testbit_addcarries_pos by lia.
+    rewrite Z.add_spec.
+    by destruct (Z.testbit a (i - 1)), (Z.testbit b (i - 1)),
+      (Z.testbit (Z.addcarries a b) (i - 1)).
+  Qed.
+
+  Lemma opp_pow2_spec n i :
+    0 ≤ n →
+    Z.testbit (- (2 ^ n)) i = bool_decide (n ≤ i).
+  Proof.
+    intros ?.
+    destruct (decide (0 ≤ i)).
+    2: { rewrite Z.testbit_neg_r by lia. case_bool_decide; lia. }
+    rewrite Z.bits_opp, <-Z.ones_equiv, Z.ones_spec;
+      [repeat case_bool_decide; lia|done..].
+  Qed.
+
+  Lemma add_pow2_spec_low m n i :
+    0 ≤ n →
+    i < n →
+    Z.testbit (m + 2 ^ n) i = Z.testbit m i.
+  Proof.
+    intros ??.
+    rewrite <-(Z.mod_pow2_bits_low (_ + _) n i) by lia.
+    rewrite <-Zplus_mod_idemp_r, Z_mod_same_full, Z.add_0_r.
+    by rewrite Z.mod_pow2_bits_low by lia.
+  Qed.
+
+  Lemma sub_pow2_spec_low m n i :
+    0 ≤ n →
+    i < n →
+    Z.testbit (m - 2 ^ n) i = Z.testbit m i.
+  Proof.
+    intros ??.
+    rewrite <-Z.add_opp_r.
+    rewrite <-(Z.mod_pow2_bits_low (_ + _) n i), Z.add_opp_r by lia.
+    rewrite <-Zminus_mod_idemp_r, Z_mod_same_full, Z.sub_0_r.
+    by rewrite Z.mod_pow2_bits_low by lia.
+  Qed.
+
+  Lemma add_pow2_spec_top m n :
+    0 ≤ n →
+    Z.testbit (m + 2 ^ n) n = negb (Z.testbit m n).
+  Proof.
+    intros ?.
+    rewrite Z.add_spec, Z.addcarries_spec.
+    rewrite Z.add_pow2_spec_low, Z.pow2_bits_true, Z.pow2_bits_false by lia.
+    destruct (Z.testbit m n), (Z.testbit m (n - 1)); done.
+  Qed.
+
+  Lemma sub_pow2_spec_top m n :
+    0 ≤ n →
+    Z.testbit (m - 2 ^ n) n = negb (Z.testbit m n).
+  Proof.
+    intros ?.
+    rewrite <-Z.add_opp_r, Z.add_spec, Z.addcarries_spec, Z.add_opp_r.
+    rewrite Z.sub_pow2_spec_low, !Z.opp_pow2_spec by lia.
+    repeat case_bool_decide; try lia;
+      by destruct (Z.testbit m n), (Z.testbit m (n - 1)).
+  Qed.
+
+  Lemma sub_pow2_spec_high m n i :
+    0 ≤ n →
+    0 ≤ m < 2 ^ (Z.succ n) →
+    n ≤ i →
+    Z.testbit (m - 2 ^ n) i = negb (Z.testbit m n).
+  Proof.
+    intros Hn Hm ?.
+    rewrite <- Z.sub_pow2_spec_top by lia.
+    rewrite Z.pow_succ_r in Hm by done.
+    rewrite !(proj1 (Z.bounded_iff_bits n (m - 2 ^ n) Hn)) by lia.
+    done.
+  Qed.
+
   Lemma add_nocarry_lor a b :
     Z.land a b = 0 →
     a + b = Z.lor a b.

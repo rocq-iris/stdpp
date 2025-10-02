@@ -1,5 +1,6 @@
 (** This file is maintained by Michael Sammler. *)
 From Coq Require Znumtheory.
+From Coq Require Import ZifyNat.
 From stdpp Require Export numbers.
 From stdpp Require Import countable finite.
 From stdpp Require Import options.
@@ -236,6 +237,44 @@ Lemma bv_wrap_spec_high n z i:
   Z.of_N n ≤ i →
   Z.testbit (bv_wrap n z) i = false.
 Proof. intros ?. rewrite bv_wrap_spec; [|lia]. case_bool_decide; [|done]. lia. Qed.
+
+Lemma bv_swrap_spec n (z i : Z):
+  0 ≤ i →
+  Z.testbit (bv_swrap n z) i =
+    if bool_decide (i < Z.of_N n-1) then
+      Z.testbit z i
+    else
+      Z.testbit z (Z.of_N n-1).
+Proof.
+  destruct (decide (0 < n)%N).
+  - intros ?.
+    unfold bv_swrap, bv_half_modulus, bv_modulus.
+    replace (2 ^ Z.of_N n `div` 2) with (2 ^ (Z.of_N n - 1)). 2: {
+      rewrite Z.pow_sub_r; lia.
+    }
+    case_bool_decide as Hi.
+    + rewrite Z.sub_pow2_spec_low, bv_wrap_spec_low,
+        Z.add_pow2_spec_low by lia.
+      done.
+    + destruct (decide (i = Z.of_N n - 1)) as [-> | Ineq].
+      * rewrite Z.sub_pow2_spec_top, bv_wrap_spec_low, Z.add_pow2_spec_top by lia.
+        by apply negb_involutive.
+      * rewrite Z.sub_pow2_spec_high; [ | lia | | lia ]. 2: {
+          replace (Z.succ (Z.of_N n - 1)) with (Z.of_N n) by lia.
+          apply bv_wrap_in_range.
+        }
+        rewrite bv_wrap_spec_low by lia.
+        rewrite Z.add_pow2_spec_top by lia.
+        by apply negb_involutive.
+  - intros ?.
+    replace n with 0%N by lia.
+    rewrite bool_decide_eq_false_2 by lia.
+    unfold bv_swrap.
+    rewrite bv_half_modulus_0, Z.add_0_r, Z.sub_0_r.
+    unfold bv_wrap.
+    change (bv_modulus 0) with 1.
+    by rewrite Z.mod_1_r, Z.bits_0, Z.testbit_neg_r.
+Qed.
 
 (** * [BvWf] *)
 (** The [BvWf] typeclass checks that the integer [z] can be
