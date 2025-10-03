@@ -162,6 +162,10 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `filter_singleton` based on `decide`. This makes the filter lemmas for
   singleton sets consistent with those for maps and lists.
 
+**Changes in `stdpp_bitvector`:**
+
+- Add support for bitwise reasoning about `bv_swrap`. (by Brian Campbell)
+
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
 Note that the script is not idempotent, do not run it twice.
