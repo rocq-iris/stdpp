@@ -429,6 +429,20 @@ Lemma bitblast_bounded_bv_unsigned n (b : bv n):
 Proof. constructor. apply bv_unsigned_in_range. Qed.
 Global Hint Resolve bitblast_bounded_bv_unsigned | 15 : bitblast.
 
+Lemma bitblast_bv_swrap z1 n n1 b1 b2 :
+  Bitblast z1 n b1 →
+  Bitblast z1 (Z.of_N n1-1) b2 →
+  Bitblast (bv_swrap n1 z1) n (if bool_decide (n < Z.of_N n1-1) then b1 else b2).
+Proof.
+  intros [<-] [<-]. constructor.
+  destruct (decide (0 ≤ n)).
+  - by rewrite bv_swrap_spec.
+  - case_bool_decide.
+    + rewrite !Z.testbit_neg_r; [done|lia..].
+    + rewrite !Z.testbit_neg_r; [done|lia..].
+Qed.
+Global Hint Resolve bitblast_bv_swrap | 10 : bitblast.
+
 (** * Tactics *)
 
 (** ** Helper definitions and lemmas for the tactics *)

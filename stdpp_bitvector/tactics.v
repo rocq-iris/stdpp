@@ -134,7 +134,9 @@ Proof.
   constructor. unfold bv_unsigned.
   destruct w, s; simpl; try done; by rewrite bv_wrap_small by by apply bv_wf_in_range.
 Qed.
-Global Hint Resolve bv_unfold_BV | 10 : bv_unfold_db.
+(* The normal typeclass eauto version of simple apply uses quite weak unification and
+   can reject applications where the BvWf proofs has a syntactically different size. *)
+Global Hint Extern 10 (BvUnfold _ _ _ (@BV _ _ _) _) => simple apply bv_unfold_BV : bv_unfold_db.
 Lemma bv_unfold_bv_0 s w n :
   BvUnfold n s w (bv_0 n) 0.
 Proof. constructor. destruct w, s; rewrite ?bv_0_signed, ?bv_0_unsigned, ?bv_swrap_0; done. Qed.
