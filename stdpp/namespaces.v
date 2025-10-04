@@ -21,12 +21,6 @@ Local Definition nclose_aux : seal (@nclose_def). by eexists. Qed.
 Global Instance nclose : UpClose namespace coPset := unseal nclose_aux.
 Local Definition nclose_unseal : @nclose = @nclose_def := seal_eq nclose_aux.
 
-Local Definition npick_def (N : namespace) : positive :=
-  positives_flatten (namespace_car N).
-Local Definition npick_aux : seal (@npick_def). by eexists. Qed.
-Definition npick := unseal npick_aux.
-Local Definition npick_unseal : @npick = @npick_def := seal_eq npick_aux.
-
 Notation "N .@ x" := (ndot N x)
   (at level 19, left associativity, format "N .@ x") : stdpp_scope.
 Notation "(.@)" := ndot (only parsing) : stdpp_scope.
@@ -78,12 +72,6 @@ Section namespace.
 
   Lemma ndot_preserve_disjoint_r N E x : E ## ↑N → E ## ↑N.@x.
   Proof. intros. by apply symmetry, ndot_preserve_disjoint_l. Qed.
-
-  Lemma npick_nclose N : npick N ∈@{coPset} ↑N.
-  Proof.
-    rewrite nclose_unseal, npick_unseal. apply elem_coPset_suffixes.
-    exists 1%positive. by rewrite (left_id_L _ _).
-  Qed.
 End namespace.
 
 (** The hope is that registering these will suffice to solve most goals
