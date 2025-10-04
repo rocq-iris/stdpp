@@ -171,6 +171,9 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `Defined`. (by Simcha van Collem)
 - Extend `set_solver` with support for `Pset_to_coPset` and `gset_to_coPset`.
 - Add lemma `set_infinite_non_empty`.
+- Improve `namespace` abstraction so it is no longer convertible to
+- Make `namespace` a newtype so it is no longer convertible to `list positive`
+  and thereby exposes the internal representation.
 
 **Changes in `stdpp_bitvector`:**
 
