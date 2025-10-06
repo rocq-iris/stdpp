@@ -55,9 +55,7 @@ Section namespace.
   Lemma nclose_not_finite N : ¬set_finite (↑ N : coPset).
   Proof. apply coPset_infinite_finite, nclose_infinite. Qed.
   Lemma nclose_non_empty N : ↑ N ≠@{coPset} ∅.
-  Proof.
-    intros HN. apply (nclose_not_finite N). rewrite HN. apply empty_finite.
-  Qed.
+  Proof. apply set_infinite_non_empty, nclose_infinite. Qed.
 
   Lemma ndot_ne_disjoint N x y : x ≠ y → N.@x ## N.@y.
   Proof.
