@@ -30,16 +30,16 @@ variables:
   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-.branches_and_dune_label: &branches_and_dune_label
+.branches_and_labeled_mrs: &branches_and_labeled_mrs
   rules:
   - if: $CI_PROJECT_NAMESPACE != "iris"
     when: never
   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master"
   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
-  - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /.*CI-dune-job.*/
+  - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /.*CI-full.*/
 
 .template: &template
-  <<: *only_branches
+  <<: *branches_and_labeled_mrs
   stage: build
   interruptible: true
   tags:
@@ -54,9 +54,10 @@ variables:
 
 ## Build jobs
 
-# The newest version runs with timing.
+# The newest version runs with timing, outside MRs.
 build-rocq.9.0.0:
   <<: *template
+  <<: *only_branches
   variables:
     OPAM_PINS: "rocq-core version 9.0.0   rocq-stdlib version 9.0.0"
     DENY_WARNINGS: "1"
@@ -80,7 +81,6 @@ build-rocq.9.0.0-mr:
 # Also ensure Dune works (broken on older Rocq versions due to Stdlib split).
 build-rocq.9.1.dev-dune:
   <<: *template
-  <<: *branches_and_dune_label
   variables:
     OPAM_PINS: "dune version 3.19.1   rocq-core version 9.1.dev   rocq-stdlib version dev"
     MAKE_TARGET: "dune"
