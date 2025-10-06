@@ -169,6 +169,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add lemma `nclose_non_empty`.
 - Allow recursive calls after applying `map_Forall_impl` by making it
   `Defined`. (by Simcha van Collem)
+- Extend `set_solver` with support for `Pset_to_coPset` and `gset_to_coPset`.
 
 **Changes in `stdpp_bitvector`:**
 

@@ -414,6 +414,13 @@ Proof. destruct X; apply elem_of_Pset_to_coPset_raw. Qed.
 Lemma Pset_to_coPset_finite X : set_finite (Pset_to_coPset X).
 Proof. apply coPset_finite_spec; destruct X; apply Pset_to_coPset_raw_finite. Qed.
 
+Global Instance set_unfold_Pset_to_coPSet x X P :
+  SetUnfoldElemOf x X P →
+  SetUnfoldElemOf x (Pset_to_coPset X) P.
+Proof.
+  constructor. rewrite elem_of_Pset_to_coPset. by apply set_unfold_elem_of.
+Qed.
+
 (** * Conversion to and from gsets of positives *)
 Definition coPset_to_gset (X : coPset) : gset positive :=
   let 'Mapset m := coPset_to_Pset X in
@@ -438,6 +445,13 @@ Qed.
 Lemma gset_to_coPset_finite X : set_finite (gset_to_coPset X).
 Proof.
   apply coPset_finite_spec; destruct X as [[?]]; apply Pset_to_coPset_raw_finite.
+Qed.
+
+Global Instance set_unfold_gset_to_coPSet x X P :
+  SetUnfoldElemOf x X P →
+  SetUnfoldElemOf x (gset_to_coPset X) P.
+Proof.
+  constructor. rewrite elem_of_gset_to_coPset. by apply set_unfold_elem_of.
 Qed.
 
 (** * Infiniteness *)
