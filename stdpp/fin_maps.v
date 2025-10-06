@@ -1822,7 +1822,7 @@ Section map_Forall.
   Proof. intros i x. by rewrite lookup_empty. Qed.
   Lemma map_Forall_impl (Q : K → A → Prop) m :
     map_Forall P m → (∀ i x, P i x → Q i x) → map_Forall Q m.
-  Proof. unfold map_Forall; naive_solver. Qed.
+  Proof. intros Hm HQ i x Hi. apply HQ, Hm, Hi. Defined.
   Lemma map_Forall_insert_1_1 m i x : map_Forall P (<[i:=x]>m) → P i x.
   Proof. intros Hm. by apply Hm; rewrite lookup_insert_eq. Qed.
   Lemma map_Forall_insert_1_2 m i x :

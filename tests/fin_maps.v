@@ -450,3 +450,16 @@ Inductive gtest_pred `{Countable K} : gtest K → Prop :=
 Inductive gtest_rel `{Countable K} : relation (gtest K) :=
   | GTest_rel ts1 ts2 :
      map_Forall2 (λ _, gtest_rel) ts1 ts2 → gtest_rel (GTest ts1) (GTest ts2).
+
+(** Test that recursive calls are allowed after applying [map_Forall_impl].
+This is particularly important when using [map_Forall] in a premise of a mutually
+inductive predicate, since such predicates are typically eliminated via [Fixpoint]
+because Rocq does not generate the right induction scheme automatically. *)
+(** TODO: Needs Rocq 9.0
+Fixpoint gtest_pred_fixpoint `{Countable K} (t : gtest K) :
+  gtest_pred t → gtest_pred t.
+Proof.
+  intros Ht. destruct Ht as [ts Hts].
+  apply GTest_pred. eapply map_Forall_impl; first apply Hts; simpl.
+  intros _. apply gtest_pred_fixpoint.
+Qed. *)
