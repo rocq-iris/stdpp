@@ -50,8 +50,14 @@ Section namespace.
   Lemma nclose_subseteq' E N x : ↑N ⊆ E → ↑N.@x ⊆ E.
   Proof. intros. etrans; eauto using nclose_subseteq. Qed.
 
-  Lemma nclose_infinite N : ¬set_finite (↑ N : coPset).
+  Lemma nclose_infinite N : set_infinite (↑ N : coPset).
   Proof. rewrite nclose_unseal. apply coPset_suffixes_infinite. Qed.
+  Lemma nclose_not_finite N : ¬set_finite (↑ N : coPset).
+  Proof. apply coPset_infinite_finite, nclose_infinite. Qed.
+  Lemma nclose_non_empty N : ↑ N ≠@{coPset} ∅.
+  Proof.
+    intros HN. apply (nclose_not_finite N). rewrite HN. apply empty_finite.
+  Qed.
 
   Lemma ndot_ne_disjoint N x y : x ≠ y → N.@x ## N.@y.
   Proof.

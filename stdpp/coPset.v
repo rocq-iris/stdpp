@@ -306,9 +306,9 @@ Proof.
   refine (cast_if (decide (coPset_finite (`X)))); by rewrite coPset_finite_spec.
 Defined.
 
-(** * Picking an element out of an infinite set *)
+(** * Picking an element out of a non-empty set *)
 
-(** Provided that the set [X] is infinite, [coPpick X] yields an element of
+(** Provided that the set [X] is non-empty, [coPpick X] yields an element of
 this set. Note that [coPpick] is implemented by depth-first search, so
 using it repeatedly to obtain elements [x] and inserting these elements
 [x] into some set [Y] will give rise to a very unbalanced tree. *)
@@ -328,19 +328,17 @@ Proof.
   revert i; induction t as [[]|[] l ? r]; intros i ?; simplify_eq/=; auto.
   destruct (coPpick_raw l); simplify_option_eq; auto.
 Qed.
-Local Lemma coPpick_raw_None t : coPpick_raw t = None → coPset_finite t.
+Local Lemma coPpick_raw_None t i : coPpick_raw t = None → ¬e_of i t.
 Proof.
-  induction t as [[]|[] l ? r]; intros i; simplify_eq/=; auto.
-  destruct (coPpick_raw l); simplify_option_eq; auto.
+  revert i. induction t as [[]|[] l ? r]; intros [] ?;
+    repeat (case_match || simplify_option_eq); auto.
 Qed.
-(** Provided [X] is infinite, the element [coPpick X] is a member of [X]. *)
-(** TODO: it should in fact be sufficient for [X] to be nonempty;
-perhaps a stronger lemma can be proved in the future. *)
-Lemma coPpick_elem_of X : ¬set_finite X → coPpick X ∈ X.
+Lemma coPpick_elem_of X : X ≠ ∅ → coPpick X ∈ X.
 Proof.
+  rewrite elem_of_equiv_empty_L.
   destruct X as [t ?]; unfold coPpick; destruct (coPpick_raw _) as [j|] eqn:?.
   - by intros; apply coPpick_raw_elem_of.
-  - by intros []; apply coPset_finite_spec, coPpick_raw_None.
+  - intros []; intros ?. by apply coPpick_raw_None.
 Qed.
 
 (** * Conversion to finite sets *)
@@ -452,8 +450,9 @@ Proof.
   intros Hfin xs. exists (coPpick (X ∖ list_to_set xs)).
   cut (coPpick (X ∖ list_to_set xs) ∈ X ∖ list_to_set xs); [set_solver|].
   apply coPpick_elem_of; intros Hfin'.
-  apply Hfin, (difference_finite_inv _ (list_to_set xs)), Hfin'.
-  apply list_to_set_finite.
+  apply Hfin, (difference_finite_inv _ (list_to_set xs)).
+  - apply list_to_set_finite.
+  - rewrite Hfin'. apply empty_finite.
 Qed.
 (** A set is finite if and only if it is not infinite. *)
 Lemma coPset_finite_infinite (X : coPset) : set_finite X ↔ ¬set_infinite X.
@@ -487,11 +486,14 @@ Proof.
       rewrite ?coPset_elem_of_node; naive_solver.
   - by intros [q' ->]; induction q; simpl; rewrite ?coPset_elem_of_node.
 Qed.
-Lemma coPset_suffixes_infinite p : ¬set_finite (coPset_suffixes p).
+
+Lemma coPset_suffixes_not_finite p : ¬set_finite (coPset_suffixes p).
 Proof.
   rewrite coPset_finite_spec; simpl.
   induction p; simpl; rewrite ?coPset_finite_node, ?andb_True; naive_solver.
 Qed.
+Lemma coPset_suffixes_infinite p : set_infinite (coPset_suffixes p).
+Proof. apply coPset_infinite_finite, coPset_suffixes_not_finite. Qed.
 
 (** * Splitting a set *)
 (** Every infinite [X : coPset] can be split into two disjoint parts, which are
