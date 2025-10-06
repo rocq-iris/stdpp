@@ -167,6 +167,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   Re-purpose `coPset_suffixes_infinite` and `nclose_infinite` for lemmas about
   `set_infinite`.
 - Add lemma `nclose_non_empty`.
+- Allow recursive calls after applying `map_Forall_impl` by making it
+  `Defined`. (by Simcha van Collem)
 
 **Changes in `stdpp_bitvector`:**
 
