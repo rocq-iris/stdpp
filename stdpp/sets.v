@@ -1239,6 +1239,8 @@ Section set_finite_infinite.
   Global Instance set_infinite_proper : Proper ((≡) ==> iff) (@set_infinite A C _).
   Proof. intros X Y HX; apply forall_proper. by setoid_rewrite HX. Qed.
 
+  Lemma set_infinite_non_empty X : set_infinite X → X ≠ ∅.
+  Proof. intros Hinf ->. by eapply set_not_infinite_finite, empty_finite. Qed.
   Lemma union_infinite_l X Y : set_infinite X → set_infinite (X ∪ Y).
   Proof. intros Hinf xs. destruct (Hinf xs). set_solver. Qed.
   Lemma union_infinite_r X Y : set_infinite Y → set_infinite (X ∪ Y).
