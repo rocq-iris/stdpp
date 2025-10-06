@@ -161,6 +161,12 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `filter_singleton_not` → `filter_singleton_False`, and add unified lemma
   `filter_singleton` based on `decide`. This makes the filter lemmas for
   singleton sets consistent with those for maps and lists.
+- Strengthen `coPpick_elem_of` to have premise `X ≠ ∅` instead of `¬set_finite X`.
+- Rename `coPset_suffixes_infinite` → `coPset_suffixes_not_finite` and
+  `nclose_infinite` → `nclose_not_finite`, these lemmas are about `set_finite`.
+  Re-purpose `coPset_suffixes_infinite` and `nclose_infinite` for lemmas about
+  `set_infinite`.
+- Add lemma `nclose_non_empty`.
 
 **Changes in `stdpp_bitvector`:**
 
@@ -300,6 +306,10 @@ s/\bgmultiset_disj_union_list_proper\b/gmultiset_disj_union_list_permutation_pro
 # filter
 s/\bfilter_singleton\b/filter_singleton_True/g
 s/\bfilter_singleton_not\b/filter_singleton_False/g
+
+# set_infinite
+s/\bcoPset_suffixes_infinite\b/coPset_suffixes_not_finite/g
+s/\bnclose_infinite\b/nclose_not_finite/g
 EOF
 ```
 
