@@ -30,7 +30,7 @@ variables:
   - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH =~ /^ci.*/
   - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-.branches_and_labeled_mrs: &branches_and_labeled_mrs
+.branches_and_labeled_mr: &branches_and_labeled_mr
   rules:
   - if: $CI_PROJECT_NAMESPACE != "iris"
     when: never
@@ -39,7 +39,7 @@ variables:
   - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /.*CI-full.*/
 
 .template: &template
-  <<: *branches_and_labeled_mrs
+  <<: *branches_and_labeled_mr
   stage: build
   interruptible: true
   tags:
