@@ -1,21 +1,22 @@
 From stdpp Require Export countable coPset.
 From stdpp Require Import options.
 
-Definition namespace := list positive.
-Global Instance namespace_eq_dec : EqDecision namespace := _.
-Global Instance namespace_countable : Countable namespace := _.
-Global Typeclasses Opaque namespace.
+Record namespace := Namespace { namespace_car : list positive }.
+Global Instance namespace_eq_dec : EqDecision namespace.
+Proof. solve_decision. Defined.
+Global Instance namespace_countable : Countable namespace.
+Proof. apply (inj_countable' namespace_car Namespace). by intros []. Defined.
 
-Definition nroot : namespace := nil.
+Definition nroot : namespace := Namespace [].
 
 Local Definition ndot_def `{Countable A} (N : namespace) (x : A) : namespace :=
-  encode x :: N.
+  Namespace $ encode x :: namespace_car N.
 Local Definition ndot_aux : seal (@ndot_def). by eexists. Qed.
 Definition ndot {A A_dec A_count}:= unseal ndot_aux A A_dec A_count.
 Local Definition ndot_unseal : @ndot = @ndot_def := seal_eq ndot_aux.
 
 Local Definition nclose_def (N : namespace) : coPset :=
-  coPset_suffixes (positives_flatten N).
+  coPset_suffixes (positives_flatten (namespace_car N)).
 Local Definition nclose_aux : seal (@nclose_def). by eexists. Qed.
 Global Instance nclose : UpClose namespace coPset := unseal nclose_aux.
 Local Definition nclose_unseal : @nclose = @nclose_def := seal_eq nclose_aux.
@@ -33,16 +34,17 @@ Section namespace.
   Implicit Types E : coPset.
 
   Global Instance ndot_inj : Inj2 (=) (=) (=) (@ndot A _ _).
-  Proof. intros N1 x1 N2 x2; rewrite !ndot_unseal; naive_solver. Qed.
+  Proof. rewrite !ndot_unseal. intros [N1] x1 [N2] x2 [=]. naive_solver. Qed.
 
   Lemma nclose_nroot : ↑nroot = (⊤:coPset).
   Proof. rewrite nclose_unseal. by apply (sig_eq_pi _). Qed.
 
-  Lemma nclose_subseteq N x : ↑N.@x ⊆ (↑N : coPset).
+  Lemma nclose_subseteq N x : ↑N.@x ⊆@{coPset} ↑N.
   Proof.
     intros p. unfold up_close. rewrite !nclose_unseal, !ndot_unseal.
     unfold nclose_def, ndot_def; rewrite !elem_coPset_suffixes.
-    intros [q ->]. destruct (positives_flatten_suffix N (ndot_def N x)) as [q' ?].
+    destruct N as [N]. intros [q ->].
+    destruct (positives_flatten_suffix N (encode x :: N)) as [q' ?].
     { by exists [encode x]. }
     by exists (q ++ q')%positive; rewrite <-(assoc_L _); f_equal.
   Qed.
