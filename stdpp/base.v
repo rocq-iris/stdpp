@@ -637,7 +637,8 @@ Notation "(∘)" := compose (only parsing) : stdpp_scope.
 Notation "( f ∘.)" := (compose f) (only parsing) : stdpp_scope.
 Notation "(.∘ f )" := (λ g, compose g f) (only parsing) : stdpp_scope.
 
-Global Instance impl_inhabited {A} `{Inhabited B} : Inhabited (A → B) :=
+Global Instance forall_inhabited {A} {B : A → Type} `{!∀ x, Inhabited (B x)} :
+    Inhabited (∀ x, B x) :=
   populate (λ _, inhabitant).
 
 (** Ensure that [simpl] unfolds [id], [compose], and [flip] when fully
