@@ -173,6 +173,9 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add lemma `set_infinite_non_empty`.
 - Make `namespace` a newtype so it is no longer convertible to `list positive`
   and thereby exposes the internal representation.
+- Add instance `Inhabited (∀ x, B x)`. The old instance `impl_inhabited` for
+  `Inhabited (A → B)` has been removed, as the one for `∀` generalizes it. (by
+  Jan-Oliver Kaiser)
 
 **Changes in `stdpp_bitvector`:**
 
