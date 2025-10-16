@@ -1,5 +1,9 @@
 From stdpp Require Import strings.
 
+(* Should follow from [forall_inhabited] *)
+Lemma impl_inhabited {A} `{Inhabited B} : Inhabited (A → B).
+Proof. apply _. Qed.
+
 Lemma tc_simpl_test_lemma (P : nat → Prop) x y :
   TCSimpl x y →
   P x → P y.
