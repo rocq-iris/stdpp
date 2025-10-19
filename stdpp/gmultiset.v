@@ -875,7 +875,7 @@ Section disj_union_list.
   Implicit Types Xs Ys : list (gmultiset A).
 
   Lemma gmultiset_disj_union_list_nil :
-    ⋃+ (@nil (gmultiset A)) = ∅.
+    ⋃+ [] =@{gmultiset A} ∅.
   Proof. done. Qed.
 
   Lemma gmultiset_disj_union_list_cons X Xs :

@@ -101,7 +101,7 @@ Qed.
 Lemma elements_empty_inv X : elements X = [] → X ≡ ∅.
 Proof. apply elements_empty_iff. Qed.
 
-Lemma elements_union_singleton (X : C) x :
+Lemma elements_union_singleton X x :
   x ∉ X → elements ({[ x ]} ∪ X) ≡ₚ x :: elements X.
 Proof.
   intros ?; apply NoDup_Permutation.
@@ -115,7 +115,7 @@ Proof.
   apply Permutation_singleton_r. by rewrite <-(right_id ∅ (∪) {[x]}),
     elements_union_singleton, elements_empty by set_solver.
 Qed.
-Lemma elements_disj_union (X Y : C) :
+Lemma elements_disj_union X Y :
   X ## Y → elements (X ∪ Y) ≡ₚ elements X ++ elements Y.
 Proof.
   intros HXY. apply NoDup_Permutation.
@@ -149,15 +149,15 @@ Proof. intros ?? E. apply Permutation_length. by rewrite E. Qed.
 
 Lemma size_empty : size (∅ : C) = 0.
 Proof. unfold size, set_size. simpl. by rewrite elements_empty. Qed.
-Lemma size_empty_iff (X : C) : size X = 0 ↔ X ≡ ∅.
+Lemma size_empty_iff X : size X = 0 ↔ X ≡ ∅.
 Proof.
   split; [|intros ->; by rewrite size_empty].
   intros; apply equiv_empty; intros x; rewrite <-elem_of_elements.
   by rewrite (nil_length_inv (elements X)), ?elem_of_nil.
 Qed.
-Lemma size_empty_inv (X : C) : size X = 0 → X ≡ ∅.
+Lemma size_empty_inv X : size X = 0 → X ≡ ∅.
 Proof. apply size_empty_iff. Qed.
-Lemma size_non_empty_iff (X : C) : size X ≠ 0 ↔ X ≢ ∅.
+Lemma size_non_empty_iff X : size X ≠ 0 ↔ X ≢ ∅.
 Proof. by rewrite size_empty_iff. Qed.
 
 Lemma set_choose_or_empty X : (∃ x, x ∈ X) ∨ X ≡ ∅.
@@ -429,7 +429,7 @@ Lemma set_fold_comm_acc {B} (f : A → B → B) (g : B → B) (b : B) X :
 Proof. intros. apply (set_fold_comm_acc_strong _); [solve_proper|auto]. Qed.
 
 (** * Minimal elements *)
-Lemma minimal_exists_elem_of R `{!Transitive R, ∀ x y, Decision (R x y)} (X : C) :
+Lemma minimal_exists_elem_of R `{!Transitive R, ∀ x y, Decision (R x y)} X :
   X ≢ ∅ → ∃ x, x ∈ X ∧ minimal R x X.
 Proof.
   pattern X; apply set_ind; clear X.
@@ -446,12 +446,12 @@ Proof.
   rewrite HX, (right_id _ (∪)). apply singleton_minimal.
 Qed.
 Lemma minimal_exists_elem_of_L R `{!LeibnizEquiv C, !Transitive R,
-    ∀ x y, Decision (R x y)} (X : C) :
+    ∀ x y, Decision (R x y)} X :
   X ≠ ∅ → ∃ x, x ∈ X ∧ minimal R x X.
 Proof. unfold_leibniz. apply (minimal_exists_elem_of R). Qed.
 
 Lemma minimal_exists R `{!Transitive R,
-    ∀ x y, Decision (R x y)} `{!Inhabited A} (X : C) :
+    ∀ x y, Decision (R x y)} `{!Inhabited A} X :
   ∃ x, minimal R x X.
 Proof.
   destruct (set_choose_or_empty X) as [ (y & Ha) | Hne].
@@ -476,15 +476,15 @@ Qed.
 Section filter.
   Context (P : A → Prop) `{!∀ x, Decision (P x)}.
 
-  Lemma filter_empty : filter P (∅:C) ≡ ∅.
+  Lemma filter_empty : filter P ∅ ≡@{C} ∅.
   Proof. set_solver. Qed.
 
   Lemma filter_singleton x :
-    filter P ({[ x ]} : C) ≡ if decide (P x) then {[ x ]} else ∅.
+    filter P {[ x ]} ≡@{C} if decide (P x) then {[ x ]} else ∅.
   Proof. case_decide; set_solver. Qed.
-  Lemma filter_singleton_True x : P x → filter P ({[ x ]} : C) ≡ {[ x ]}.
+  Lemma filter_singleton_True x : P x → filter P {[ x ]} ≡@{C} {[ x ]}.
   Proof. set_solver. Qed.
-  Lemma filter_singleton_False x : ¬P x → filter P ({[ x ]} : C) ≡ ∅.
+  Lemma filter_singleton_False x : ¬P x → filter P {[ x ]} ≡@{C} ∅.
   Proof. set_solver. Qed.
 
   Lemma filter_empty_not_elem_of X x : filter P X ≡ ∅ → P x → x ∉ X.
@@ -501,15 +501,16 @@ Section filter.
 
   Section leibniz_equiv.
     Context `{!LeibnizEquiv C}.
-    Lemma filter_empty_L : filter P (∅:C) = ∅.
+
+    Lemma filter_empty_L : filter P ∅ =@{C} ∅.
     Proof. unfold_leibniz. apply filter_empty. Qed.
 
     Lemma filter_singleton_L x :
-      filter P ({[ x ]} : C) = if decide (P x) then {[ x ]} else ∅.
+      filter P {[ x ]} =@{C} if decide (P x) then {[ x ]} else ∅.
     Proof. unfold_leibniz. apply filter_singleton. Qed.
-    Lemma filter_singleton_True_L x : P x → filter P ({[ x ]} : C) = {[ x ]}.
+    Lemma filter_singleton_True_L x : P x → filter P {[ x ]} =@{C} {[ x ]}.
     Proof. unfold_leibniz. apply filter_singleton_True. Qed.
-    Lemma filter_singleton_False_L x : ¬P x → filter P ({[ x ]} : C) = ∅.
+    Lemma filter_singleton_False_L x : ¬P x → filter P {[ x ]} =@{C} ∅.
     Proof. unfold_leibniz. apply filter_singleton_False. Qed.
 
     Lemma filter_empty_not_elem_of_L X x : filter P X = ∅ → P x → x ∉ X.
