@@ -34,40 +34,41 @@ Section definitions.
   Global Instance gmultiset_equiv : Equiv (gmultiset A) := λ X Y, ∀ x,
     multiplicity x X = multiplicity x Y.
 
-  Global Instance gmultiset_elements : Elements A (gmultiset A) := λ X,
-    let (X) := X in '(x,n) ← map_to_list X; replicate (Pos.to_nat n) x.
+  Global Instance gmultiset_elements : Elements A (gmultiset A) :=
+    λ '(GMultiSet X),
+      '(x,n) ← map_to_list X; replicate (Pos.to_nat n) x.
   Global Instance gmultiset_size : Size (gmultiset A) := length ∘ elements.
 
   Global Instance gmultiset_empty : Empty (gmultiset A) := GMultiSet ∅.
   Global Instance gmultiset_singleton : SingletonMS A (gmultiset A) := λ x,
     GMultiSet {[ x := 1%positive ]}.
-  Global Instance gmultiset_union : Union (gmultiset A) := λ X Y,
-    let (X) := X in let (Y) := Y in
-    GMultiSet $ union_with (λ x y, Some (x `max` y)%positive) X Y.
-  Global Instance gmultiset_intersection : Intersection (gmultiset A) := λ X Y,
-    let (X) := X in let (Y) := Y in
-    GMultiSet $ intersection_with (λ x y, Some (x `min` y)%positive) X Y.
+  Global Instance gmultiset_union : Union (gmultiset A) :=
+    λ '(GMultiSet X) '(GMultiSet Y),
+      GMultiSet $ union_with (λ x y, Some (x `max` y)%positive) X Y.
+  Global Instance gmultiset_intersection : Intersection (gmultiset A) :=
+    λ '(GMultiSet X) '(GMultiSet Y),
+      GMultiSet $ intersection_with (λ x y, Some (x `min` y)%positive) X Y.
   (** Often called the "sum" *)
-  Global Instance gmultiset_disj_union : DisjUnion (gmultiset A) := λ X Y,
-    let (X) := X in let (Y) := Y in
-    GMultiSet $ union_with (λ x y, Some (x + y)%positive) X Y.
-  Global Instance gmultiset_difference : Difference (gmultiset A) := λ X Y,
-    let (X) := X in let (Y) := Y in
-    GMultiSet $ difference_with (λ x y,
-      guard (y < x)%positive;; Some (x - y)%positive) X Y.
-  Global Instance gmultiset_scalar_mul : ScalarMul nat (gmultiset A) := λ n X,
-    let (X) := X in GMultiSet $
+  Global Instance gmultiset_disj_union : DisjUnion (gmultiset A) :=
+    λ '(GMultiSet X) '(GMultiSet Y),
+      GMultiSet $ union_with (λ x y, Some (x + y)%positive) X Y.
+  Global Instance gmultiset_difference : Difference (gmultiset A) :=
+    λ '(GMultiSet X) '(GMultiSet Y),
+      GMultiSet $ difference_with (λ x y,
+        guard (y < x)%positive;; Some (x - y)%positive) X Y.
+  Global Instance gmultiset_scalar_mul : ScalarMul nat (gmultiset A) :=
+    λ n '(GMultiSet X), GMultiSet $
       match n with 0 => ∅ | _ => fmap (λ m, m * Pos.of_nat n)%positive X end.
 
-  Global Instance gmultiset_dom : Dom (gmultiset A) (gset A) := λ X,
-    let (X) := X in dom X.
+  Global Instance gmultiset_dom : Dom (gmultiset A) (gset A) :=
+    λ '(GMultiSet X), dom X.
 
-  Definition gmultiset_map `{Countable B} (f : A → B)
-      (X : gmultiset A) : gmultiset B :=
-    GMultiSet $ map_fold
-      (λ x n, partial_alter (Some ∘ from_option (Pos.add n) n) (f x))
-      ∅
-      (gmultiset_car X).
+  Definition gmultiset_map `{Countable B} (f : A → B) : gmultiset A → gmultiset B :=
+    λ '(GMultiSet X),
+      GMultiSet $ map_fold
+        (λ x n, partial_alter (Some ∘ from_option (Pos.add n) n) (f x))
+        ∅
+        X.
 End definitions.
 
 Global Typeclasses Opaque gmultiset_elem_of gmultiset_subseteq.
