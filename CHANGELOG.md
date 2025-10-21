@@ -178,8 +178,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   Jan-Oliver Kaiser)
 - Add `Filter` instance for `gmultiset`, along with the corresponding lemmas
   for `gmultiset` operations, `elem_of`, `subseteq` and `multiplicity`.
-  Most of these lemmas are proven with the updated `multiset_solver`
-  (by Egor Namakonov and Robbert Krebbers)
+  (by Egor Namakonov)
+- Extend the `multiset_solver` tactic to support the `filter` operation.
 
 **Changes in `stdpp_bitvector`:**
 
