@@ -176,6 +176,10 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add instance `Inhabited (∀ x, B x)`. The old instance `impl_inhabited` for
   `Inhabited (A → B)` has been removed, as the one for `∀` generalizes it. (by
   Jan-Oliver Kaiser)
+- Add `Filter` instance for `gmultiset`, along with the corresponding lemmas
+  for `gmultiset` operations, `elem_of`, `subseteq` and `multiplicity`.
+  (by Egor Namakonov)
+- Extend the `multiset_solver` tactic to support the `filter` operation.
 
 **Changes in `stdpp_bitvector`:**
 

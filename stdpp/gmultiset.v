@@ -69,6 +69,9 @@ Section definitions.
         (λ x n, partial_alter (Some ∘ from_option (Pos.add n) n) (f x))
         ∅
         X.
+
+  Global Instance gmultiset_filter : Filter A (gmultiset A) :=
+    λ P _ '(GMultiSet X), GMultiSet (filter (P ∘ fst) X).
 End definitions.
 
 Global Typeclasses Opaque gmultiset_elem_of gmultiset_subseteq.
@@ -138,6 +141,12 @@ Section basic_lemmas.
     destruct X as [X]; unfold multiplicity; simpl. destruct n as [|n]; [done|].
     rewrite lookup_fmap. destruct (X !! _); simpl; lia.
   Qed.
+  Lemma multiplicity_filter (P : A → Prop) `{!∀ x, Decision (P x)} X x :
+    multiplicity x (filter P X) = if decide (P x) then multiplicity x X else 0.
+  Proof.
+    destruct X as [X]. unfold multiplicity; simpl.
+    rewrite map_lookup_filter. destruct (X !! x); by simplify_option_eq.
+  Qed.
 
   (* Set *)
   Lemma elem_of_multiplicity x X : x ∈ X ↔ 0 < multiplicity x X.
@@ -157,6 +166,12 @@ Section basic_lemmas.
   Proof. rewrite !elem_of_multiplicity, multiplicity_intersection. lia. Qed.
   Lemma gmultiset_elem_of_scalar_mul n X x : x ∈ n *: X ↔ n ≠ 0 ∧ x ∈ X.
   Proof. rewrite !elem_of_multiplicity, multiplicity_scalar_mul. lia. Qed.
+  Lemma gmultiset_elem_of_filter (P : A → Prop) `{!∀ x, Decision (P x)} X x :
+    x ∈ filter P X ↔ P x ∧ x ∈ X.
+  Proof.
+    rewrite !elem_of_multiplicity, multiplicity_filter.
+    case_decide; naive_solver lia.
+  Qed.
 
   Global Instance gmultiset_elem_of_dec : RelDecision (∈@{gmultiset A}).
   Proof. refine (λ x X, cast_if (decide (0 < multiplicity x X))); done. Defined.
@@ -248,6 +263,10 @@ Section multiset_unfold.
     MultisetUnfold x X n →
     MultisetUnfold x (m *: X) (m * n).
   Proof. intros [HX]; constructor. by rewrite multiplicity_scalar_mul, HX. Qed.
+  Global Instance multiset_unfold_filter (P : A → Prop) `{!∀ x, Decision (P x)} x X n :
+    MultisetUnfold x X n →
+    MultisetUnfold x (filter P X) (if decide (P x) then n else 0).
+  Proof. intros [HX]; constructor. by rewrite multiplicity_filter, HX. Qed.
 
   Global Instance set_unfold_multiset_equiv X Y f g :
     (∀ x, MultisetUnfold x X (f x)) → (∀ x, MultisetUnfold x Y (g x)) →
@@ -307,6 +326,15 @@ Section multiset_unfold.
     intros ??; constructor. rewrite gmultiset_elem_of_intersection.
     by rewrite (set_unfold_elem_of x X P), (set_unfold_elem_of x Y Q).
   Qed.
+  Global Instance set_unfold_gmultiset_filter (P : A → Prop)
+      `{!∀ x, Decision (P x)} x X Q :
+    SetUnfoldElemOf x X Q →
+    SetUnfoldElemOf x (filter P X) (P x ∧ Q).
+  Proof.
+    intros ?; constructor.
+    by rewrite gmultiset_elem_of_filter, (set_unfold_elem_of x X Q).
+  Qed.
+
   Global Instance set_unfold_gmultiset_dom x X :
     SetUnfoldElemOf x (dom X) (x ∈ X).
   Proof. constructor. apply gmultiset_elem_of_dom. Qed.
@@ -365,11 +393,13 @@ End tactics.
 parameter whose default is [eauto]. *)
 Tactic Notation "multiset_solver" "by" tactic3(tac) :=
   set_solver by (multiset_instantiate;
+                 repeat case_decide;
                  multiset_simplify_singletons;
-                 (* [fast_done] to solve trivial equalities or contradictions,
+                 (* [done] to solve trivial equalities or contradictions (e.g.,
+                 [P x] and [¬P x] due to filter),
                  [lia] for the common case that involves arithmetic,
                  [tac] if all else fails *)
-                 solve [fast_done|lia|tac]).
+                 solve [done|lia|tac]).
 Tactic Notation "multiset_solver" := multiset_solver by eauto.
 
 Section more_lemmas.
@@ -454,6 +484,8 @@ Section more_lemmas.
   Qed.
   Lemma gmultiset_non_empty_singleton x : {[+ x +]} ≠@{gmultiset A} ∅.
   Proof. multiset_solver. Qed.
+  Lemma not_elem_of_multiplicity x X : x ∉ X ↔ multiplicity x X = 0.
+  Proof. multiset_solver. Qed.
 
   (** Scalar *)
   Lemma gmultiset_scalar_mul_0 X : 0 *: X = ∅.
@@ -488,6 +520,55 @@ Section more_lemmas.
   Global Instance gmultiset_scalar_mul_inj_S n :
     Inj (=) (=@{gmultiset A}) (S n *:.).
   Proof. intros x1 x2. apply gmultiset_scalar_mul_inj_ne_0. lia. Qed.
+
+  Section filter.
+    Context (P : A → Prop) `{∀ x, Decision (P x)}.
+
+    Lemma gmultiset_filter_empty : filter P ∅ =@{gmultiset A} ∅.
+    Proof. multiset_solver. Qed.
+
+    Lemma gmultiset_filter_singleton x :
+      filter P {[+ x +]} =@{gmultiset A} if decide (P x) then {[+ x +]} else ∅.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_singleton_True x :
+      P x → filter P {[+ x +]} =@{gmultiset A} {[+ x +]}.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_singleton_False x :
+      ¬P x → filter P {[+ x +]} =@{gmultiset A} ∅.
+    Proof. multiset_solver. Qed.
+
+    Lemma gmultiset_filter_union X Y :
+      filter P (X ∪ Y) = filter P X ∪ filter P Y.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_intersection X Y :
+      filter P (X ∩ Y) = filter P X ∩ filter P Y.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_disj_union X Y :
+      filter P (X ⊎ Y) = filter P X ⊎ filter P Y.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_difference X Y :
+      filter P (X ∖ Y) = filter P X ∖ filter P Y.
+    Proof. multiset_solver. Qed.
+    Lemma gmultiset_filter_scalar_mul X n :
+      filter P (n *: X) = n *: filter P X.
+    Proof. multiset_solver. Qed.
+
+    Lemma gmultiset_filter_id X :
+      (∀ x, x ∈ X → P x) → filter P X = X.
+    Proof.
+      intros. apply gmultiset_eq; intros x.
+      rewrite multiplicity_filter. case_decide; [done|].
+      symmetry. apply not_elem_of_multiplicity. naive_solver.
+    Qed.
+
+    Lemma gmultiset_filter_empty_iff X :
+      filter P X = ∅ ↔ (∀ x, x ∈ X → ¬ P x).
+    Proof.
+      rewrite gmultiset_eq. apply forall_proper; intros x.
+      rewrite multiplicity_filter, multiplicity_empty.
+      case_decide; [|done]. rewrite <-not_elem_of_multiplicity. naive_solver.
+    Qed.
+  End filter.
 
   (** Conversion from lists *)
   Lemma list_to_set_disj_nil : list_to_set_disj [] =@{gmultiset A} ∅.
@@ -777,6 +858,26 @@ Section more_lemmas.
       gmultiset_size_disj_union by auto using gmultiset_subset_subseteq. lia.
   Qed.
 
+  Lemma gmultiset_filter_subseteq (P : A → Prop) `{!∀ x, Decision (P x)} X :
+    filter P X ⊆ X.
+  Proof. multiset_solver. Qed.
+
+  Lemma gmultiset_filter_strong_subseteq_ext (P Q : A → Prop)
+      `{!∀ x, Decision (P x), !∀ x, Decision (Q x)} X Y :
+    filter P X ⊆ filter Q Y ↔
+      ∀ x, x ∈ X → P x → Q x ∧ multiplicity x X ≤ multiplicity x Y.
+  Proof.
+    apply forall_proper. intros x.
+    rewrite !multiplicity_filter. case_decide; [|naive_solver lia].
+    case_decide.
+    - destruct (decide (x ∈ X)) as [|?%not_elem_of_multiplicity]; naive_solver lia.
+    - rewrite Nat.le_0_r. rewrite <-not_elem_of_multiplicity. naive_solver.
+  Qed.
+
+  Lemma gmultiset_filter_subseteq_mono (P : A → Prop) `{!∀ x, Decision (P x)} X Y :
+    X ⊆ Y → filter P X ⊆ filter P Y.
+  Proof. by rewrite gmultiset_filter_strong_subseteq_ext. Qed.
+
   (** Well-foundedness *)
   Lemma gmultiset_wf : well_founded (⊂@{gmultiset A}).
   Proof.
@@ -866,6 +967,17 @@ Section map.
     MultisetUnfold (f x) (gmultiset_map f X) n.
   Proof.
     intros ? [HX]; constructor. by rewrite multiplicity_gmultiset_map, HX.
+  Qed.
+
+  Lemma gmultiset_filter_map (P : B → Prop) `{∀ x, Decision (P x)} X :
+    filter P (gmultiset_map f X) = gmultiset_map f (filter (P ∘ f) X).
+  Proof.
+    induction X as [|y X IH] using gmultiset_ind; [multiset_solver|].
+    rewrite gmultiset_map_disj_union, gmultiset_map_singleton.
+    rewrite !gmultiset_filter_disj_union, !gmultiset_filter_singleton, IH. simpl.
+    rewrite gmultiset_map_disj_union. case_decide.
+    - by rewrite gmultiset_map_singleton.
+    - by rewrite gmultiset_map_empty.
   Qed.
 End map.
 
