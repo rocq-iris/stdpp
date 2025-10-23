@@ -5,6 +5,8 @@ API-breaking change is listed.
 
 The opam packages have been renamed from `coq-*` to `rocq-*`.
 
+This version of std++ newly supports Rocq 9.1.
+
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
