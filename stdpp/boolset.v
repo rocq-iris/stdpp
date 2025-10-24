@@ -21,17 +21,18 @@ Global Instance boolset_cprod {A B} :
   CProd (boolset A) (boolset B) (boolset (A * B)) := λ X1 X2,
   BoolSet (λ x, boolset_car X1 x.1 && boolset_car X2 x.2).
 
-Global Instance boolset_top_set `{EqDecision A} : TopSet A (boolset A).
+Global Instance boolset_set `{!EqDecision A} : Set_ A (boolset A).
 Proof.
-  split; [split; [split| |]|].
+  split; [split| |].
   - by intros x ?.
   - by intros x y; rewrite <-(bool_decide_spec (x = y)).
   - split; [apply orb_prop_elim | apply orb_prop_intro].
   - split; [apply andb_prop_elim | apply andb_prop_intro].
   - intros X Y x; unfold elem_of, boolset_elem_of; simpl.
     destruct (boolset_car X x), (boolset_car Y x); simpl; tauto.
-  - done.
 Qed.
+Global Instance boolset_top_set `{!EqDecision A} : TopSet A (boolset A).
+Proof. by split. Qed.
 Global Instance boolset_elem_of_dec {A} : RelDecision (∈@{boolset A}).
 Proof. refine (λ x X, cast_if (decide (boolset_car X x))); done. Defined.
 
