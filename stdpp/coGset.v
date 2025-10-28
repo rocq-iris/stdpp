@@ -158,13 +158,12 @@ Section to_gset.
   Lemma elem_of_gset_to_coGset (X : gset A) x : x ∈ gset_to_coGset X ↔ x ∈ X.
   Proof. done. Qed.
 
-  Context `{Infinite A}.
+  Lemma gset_to_coGset_finite (X : gset A) : set_finite (gset_to_coGset X).
+  Proof. exists (elements X). set_solver. Qed.
 
-  Lemma elem_of_coGset_to_gset (X : coGset A) x :
+  Lemma elem_of_coGset_to_gset `{Infinite A} (X : coGset A) x :
     set_finite X → x ∈ coGset_to_gset X ↔ x ∈ X.
   Proof. rewrite coGset_finite_spec. by destruct X. Qed.
-  Lemma gset_to_coGset_finite (X : gset A) : set_finite (gset_to_coGset X).
-  Proof. by rewrite coGset_finite_spec. Qed.
 End to_gset.
 
 (** * Conversion to coPset *)
