@@ -1,11 +1,12 @@
-(** This file implements the type [topGset A] of finite sets
-with a top element, of elements of any countable type [A].
+(** This file implements the type [topGset A] of finite sets with a top element,
+of elements of any countable type [A].
 
 Unlike [coGset], the only cofinite element of [topGset] is its top element,
-[TopGSet]. In particular, this implies that if the union of two [topGset]s
-equals the top element, then at least one of them must already be the
-top element. This property, expressed by the lemma [topGset_union_top],
-does not hold for [coGset]. *)
+[⊤]. In particular, this implies that if the union of two [topGset]s equals the
+top element, then at least one of them must already be the top element. This
+property, expressed by the lemma [topGset_union_top], does not hold for [coGset].
+On the other hand, unlike [coGset], there is no notion of set difference (∖),
+and hence [topGset] is not a [Set_], only a [SemiSet]. *)
 From stdpp Require Export sets countable.
 From stdpp Require Import decidable finite gmap coPset.
 From stdpp Require Import options.
@@ -66,8 +67,9 @@ Global Instance topGset_elem_of_dec `{Countable A} : RelDecision (∈@{topGset A
 Section infinite.
   Context `{Countable A, Infinite A}.
 
-  (* [topGset A] is only [LeibnizEquiv] for infinite [A], as, for example
-     for [unit], [FinGSet {[ tt ]}] and [TopGSet] are equivalent, but not equal. *)
+  (** [topGset A] is only [LeibnizEquiv] for infinite [A], as, for example for
+  [unit], [FinGSet {[ tt ]}] and [TopGSet] are equivalent ([≡]), but not equal
+  ([=]). *)
   Global Instance topGset_leibniz : LeibnizEquiv (topGset A).
   Proof.
     intros [X|] [Y|]; rewrite set_equiv;
@@ -83,24 +85,29 @@ Section infinite.
     refine (λ X Y, cast_if (decide (X = Y))); abstract (by fold_leibniz).
   Defined.
 
-  (* We need [Inhabited A] to conclude that [TopGSet] is not disjoint from itself. *)
-  Global Instance topGset_disjoint_dec `{Inhabited A} :
-    RelDecision (##@{topGset A}).
-  Proof.
-    refine (λ X Y, match X, Y with
+  (** We need [Inhabited A] to conclude that [TopGSet] is not disjoint from
+  itself. *)
+  Global Program Instance topGset_disjoint_dec `{Inhabited A} :
+      RelDecision (##@{topGset A}) := λ X Y,
+    match X, Y return _ with
     | FinGSet X, FinGSet Y => cast_if (decide (X ## Y))
     | FinGSet X, TopGSet => cast_if (decide (X = ∅))
     | TopGSet, FinGSet Y => cast_if (decide (Y = ∅))
     | TopGSet, TopGSet => right _
-    end); simplify_eq; auto.
-    - by intros ? ?%not_elem_of_empty.
-    - destruct (set_choose_L X) as [x Helem]; first done.
-      intros Hdisj. by apply (Hdisj x).
-    - by intros ? ? ?%not_elem_of_empty.
-    - destruct (set_choose_L Y) as [y Helem]; first done.
-      intros Hdisj. by apply (Hdisj y).
-    - intros Hdisj. by apply (Hdisj inhabitant).
-  Defined.
+    end.
+  Next Obligation. done. Qed.
+  Next Obligation. done. Qed.
+  Next Obligation. intros ??? X -> x []%not_elem_of_empty. Qed.
+  Next Obligation.
+    intros ??? X HX Hdisj. destruct (set_choose_L X) as [x ?]; first done.
+    by apply (Hdisj x).
+  Qed.
+  Next Obligation. intros ??? X -> x ? []%not_elem_of_empty. Qed.
+  Next Obligation.
+    intros ??? X HX Hdisj. destruct (set_choose_L X) as [x ?]; first done.
+    by apply (Hdisj x).
+  Qed.
+  Next Obligation. intros ??? Hdisj. by apply (Hdisj inhabitant). Qed.
 
   Global Instance topGset_subseteq_dec : RelDecision (⊆@{topGset A}).
   Proof.
