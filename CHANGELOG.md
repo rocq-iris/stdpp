@@ -186,6 +186,7 @@ This version of std++ newly supports Rocq 9.1.
   dependency on `Intersection` and `Difference`). (by Simcha van Collem)
 - Add the type `topGset` of finite sets with a top element. (by Simcha van
   Collem)
+- Remove superfluous `Infinite` premise from `gset_to_coGset_finite`.
 
 **Changes in `stdpp_bitvector`:**
 
