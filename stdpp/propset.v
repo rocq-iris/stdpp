@@ -25,8 +25,10 @@ Global Instance propset_intersection {A} : Intersection (propset A) := λ X1 X2,
   {[ x | x ∈ X1 ∧ x ∈ X2 ]}.
 Global Instance propset_difference {A} : Difference (propset A) := λ X1 X2,
   {[ x | x ∈ X1 ∧ x ∉ X2 ]}.
+Global Instance propset_set {A} : Set_ A (propset A).
+Proof. split; [split| |]; by repeat intro. Qed.
 Global Instance propset_top_set {A} : TopSet A (propset A).
-Proof. split; [split; [split| |]|]; by repeat intro. Qed.
+Proof. by split. Qed.
 
 Lemma elem_of_PropSet {A} (P : A → Prop) x : x ∈ {[ x | P x ]} ↔ P x.
 Proof. done. Qed.

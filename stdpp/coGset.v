@@ -57,9 +57,9 @@ Section coGset.
     | CoFinGset X, FinGSet Y => CoFinGset (X ∪ Y)
     end.
 
-  Global Instance coGset_set : TopSet A (coGset A).
+  Global Instance coGset_set : Set_ A (coGset A).
   Proof.
-    split; [split; [split| |]|].
+    split; [split| |].
     - by intros ??.
     - intros x y. unfold elem_of, coGset_elem_of; simpl.
       by rewrite elem_of_singleton.
@@ -76,8 +76,9 @@ Section coGset.
       + rewrite elem_of_intersection. destruct (decide (x ∈ Y)); tauto.
       + set_solver.
       + rewrite elem_of_difference. destruct (decide (x ∈ Y)); tauto.
-    - done.
   Qed.
+  Global Instance coGset_top_set : TopSet A (coGset A).
+  Proof. by split. Qed.
 End coGset.
 
 Global Instance coGset_elem_of_dec `{Countable A} : RelDecision (∈@{coGset A}) :=
@@ -157,13 +158,12 @@ Section to_gset.
   Lemma elem_of_gset_to_coGset (X : gset A) x : x ∈ gset_to_coGset X ↔ x ∈ X.
   Proof. done. Qed.
 
-  Context `{Infinite A}.
+  Lemma gset_to_coGset_finite (X : gset A) : set_finite (gset_to_coGset X).
+  Proof. exists (elements X). set_solver. Qed.
 
-  Lemma elem_of_coGset_to_gset (X : coGset A) x :
+  Lemma elem_of_coGset_to_gset `{Infinite A} (X : coGset A) x :
     set_finite X → x ∈ coGset_to_gset X ↔ x ∈ X.
   Proof. rewrite coGset_finite_spec. by destruct X. Qed.
-  Lemma gset_to_coGset_finite (X : gset A) : set_finite (gset_to_coGset X).
-  Proof. by rewrite coGset_finite_spec. Qed.
 End to_gset.
 
 (** * Conversion to coPset *)
@@ -188,7 +188,7 @@ Definition coGset_to_top_set `{Countable A, Empty C, Singleton A C, Union C,
   | FinGSet X => list_to_set (elements X)
   | CoFinGset X => ⊤ ∖ list_to_set (elements X)
   end.
-Lemma elem_of_coGset_to_top_set `{Countable A, TopSet A C} X x :
+Lemma elem_of_coGset_to_top_set `{Countable A, FinSet A C, Top C, !TopSet A C} X x :
   x ∈@{C} coGset_to_top_set X ↔ x ∈ X.
 Proof. destruct X; set_solver. Qed.
 

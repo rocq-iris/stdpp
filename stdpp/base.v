@@ -1554,13 +1554,11 @@ Class Set_ A C `{ElemOf A C, Empty C, Singleton A C,
 }.
 Global Hint Mode Set_ - ! - - - - - - : typeclass_instances.
 
-Class TopSet A C `{ElemOf A C, Empty C, Top C, Singleton A C,
-    Union C, Intersection C, Difference C} : Prop := {
-  top_set_set :: Set_ A C;
+Class TopSet A C `{ElemOf A C, Top C} : Prop := {
   elem_of_top' (x : A) : x ∈@{C} ⊤; (* We prove [elem_of_top : x ∈@{C} ⊤ ↔ True]
   in [sets.v], which is more convenient for rewriting. *)
 }.
-Global Hint Mode TopSet - ! - - - - - - - : typeclass_instances.
+Global Hint Mode TopSet - ! - - : typeclass_instances.
 
 (** We axiomative a finite set as a set whose elements can be
 enumerated as a list. These elements, given by the [elements] function, may be
