@@ -117,6 +117,10 @@ Section Forall2.
   Qed.
 End Forall2.
 
+Lemma option_Forall2_flip {A B} (R : A → B → Prop) (mx : option A) my :
+  option_Forall2 (flip R) my mx ↔ option_Forall2 R mx my.
+Proof. split; destruct 1; constructor; auto. Qed.
+
 (** Setoids *)
 Global Instance option_equiv `{Equiv A} : Equiv (option A) := option_Forall2 (≡).
 
