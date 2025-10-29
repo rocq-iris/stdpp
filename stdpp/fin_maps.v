@@ -3522,6 +3522,34 @@ Lemma map_disjoint_list_to_map_zip_r_2 {A} (m : M A) is xs :
   m ##ₘ list_to_map (zip is xs).
 Proof. intro. by rewrite map_disjoint_list_to_map_zip_r. Qed.
 
+Lemma map_Forall2_union_inv_l {A B} (R : K → A → B → Prop)
+    (m1a m1b : M A) (m2 : M B) :
+  m1a ##ₘ m1b →
+  map_Forall2 R (m1a ∪ m1b) m2 →
+  ∃ m2a m2b, m2 = m2a ∪ m2b ∧ map_Forall2 R m1a m2a ∧ map_Forall2 R m1b m2b.
+Proof.
+  revert m2 m1b.
+  induction m1a as [|k x1 m1a ? IH] using map_ind; intros m1 m2b Hdisj Hm.
+  { rewrite (left_id_L _ _) in Hm.
+    exists ∅, m1. rewrite (left_id_L ∅ _). auto using map_Forall2_empty. }
+  apply map_disjoint_insert_l in Hdisj as [? Hdisj].
+  rewrite <-insert_union_l in Hm.
+  apply map_Forall2_insert_inv_l in Hm as (x2 & m2' & -> & Hk & ? & Hm);
+    [|by rewrite lookup_union, union_None].
+  apply IH in Hm as (m2a' & m2b' & -> & Hm1 & Hm2); [|done].
+  rewrite lookup_union, union_None in Hk; destruct Hk as [??].
+  exists (<[k:=x2]> m2a'), m2b'. split_and!.
+  - by rewrite insert_union_l.
+  - apply map_Forall2_insert; auto.
+  - done.
+Qed.
+
+Lemma map_Forall2_union_inv_r {A B} (R : K → A → B → Prop)
+    (m1 : M A) (m2a m2b : M B) :
+  m2a ##ₘ m2b → map_Forall2 R m1 (m2a ∪ m2b) →
+  ∃ m1a m1b, m1 = m1a ∪ m1b ∧ map_Forall2 R m1a m2a ∧ map_Forall2 R m1b m2b.
+Proof. setoid_rewrite <-map_Forall2_flip. apply map_Forall2_union_inv_l. Qed.
+
 (** ** Properties of the [intersection_with] operation *)
 Section intersection_with.
   Context {A} (f : A → A → option A).
