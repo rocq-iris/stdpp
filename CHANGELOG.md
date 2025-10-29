@@ -187,6 +187,8 @@ This version of std++ newly supports Rocq 9.1.
 - Add the type `topGset` of finite sets with a top element. (by Simcha van
   Collem)
 - Remove superfluous `Infinite` premise from `gset_to_coGset_finite`.
+- Add lemmas `map_Forall2_flip` and `option_Forall2_flip`.
+- Add lemmas `map_Forall2_union_inv_{l,r}`. (inspired by Tesla Zhang)
 
 **Changes in `stdpp_bitvector`:**
 
