@@ -2632,6 +2632,10 @@ Section map_Forall2.
   Qed.
 End map_Forall2.
 
+Lemma map_Forall2_flip {A B} (R : K → A → B → Prop) (m1 : M A) m2 :
+  map_Forall2 (flip ∘ R) m2 m1 ↔ map_Forall2 R m1 m2.
+Proof. apply forall_proper=> k. apply option_Forall2_flip. Qed.
+
 (** ** Properties of the [map_agree] relation *)
 Lemma map_agree_spec {A} (m1 m2 : M A) :
   map_agree m1 m2 ↔ ∀ i x y, m1 !! i = Some x → m2 !! i = Some y → x = y.
