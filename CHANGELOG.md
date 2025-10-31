@@ -189,6 +189,8 @@ This version of std++ newly supports Rocq 9.1.
 - Remove superfluous `Infinite` premise from `gset_to_coGset_finite`.
 - Add lemmas `map_Forall2_flip` and `option_Forall2_flip`.
 - Add lemmas `map_Forall2_union_inv_{l,r}`. (inspired by Tesla Zhang)
+- Add instances for `EqDecision` and `Countable` for `sigT` types. (by Tesla
+  Zhang)
 
 **Changes in `stdpp_bitvector`:**
 

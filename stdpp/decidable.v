@@ -136,6 +136,20 @@ Proof.
  refine (λ x y, cast_if (decide (`x = `y))); rewrite sig_eq_pi; trivial.
 Defined.
 
+Global Program Instance sigT_eq_dec `(B : A → Type)
+    `{!EqDecision A, !∀ x, EqDecision (B x)} : EqDecision (sigT B) :=
+  λ '(existT x1 y1) '(existT x2 y2),
+    match decide (x1 = x2) return _ with
+    | left Hx => cast_if (decide (eq_rect _ _ y1 _ Hx = y2))
+    | right Hx => right _
+    end.
+Next Obligation. intros. subst. reflexivity. Qed.
+Next Obligation.
+  intros A B ??? x1 y1 _ _ x2 y2 _ -> Hy.
+  intros Hy'%(Eqdep_dec.inj_pair2_eq_dec _ (decide_rel (=))). contradiction.
+Qed.
+Next Obligation. intros A B ??? x1 y1 _ _ x2 y2 _ Hx [= ??]. contradiction. Qed.
+
 (** Some laws for decidable propositions *)
 Lemma not_and_l {P Q : Prop} `{Decision P} : ¬(P ∧ Q) ↔ ¬P ∨ ¬Q.
 Proof. destruct (decide P); tauto. Qed.

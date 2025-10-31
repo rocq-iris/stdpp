@@ -248,6 +248,20 @@ Next Obligation.
   by rewrite !decode_encode.
 Qed.
 
+(** ** Sigma types *)
+Global Program Instance sigT_countable `{Countable A} (B : A → Type)
+    `{!∀ x, EqDecision (B x), !∀ x, Countable (B x)} : Countable (sigT B) :=
+  {| encode xy := prod_encode (encode (projT1 xy)) (encode (projT2 xy));
+     decode p :=
+       x ← prod_decode_fst p ≫= decode;
+       y ← prod_decode_snd p ≫= decode;
+       Some (existT x y) |}.
+Next Obligation.
+  intros ?????? [x y]; simpl.
+  rewrite prod_decode_encode_fst, prod_decode_encode_snd; simpl.
+  by repeat (rewrite decode_encode; simpl).
+Qed.
+
 (** ** Lists *)
 Global Program Instance list_countable `{Countable A} : Countable (list A) :=
   {| encode xs := positives_flatten (encode <$> xs);
