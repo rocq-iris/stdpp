@@ -54,6 +54,13 @@ variables:
 
 ## Build jobs
 
+# We are in Rocq's CI test suite, so better make sure we keep working with Rocq master.
+build-rocq.dev:
+  <<: *template
+  variables:
+    OCAML: "ocaml-base-compiler.4.14.0" # for faster rebuilds
+    OPAM_PINS: "rocq-core version dev"
+
 # The newest version runs with timing, outside MRs.
 build-rocq.9.1.0:
   <<: *template
