@@ -9,6 +9,7 @@ This version of std++ newly supports Rocq 9.1.
 
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
+- Add `Countable` instance for `coPset`. (by Benjamin Peters)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
 - Generalize `gmap_curry`, `gmap_uncurry` to any finite map as `map_curry`,
   `map_uncurry`. (by Isaac van Bakel)
