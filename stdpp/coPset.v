@@ -46,6 +46,22 @@ Inductive coPset_raw :=
   | coPNode : bool → coPset_raw → coPset_raw → coPset_raw.
 Local Instance coPset_raw_eq_dec : EqDecision coPset_raw.
 Proof. solve_decision. Defined.
+Local Instance coPset_raw_countable : Countable coPset_raw.
+Proof.
+  set (enc := fix go t :=
+    match t with
+    | coPLeaf b => GenLeaf b
+    | coPNode b l r => GenNode 0 [GenLeaf b; go l; go r]
+    end).
+  set (dec := fix go t :=
+    match t with
+    | GenLeaf b => coPLeaf b
+    | GenNode 0 [GenLeaf b; l; r] => coPNode b (go l) (go r)
+    | _ => coPLeaf false
+    end).
+  eapply (inj_countable' enc dec).
+  intros t. induction t; simpl; congruence.
+Qed.
 
 (** The type of raw trees (above) offers several representations of the
 empty set and several representations of the full set. In order to
@@ -271,6 +287,18 @@ Global Instance mapset_subseteq_dec : RelDecision (⊆@{coPset}).
 Proof.
  refine (λ X Y, cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
 Defined.
+
+(** * Countability *)
+Global Instance coPset_countable : Countable coPset.
+Proof.
+  set (dec := λ t, match (decide (coPset_wf t)) return option coPset with
+                    | left yes => Some (exist _ t yes)
+                    | right _ => None
+                    end).
+  apply (inj_countable proj1_sig dec).
+  intros [t Ht]. unfold dec. destruct decide; last done.
+  do 2 f_equiv. apply proof_irrel.
+Qed.
 
 (** * Finiteness *)
 (** The internal function [coPset_finite] determines whether a (raw) set is
