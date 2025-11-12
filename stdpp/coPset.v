@@ -44,8 +44,10 @@ is a member of the set. *)
 Inductive coPset_raw :=
   | coPLeaf : bool → coPset_raw
   | coPNode : bool → coPset_raw → coPset_raw → coPset_raw.
+
 Local Instance coPset_raw_eq_dec : EqDecision coPset_raw.
 Proof. solve_decision. Defined.
+
 Local Instance coPset_raw_countable : Countable coPset_raw.
 Proof.
   set (enc := fix go t :=
@@ -60,8 +62,8 @@ Proof.
     | _ => coPLeaf false
     end).
   eapply (inj_countable' enc dec).
-  intros t. induction t; simpl; congruence.
-Qed.
+  abstract (intros t; induction t; simpl; congruence).
+Defined.
 
 (** The type of raw trees (above) offers several representations of the
 empty set and several representations of the full set. In order to
@@ -226,6 +228,14 @@ Qed.
 (** A set is a well-formed tree. *)
 Definition coPset := { t | coPset_wf t }.
 
+Global Typeclasses Opaque coPset.
+
+Global Instance coPset_eq_dec : EqDecision coPset.
+Proof. unfold coPset; apply _. Defined.
+
+Global Instance coPset_countable : Countable coPset.
+Proof. unfold coPset; apply _. Defined.
+
 (** All operations are redefined at the level of [coPset]. *)
 Global Instance coPset_singleton : Singleton positive coPset := λ p,
   coPset_singleton_raw p ↾ coPset_singleton_wf _.
@@ -288,18 +298,6 @@ Proof.
  refine (λ X Y, cast_if (decide (X ∪ Y = Y))); abstract (by rewrite subseteq_union_L).
 Defined.
 
-(** * Countability *)
-Global Instance coPset_countable : Countable coPset.
-Proof.
-  set (dec := λ t, match (decide (coPset_wf t)) return option coPset with
-                    | left yes => Some (exist _ t yes)
-                    | right _ => None
-                    end).
-  apply (inj_countable proj1_sig dec).
-  intros [t Ht]. unfold dec. destruct decide; last done.
-  do 2 f_equiv. apply proof_irrel.
-Qed.
-
 (** * Finiteness *)
 (** The internal function [coPset_finite] determines whether a (raw) set is
 finite. This definition is internal, use [set_finite] instead. *)
@@ -312,7 +310,7 @@ Local Lemma coPset_finite_node b l r :
 Proof. by destruct b, l as [[]|], r as [[]|]. Qed.
 (** This function is correct; it is equivalent to [set_finite], which is
     defined in terms of set membership. *)
-Local Lemma coPset_finite_spec X : set_finite X ↔ coPset_finite (`X).
+Local Lemma coPset_finite_spec (X : coPset) : set_finite X ↔ coPset_finite (`X).
 Proof.
   destruct X as [t Ht].
   unfold set_finite, elem_of at 1, coPset_elem_of; simpl; clear Ht; split.

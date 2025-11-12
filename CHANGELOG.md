@@ -9,7 +9,6 @@ This version of std++ newly supports Rocq 9.1.
 
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
-- Add `Countable` instance for `coPset`. (by Benjamin Peters)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
 - Generalize `gmap_curry`, `gmap_uncurry` to any finite map as `map_curry`,
   `map_uncurry`. (by Isaac van Bakel)
@@ -195,6 +194,7 @@ This version of std++ newly supports Rocq 9.1.
 - Add lemma `rtsc_nf`.
 - Add instance `Symmetric R → Equivalence (rtc R)`. Previously this was a lemma
   called `rtc_equivalence`.
+- Add `Countable` instance for `coPset`. (by Benjamin Peters)
 
 **Changes in `stdpp_bitvector`:**
 
