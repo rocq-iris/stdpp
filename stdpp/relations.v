@@ -374,6 +374,9 @@ Section more_general.
   Lemma rtc_rtsc_lr x y : rtc R y x → rtsc R x y.
   Proof. intros. symmetry. eauto using rtc_rtsc_rl. Qed.
 
+  Lemma rtsc_nf x y : rtsc R x y → nf (sc R) x → x = y.
+  Proof. apply rtc_nf. Qed.
+
   Lemma rtsc_congruence {B} (f : A → B) (R' : relation B) x y :
     (∀ x y, R x y → R' (f x) (f y)) → rtsc R x y → rtsc R' (f x) (f y).
   Proof. unfold rtsc; eauto using rtc_congruence, sc_congruence. Qed.

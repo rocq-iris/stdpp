@@ -191,6 +191,7 @@ This version of std++ newly supports Rocq 9.1.
 - Add lemmas `map_Forall2_union_inv_{l,r}`. (inspired by Tesla Zhang)
 - Add instances for `EqDecision` and `Countable` for `sigT` types. (by Tesla
   Zhang)
+- Add lemma `rtsc_nf`.
 
 **Changes in `stdpp_bitvector`:**
 
