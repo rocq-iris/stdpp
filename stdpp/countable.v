@@ -249,6 +249,14 @@ Next Obligation.
 Qed.
 
 (** ** Sigma types *)
+Global Program Instance sig_countable `{Countable A} (P : A → Prop)
+        `{!∀ x, Decision (P x), !∀ x, ProofIrrel (P x)} :
+  Countable { x : A | P x } :=
+  inj_countable proj1_sig (λ x, Hx ← guard (P x); Some (x ↾ Hx)) _.
+Next Obligation.
+  intros A ?? P ?? [x Hx]. by erewrite (option_guard_True_pi (P x)).
+Qed.
+
 Global Program Instance sigT_countable `{Countable A} (B : A → Type)
     `{!∀ x, EqDecision (B x), !∀ x, Countable (B x)} : Countable (sigT B) :=
   {| encode xy := prod_encode (encode (projT1 xy)) (encode (projT2 xy));
@@ -389,13 +397,4 @@ Global Program Instance gen_tree_countable `{Countable T} : Countable (gen_tree 
 Next Obligation.
   intros T ?? t.
   by rewrite <-(right_id_L [] _ (gen_tree_to_list _)), gen_tree_of_to_list.
-Qed.
-
-(** ** Sigma *)
-Global Program Instance countable_sig `{Countable A} (P : A → Prop)
-        `{!∀ x, Decision (P x), !∀ x, ProofIrrel (P x)} :
-  Countable { x : A | P x } :=
-  inj_countable proj1_sig (λ x, Hx ← guard (P x); Some (x ↾ Hx)) _.
-Next Obligation.
-  intros A ?? P ?? [x Hx]. by erewrite (option_guard_True_pi (P x)).
 Qed.
