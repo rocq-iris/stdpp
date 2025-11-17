@@ -86,20 +86,10 @@ Section general.
   Lemma rtc_transitive x y z : rtc R x y → rtc R y z → rtc R x z.
   Proof. induction 1; eauto. Qed.
 
-  (* We give this instance a lower-than-usual priority because [setoid_rewrite]
-     queries for [@Reflexive Prop ?r] in the hope of [iff_reflexive] getting
-     picked as the instance.  [rtc_reflexive] overlaps with that, leading to
-     backtracking.  We cannot set [Hint Mode] because that query must not fail,
-     but we can at least avoid picking [rtc_reflexive].
-
-     See Coq bug https://github.com/coq/coq/issues/7916 and the test
-     [tests.typeclasses.test_setoid_rewrite]. *)
-  Global Instance rtc_po : PreOrder (rtc R) | 10.
+  Global Instance rtc_po : PreOrder (rtc R).
   Proof. split; [exact (@rtc_refl A R) | exact rtc_transitive]. Qed.
 
-  (* Not an instance, related to the issue described above, this sometimes makes
-  [setoid_rewrite] queries loop. *)
-  Lemma rtc_equivalence : Symmetric R → Equivalence (rtc R).
+  Global Instance rtc_equivalence : Symmetric R → Equivalence (rtc R).
   Proof.
     split; try apply _.
     intros x y. induction 1 as [|x1 x2 x3]; [done|trans x2; eauto].
@@ -362,7 +352,7 @@ Section more_general.
   Context `{R : relation A}.
 
   (** ** Results about the reflexive-transitive-symmetric closure [rtsc] *)
-  Global Instance rtsc_equivalence : Equivalence (rtsc R) | 10.
+  Global Instance rtsc_equivalence : Equivalence (rtsc R).
   Proof. apply rtc_equivalence, _. Qed.
 
   Lemma rtsc_lr x y : R x y → rtsc R x y.

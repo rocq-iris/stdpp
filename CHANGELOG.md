@@ -192,6 +192,8 @@ This version of std++ newly supports Rocq 9.1.
 - Add instances for `EqDecision` and `Countable` for `sigT` types. (by Tesla
   Zhang)
 - Add lemma `rtsc_nf`.
+- Add instance `Symmetric R → Equivalence (rtc R)`. Previously this was a lemma
+  called `rtc_equivalence`.
 
 **Changes in `stdpp_bitvector`:**
 
