@@ -44,3 +44,10 @@ Proof. intros ??. apply (sig_eq_pi P). Qed.
 Lemma exists_proj1_pi `(P : A → Prop) `{∀ x, ProofIrrel (P x)}
   (x : sig P) p : `x ↾ p = x.
 Proof. apply (sig_eq_pi _); reflexivity. Qed.
+
+Global Instance existT_inj_2 {A} {B : A → Type} (a : A) `{!ProofIrrel (a = a)} :
+  Inj (=) (=@{sigT B}) (existT a).
+Proof.
+  intros b1 b2 [Ha Hb]%EqdepFacts.eq_sigT_sig_eq.
+  rewrite (proof_irrel Ha eq_refl) in Hb. apply Hb.
+Qed.

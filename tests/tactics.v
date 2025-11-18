@@ -421,3 +421,31 @@ Example naive_solver_issue_180_1 : is_Some (Some 10).
 Proof. naive_solver. Qed.
 Example naive_solver_issue_180_2 : is_Some (None : option nat) → False.
 Proof. naive_solver. Qed.
+
+(** These tests check that [simplify_eq] handles equality between [existT] if
+various type class instances are present under which the simplification is
+allowed. *)
+Example existT_inj2_test_eq_dec `{!EqDecision A} {B : A → Type} {a} (b1 b2 : B a) :
+  existT a b1 = existT a b2 → b1 = b2.
+Proof. intros. by simplify_eq. Qed.
+
+Example existT_inj2_test_proof_irrel {A} {B : A → Type}
+    `{!ProofIrrel (a = a)} (b1 b2 : B a) :
+  existT a b1 = existT a b2 → b1 = b2.
+Proof. intros. by simplify_eq. Qed.
+
+(** Test that if the [a]s are different, we obtain [a1 = a2] and [b1 = b2]. Note
+that this result is provable without the [ProofIrrel] assumption through a
+manual proof, but the present [simplify_eq] is not smart enough for that. *)
+Example existT_inj2_test_different_a {A} {B : A → Type}
+    `{!ProofIrrel (a1 = a1)} {a2} (b1 : B a1) (b2 : B a2) :
+  existT a1 b1 = existT a2 b2 →
+  (* The sigma type and match express that also [b1] and [b2] are equated. *)
+  { Heq : a1 = a2 | match Heq with eq_refl => eq end b1 b2 }.
+Proof.
+  intros. simplify_eq. by exists eq_refl.
+Restart. Proof.
+  (* Manual proof after clearing [ProofIrrrel] assumption. *)
+  select (ProofIrrel _) ltac:(fun H => clear H).
+  intros []%EqdepFacts.eq_sigT_eq_dep. by exists eq_refl.
+Qed.

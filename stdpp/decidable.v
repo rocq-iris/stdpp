@@ -146,8 +146,7 @@ Global Program Instance sigT_eq_dec `(B : A → Type)
     end.
 Next Obligation. intros. subst. reflexivity. Qed.
 Next Obligation.
-  intros A B ??? x1 y1 _ _ x2 y2 _ -> Hy.
-  intros Hy'%(Eqdep_dec.inj_pair2_eq_dec _ (decide_rel (=))). contradiction.
+  intros A B ??? x1 y1 _ _ x2 y2 _ -> Hy ?%(inj _). contradiction.
 Qed.
 Next Obligation. intros A B ??? x1 y1 _ _ x2 y2 _ Hx [= ??]. contradiction. Qed.
 
