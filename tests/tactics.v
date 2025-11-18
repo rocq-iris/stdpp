@@ -1,5 +1,6 @@
 (** Basic tests for atctics that don't import anything else
 (and hence can be run even when nothing else even builds. *)
+From Coq Require Import Logic.EqdepFacts.
 From Coq Require Import String.
 From stdpp Require Import tactics.
 
