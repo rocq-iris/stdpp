@@ -1,4 +1,5 @@
 (** This file collects facts on proof irrelevant types/propositions. *)
+From Coq Require Import Logic.EqdepFacts.
 From stdpp Require Export base.
 From stdpp Require Import options.
 
