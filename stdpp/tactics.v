@@ -363,8 +363,6 @@ Tactic Notation "simplify_eq" := repeat
   | H1 : ?o = Some ?x, H2 : ?o = Some ?y |- _ =>
     assert (y = x) by congruence; clear H2
   | H1 : ?o = Some ?x, H2 : ?o = None |- _ => congruence
-  | H : @existT ?A _ _ _ = existT _ _ |- _ =>
-     apply (Eqdep_dec.inj_pair2_eq_dec _ (decide_rel (=@{A}))) in H
   end.
 Tactic Notation "simplify_eq" "/=" :=
   repeat (progress csimpl in * || simplify_eq).
