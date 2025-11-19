@@ -198,6 +198,8 @@ This version of std++ newly supports Rocq 9.1.
 - Rename `countable_sig` into `sig_countable`.
 - Strengthen `simplify_eq`'s handling of dependent pair injectivity by providing
   more precise typeclasses. (by Johannes Hostert)
+- Add `set_solver` support for `map_disjoint`. Support `seq` and `seqZ` when
+  using `set_solver by lia`. (by Tej Chajed)
 
 **Changes in `stdpp_bitvector`:**
 
