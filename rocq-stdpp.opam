@@ -36,7 +36,7 @@ depends: [
   "coq" { (>= "8.18" & < "9.2~") | (= "dev") }
 ]
 conflicts: [
-  "coq-stdpp" {< "dev.2025-08-02.1"}
+  "coq-stdpp"
 ]
 
 build: ["./make-package" "stdpp" "-j%{jobs}%"]
