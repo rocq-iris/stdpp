@@ -472,6 +472,10 @@ Global Instance set_unfold_dom_fmap {A B} (f : A → B) i (m : M A) Q :
   SetUnfoldElemOf i (dom m) Q →
   SetUnfoldElemOf i (dom (f <$> m)) Q.
 Proof. constructor. by rewrite dom_fmap, (set_unfold_elem_of _ (dom _) _). Qed.
+Global Instance set_unfold_map_disjoint {A} (m1 m2 : M A) Q :
+  SetUnfold (dom m1 ## dom m2) Q →
+  SetUnfold (m1 ##ₘ m2) Q.
+Proof. constructor. by rewrite map_disjoint_dom, (set_unfold (_ ## _)). Qed.
 End fin_map_dom.
 
 Lemma dom_seq `{FinMapDom nat M D} {A} start (xs : list A) :

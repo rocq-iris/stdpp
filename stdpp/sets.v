@@ -323,6 +323,13 @@ Section set_unfold_list.
     (∀ x, SetUnfoldElemOf x l (P x)) → (∀ x, SetUnfoldElemOf y (f x) (Q x)) →
     SetUnfoldElemOf y (l ≫= f) (∃ x, Q x ∧ P x).
   Proof. constructor. rewrite list_elem_of_bind. naive_solver. Qed.
+
+  Global Instance set_unfold_list_seq (x n m : nat) :
+    SetUnfoldElemOf x (seq n m) (n ≤ x < n + m)%nat.
+  Proof. constructor. by rewrite elem_of_seq. Qed.
+  Global Instance set_unfold_list_seqZ (x n m : Z) :
+    SetUnfoldElemOf x (seqZ n m) (n ≤ x < n + m)%Z.
+  Proof. constructor. by rewrite elem_of_seqZ. Qed.
 End set_unfold_list.
 
 Tactic Notation "set_unfold" :=

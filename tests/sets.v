@@ -68,3 +68,21 @@ Section perennial_369_listset.
     length (map_to_list (insert i x m)) = S (length (map_to_list m)).
   Proof. intros. by rewrite map_to_list_insert. Qed.
 End perennial_369_listset.
+
+Section set_solver_seq.
+  Lemma set_solver_elem_of_seq (n m : nat) :
+    n < m →
+    n ∈ seq 0 m.
+  Proof.
+    Fail set_solver.
+    set_solver by lia.
+  Qed.
+
+  Lemma set_solver_elem_of_seqZ (n m : Z) :
+    (n ≤ 3 ≤ m + 2)%Z →
+    4%Z ∈ seqZ n (m - n + 4).
+  Proof.
+    Fail set_solver.
+    set_solver by lia.
+  Qed.
+End set_solver_seq.
