@@ -1,0 +1,8 @@
+"set_solver_elem_of_seq"
+     : string
+The command has indeed failed with message:
+No matching clauses for match.
+"set_solver_elem_of_seqZ"
+     : string
+The command has indeed failed with message:
+No matching clauses for match.

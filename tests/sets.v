@@ -1,4 +1,7 @@
+From Coq Require Import String.
 From stdpp Require Import sets gmap listset.
+
+Local Open Scope string_scope.
 
 Lemma foo `{Set_ A C} (x : A) (X Y : C) : x ∈ X ∩ Y → x ∈ X.
 Proof. intros Hx. set_unfold in Hx. tauto. Qed.
@@ -70,6 +73,7 @@ Section perennial_369_listset.
 End perennial_369_listset.
 
 Section set_solver_seq.
+  Check "set_solver_elem_of_seq".
   Lemma set_solver_elem_of_seq (n m : nat) :
     n < m →
     n ∈ seq 0 m.
@@ -78,6 +82,7 @@ Section set_solver_seq.
     set_solver by lia.
   Qed.
 
+  Check "set_solver_elem_of_seqZ".
   Lemma set_solver_elem_of_seqZ (n m : Z) :
     (n ≤ 3 ≤ m + 2)%Z →
     4%Z ∈ seqZ n (m - n + 4).
