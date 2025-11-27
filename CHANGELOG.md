@@ -206,6 +206,8 @@ This version of std++ newly supports Rocq 9.1.
 - Add definition `deterministic` and lemma `deterministic_confluent`.
 - Add instance `Reflexive (sc R)`.
 - Add lemma `nf_tc`.
+- Make lemma `tc_ind_r_weak` local. Use the stronger lemma `tc_ind_r` instead.
+- Add induction scheme `tc_ind_r`.
 
 **Changes in `stdpp_bitvector`:**
 
