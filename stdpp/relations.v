@@ -476,6 +476,23 @@ Section properties.
     confluent R → rtsc R x y → nf R x → rtc R y x.
   Proof. intros. by apply (confluent_nf_r y x). Qed.
 
+  Lemma confluent_rtc_nf x y1 y2 :
+    confluent R →
+    rtc R x y1 → nf R y1 →
+    rtc R x y2 → nf R y2 →
+    y1 = y2.
+  Proof.
+    intros Hconf ????. destruct (Hconf x y1 y2) as (z & Hz & Hz'); [done..|].
+    apply rtc_nf in Hz as ->; [|done]. by apply rtc_nf in Hz' as ->.
+  Qed.
+
+  Lemma confluent_rtsc_nf x y1 y2 :
+    confluent R →
+    rtsc R x y1 → nf R y1 →
+    rtsc R x y2 → nf R y2 →
+    y1 = y2.
+  Proof. eauto using confluent_rtc_nf, confluent_nf_r. Qed.
+
   Lemma diamond_confluent :
     diamond R → confluent R.
   Proof.
