@@ -74,6 +74,9 @@ Definition confluent {A} (R : relation A) :=
 Definition locally_confluent {A} (R : relation A) :=
   ∀ x y1 y2, R x y1 → R x y2 → ∃ z, rtc R y1 z ∧ rtc R y2 z.
 
+Definition deterministic {A} (R : relation A) :=
+  ∀ x y1 y2, R x y1 → R x y2 → y1 = y2.
+
 Global Hint Unfold nf red : core.
 
 (** * General theorems *)
@@ -492,6 +495,17 @@ Section properties.
     rtsc R x y2 → nf R y2 →
     y1 = y2.
   Proof. eauto using confluent_rtc_nf, confluent_nf_r. Qed.
+
+  Lemma deterministic_confluent :
+    deterministic R → confluent R.
+  Proof.
+    intros Hdet x y1 y2 Hy1. revert y2.
+    induction Hy1 as [y1|y1 y1' y1'' ?? IH]; intros y2 Hy2; [by eauto|].
+    destruct Hy2 as [y2|y2 y2' y2'' ? Hy2].
+    { destruct (IH y1') as (z & ? & ?); eauto. }
+    assert (y1' = y2') as <- by (by eapply Hdet).
+    apply IH in Hy2 as (z & ? & ?); eauto.
+  Qed.
 
   Lemma diamond_confluent :
     diamond R → confluent R.
