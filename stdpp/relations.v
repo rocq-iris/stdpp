@@ -224,6 +224,8 @@ Section general.
     - intros [y []]; eexists; eauto.
     - intros [y HR]. exists y. by apply tc_once.
   Qed.
+  Lemma nf_tc x : nf (tc R) x ↔ nf R x.
+  Proof. unfold nf. by rewrite red_tc. Qed.
 
   Lemma tc_congruence {B} (f : A → B) (R' : relation B) x y :
     (∀ x y, R x y → R' (f x) (f y)) → tc R x y → tc R' (f x) (f y).
