@@ -83,11 +83,11 @@ Section general.
   Local Hint Constructors rtc nsteps bsteps tc : core.
 
   (** ** Results about the reflexive-transitive closure [rtc] *)
-  Lemma rtc_transitive x y z : rtc R x y → rtc R y z → rtc R x z.
+  Lemma rtc_trans x y z : rtc R x y → rtc R y z → rtc R x z.
   Proof. induction 1; eauto. Qed.
 
   Global Instance rtc_po : PreOrder (rtc R).
-  Proof. split; [exact (@rtc_refl A R) | exact rtc_transitive]. Qed.
+  Proof. split; [exact (@rtc_refl A R) | exact rtc_trans]. Qed.
 
   Global Instance rtc_equivalence : Symmetric R → Equivalence (rtc R).
   Proof.
@@ -201,10 +201,11 @@ Section general.
   Proof. induction 2; econstructor; eauto. Qed.
 
   (** ** Results about the transitive closure [tc] *)
-  Lemma tc_transitive x y z : tc R x y → tc R y z → tc R x z.
+  Lemma tc_trans x y z : tc R x y → tc R y z → tc R x z.
   Proof. induction 1; eauto. Qed.
-  Global Instance tc_transitive' : Transitive (tc R).
-  Proof. exact tc_transitive. Qed.
+  Global Instance tc_transitive : Transitive (tc R).
+  Proof. exact tc_trans. Qed.
+
   Lemma tc_r x y z : tc R x y → R y z → tc R x z.
   Proof. intros. etrans; eauto. Qed.
   Lemma tc_rtc_l x y z : rtc R x y → tc R y z → tc R x z.
@@ -460,7 +461,7 @@ Section properties.
   Proof.
     split.
     - intros Hcr. induction 1 as [x|x y1 y1' [Hy1|Hy1] Hy1' (z&IH1&IH2)]; eauto.
-      destruct (Hcr y1 x z) as (z'&?&?); eauto using rtc_transitive.
+      destruct (Hcr y1 x z) as (z'&?&?); eauto using rtc_trans.
     - intros Hcr x y1 y2 Hy1 Hy2.
       apply Hcr; trans x; eauto using rtc_rtsc_rl, rtc_rtsc_lr.
   Qed.
@@ -487,7 +488,7 @@ Section properties.
     intros x y1 y2 Hy1; revert y2.
     induction Hy1 as [x|x y1 y1' Hy1 Hy1' IH]; [by eauto|]; intros y2 Hy2.
     destruct (Hstrip x y2 y1) as (z&?&?); eauto.
-    destruct (IH z) as (z'&?&?); eauto using rtc_transitive.
+    destruct (IH z) as (z'&?&?); eauto using rtc_trans.
   Qed.
 
   Lemma confluent_locally_confluent :
@@ -503,7 +504,7 @@ Section properties.
     destruct Hy2 as [x|x y2 y2' Hy2 Hy2']; [by eauto|].
     destruct (Hcr x y1 y2) as (z&Hy1z&Hy2z); auto.
     destruct (IH _ Hy1 y1' z) as (z1&?&?); auto.
-    destruct (IH _ Hy2 y2' z1) as (z2&?&?); eauto using rtc_transitive.
+    destruct (IH _ Hy2 y2' z1) as (z2&?&?); eauto using rtc_trans.
   Qed.
 End properties.
 
