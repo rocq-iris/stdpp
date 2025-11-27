@@ -1458,7 +1458,7 @@ Section Forall2.
   Proof. rewrite <-Forall2_same_length. induction 2; naive_solver. Qed.
   Lemma Forall2_flip l k : Forall2 (flip P) k l ↔ Forall2 P l k.
   Proof. split; induction 1; constructor; auto. Qed.
-  Lemma Forall2_transitive {C} (Q : B → C → Prop) (R : A → C → Prop) l k lC :
+  Lemma Forall2_trans {C} (Q : B → C → Prop) (R : A → C → Prop) l k lC :
     (∀ x y z, P x y → Q y z → R x z) →
     Forall2 P l k → Forall2 Q k lC → Forall2 R l lC.
   Proof. intros ? Hl. revert lC. induction Hl; inv 1; eauto. Qed.
@@ -1673,7 +1673,7 @@ Section Forall2_proper.
   Global Instance: Symmetric R → Symmetric (Forall2 R).
   Proof. intros. induction 1; constructor; auto. Qed.
   Global Instance: Transitive R → Transitive (Forall2 R).
-  Proof. intros ????. apply Forall2_transitive. by apply @transitivity. Qed.
+  Proof. intros ????. apply Forall2_trans. by apply @transitivity. Qed.
   Global Instance: Equivalence R → Equivalence (Forall2 R).
   Proof. split; apply _. Qed.
   Global Instance: PreOrder R → PreOrder (Forall2 R).

@@ -200,6 +200,8 @@ This version of std++ newly supports Rocq 9.1.
   more precise typeclasses. (by Johannes Hostert)
 - Add `set_solver` support for `map_disjoint`. Support `seq` and `seqZ` when
   using `set_solver by lia`. (by Tej Chajed)
+- Rename transitivity lemmas for `X` from `X_transitive` to `X_trans` (see
+  `sed` script for full list).
 
 **Changes in `stdpp_bitvector`:**
 
@@ -343,6 +345,15 @@ s/\bfilter_singleton_not\b/filter_singleton_False/g
 # set_infinite
 s/\bcoPset_suffixes_infinite\b/coPset_suffixes_not_finite/g
 s/\bnclose_infinite\b/nclose_not_finite/g
+
+# trans lemmas
+s/\bimpl_transitive\b/impl_trans/g
+s/\bprod_lexico_transitive\b/prod_lexico_trans/g
+s/\bForall2_transitive\b/Forall2_trans/g
+s/\bstrict_transitive_l\b/strict_trans_l/g
+s/\bstrict_transitive_r\b/strict_trans_r/g
+s/\brtc_transitive\b/rtc_trans/g
+s/\btc_transitive\b/tc_trans/g
 EOF
 ```
 

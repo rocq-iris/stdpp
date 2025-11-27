@@ -572,7 +572,7 @@ Lemma and_wlog_l (P Q : Prop) : (Q → P) → Q → (P ∧ Q).
 Proof. tauto. Qed.
 Lemma and_wlog_r (P Q : Prop) : P → (P → Q) → (P ∧ Q).
 Proof. tauto. Qed.
-Lemma impl_transitive (P Q R : Prop) : (P → Q) → (Q → R) → (P → R).
+Lemma impl_trans (P Q R : Prop) : (P → Q) → (Q → R) → (P → R).
 Proof. tauto. Qed.
 Lemma forall_proper {A} (P Q : A → Prop) :
   (∀ x, P x ↔ Q x) → (∀ x, P x) ↔ (∀ x, Q x).

@@ -22,12 +22,12 @@ Section orders.
   Proof. by intros [??] <-. Qed.
   Lemma strict_ne_sym X Y : X ⊂ Y → Y ≠ X.
   Proof. by intros [??] <-. Qed.
-  Lemma strict_transitive_l `{!Transitive R} X Y Z : X ⊂ Y → Y ⊆ Z → X ⊂ Z.
+  Lemma strict_trans_l `{!Transitive R} X Y Z : X ⊂ Y → Y ⊆ Z → X ⊂ Z.
   Proof.
     intros [? HXY] ?. split; [by trans Y|].
     contradict HXY. by trans Z.
   Qed.
-  Lemma strict_transitive_r `{!Transitive R} X Y Z : X ⊆ Y → Y ⊂ Z → X ⊂ Z.
+  Lemma strict_trans_r `{!Transitive R} X Y Z : X ⊆ Y → Y ⊂ Z → X ⊂ Z.
   Proof.
     intros ? [? HYZ]. split; [by trans Y|].
     contradict HYZ. by trans X.
@@ -37,7 +37,7 @@ Section orders.
   Global Instance: Transitive R → StrictOrder (strict R).
   Proof.
     split; try apply _.
-    eauto using strict_transitive_r, strict_include.
+    eauto using strict_trans_r, strict_include.
   Qed.
   Global Instance preorder_subset_dec_slow `{!RelDecision R} :
     RelDecision (strict R) | 100.
