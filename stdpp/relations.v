@@ -108,8 +108,10 @@ Section general.
     (Prefl : P z) (Pstep : ∀ x y, R x y → rtc R y z → P y → P x) :
     ∀ x, rtc R x z → P x.
   Proof. induction 1; eauto. Qed.
-  Lemma rtc_ind_r_weak (P : A → A → Prop)
-    (Prefl : ∀ x, P x x) (Pstep : ∀ x y z, rtc R x y → R y z → P x y → P x z) :
+
+  Local Lemma rtc_ind_r_weak (P : A → A → Prop)
+      (Prefl : ∀ x, P x x)
+      (Pstep : ∀ x y z, rtc R x y → R y z → P x y → P x z) :
     ∀ x z, rtc R x z → P x z.
   Proof.
     cut (∀ y z, rtc R y z → ∀ x, rtc R x y → P x y → P x z).
@@ -182,6 +184,7 @@ Section general.
   Proof. induction 1; simpl; eauto using bsteps_add_l. Qed.
   Lemma bsteps_r n x y z : bsteps R n x y → R y z → bsteps R (S n) x z.
   Proof. induction 1; eauto. Qed.
+
   Lemma bsteps_ind_r (P : nat → A → Prop) (x : A)
     (Prefl : ∀ n, P n x)
     (Pstep : ∀ n y z, bsteps R n x y → R y z → P n y → P (S n) z) :
@@ -217,6 +220,21 @@ Section general.
   Proof. intros Hxy Hyz. revert x Hxy. induction Hyz; eauto using tc_r. Qed.
   Lemma tc_rtc x y : tc R x y → rtc R x y.
   Proof. induction 1; eauto. Qed.
+
+  Local Lemma tc_ind_r_weak (P : A → A → Prop)
+      (Ponce : ∀ x y, R x y → P x y)
+      (Pstep : ∀ x y z, tc R x y → R y z → P x y → P x z) :
+    ∀ x z, tc R x z → P x z.
+  Proof.
+    cut (∀ y z, tc R y z → ∀ x, x = y ∨ (tc R x y ∧ P x y) → P x z); [by eauto|].
+    induction 1; naive_solver eauto using tc_r.
+  Qed.
+  Lemma tc_ind_r (P : A → Prop) (x : A)
+    (Prefl : ∀ z, R x z → P z) (Pstep : ∀ y z, tc R x y → R y z → P y → P z) :
+    ∀ z, tc R x z → P z.
+  Proof.
+    intros z p. revert x z p Prefl Pstep. refine (tc_ind_r_weak _ _ _); eauto.
+  Qed.
 
   Lemma red_tc x : red (tc R) x ↔ red R x.
   Proof.
