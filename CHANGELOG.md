@@ -202,6 +202,7 @@ This version of std++ newly supports Rocq 9.1.
   using `set_solver by lia`. (by Tej Chajed)
 - Rename transitivity lemmas for `X` from `X_transitive` to `X_trans` (see
   `sed` script for full list).
+- Add lemmas `confluent_rtc_nf` and `confluent_rtsc_nf`.
 
 **Changes in `stdpp_bitvector`:**
 
