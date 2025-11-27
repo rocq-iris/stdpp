@@ -230,6 +230,8 @@ Section general.
   Proof. induction 2; econstructor; by eauto. Qed.
 
   (** ** Results about the symmetric closure [sc] *)
+  Global Instance sc_reflexive : Reflexive R → Reflexive (sc R).
+  Proof. by left. Qed.
   Global Instance sc_symmetric : Symmetric (sc R).
   Proof. unfold Symmetric, sc. naive_solver. Qed.
 
