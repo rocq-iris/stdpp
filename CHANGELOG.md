@@ -204,6 +204,7 @@ This version of std++ newly supports Rocq 9.1.
   `sed` script for full list).
 - Add lemmas `confluent_rtc_nf` and `confluent_rtsc_nf`.
 - Add definition `deterministic` and lemma `deterministic_confluent`.
+- Add instance `Reflexive (sc R)`.
 
 **Changes in `stdpp_bitvector`:**
 
