@@ -3,10 +3,6 @@
 # - One flag per line with no leading/trailing blanks.
 # - Empty lines and lines starting with '#' are ignored.
 
-# Fixing this one requires Coq 8.19
--w
--argument-scope-delimiter
-
 # Warning seems incorrect, see https://gitlab.mpi-sws.org/iris/stdpp/-/issues/216
 -w
 -notation-incompatible-prefix

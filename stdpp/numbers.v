@@ -1070,7 +1070,7 @@ Delimit Scope Qp_scope with Qp.
 Record Qp := mk_Qp { Qp_to_Qc : Qc ; Qp_prf : (0 < Qp_to_Qc)%Qc }.
 Add Printing Constructor Qp.
 Bind Scope Qp_scope with Qp.
-Global Arguments Qp_to_Qc _%Qp : assert.
+Global Arguments Qp_to_Qc _%_Qp : assert.
 
 Program Definition pos_to_Qp (n : positive) : Qp := mk_Qp (Qc_of_Z $ Z.pos n) _.
 Next Obligation. intros n. by rewrite <-Z2Qc_inj_0, <-Z2Qc_inj_lt. Qed.
