@@ -2,7 +2,3 @@
 # Syntax:
 # - One flag per line with no leading/trailing blanks.
 # - Empty lines and lines starting with '#' are ignored.
-
-# Warning seems incorrect, see https://gitlab.mpi-sws.org/iris/stdpp/-/issues/216
--w
--notation-incompatible-prefix
