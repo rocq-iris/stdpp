@@ -1,6 +1,6 @@
 (** This file is maintained by Michael Sammler. *)
-From Coq Require Znumtheory.
-From Coq Require Import ZifyNat.
+From Stdlib Require Znumtheory.
+From Stdlib Require Import ZifyNat.
 From stdpp Require Export numbers.
 From stdpp Require Import countable finite.
 From stdpp Require Import options.

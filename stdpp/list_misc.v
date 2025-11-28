@@ -1,4 +1,4 @@
-From Coq Require Export Permutation.
+From Stdlib Require Export Permutation.
 From stdpp Require Export numbers base option list_basics list_relations list_monad.
 From stdpp Require Import options.
 

@@ -1,6 +1,6 @@
 (** This file provides support for using std++ in combination with the ssreflect
 tactics. It patches up some global options of ssreflect. *)
-From Coq.ssr Require Export ssreflect.
+From Stdlib.ssr Require Export ssreflect.
 From stdpp Require Export prelude.
 From stdpp Require Import options.
 

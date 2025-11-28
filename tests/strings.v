@@ -1,5 +1,5 @@
 From stdpp Require Import strings sorting.
-From Coq Require Ascii.
+From Stdlib Require Ascii.
 
 (** Check that the string notation works without [%string]. *)
 Check "foo".

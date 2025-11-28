@@ -7,7 +7,7 @@ about people having too much fun with type indices. See
 <https://github.com/coq/coq/pull/18032> for discussion. The warning is also emitted by [Fin].
 Let's just silence that. *)
 Local Set Warnings "-stdlib-vector".
-From Coq Require Fin.
+From Stdlib Require Fin.
 From stdpp Require Export base tactics.
 From stdpp Require Import options.
 

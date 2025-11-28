@@ -10,11 +10,3 @@
 # Warning seems incorrect, see https://gitlab.mpi-sws.org/iris/stdpp/-/issues/216
 -w
 -notation-incompatible-prefix
-
-# We can't do this migration yet until we require Coq 9.0
--w
--deprecated-from-Coq
--w
--deprecated-dirpath-Coq
--w
--deprecated-reference-since-9.1
