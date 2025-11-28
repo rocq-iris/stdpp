@@ -49,7 +49,7 @@ This list is incomplete, but notable side-effects include:
 
 This version is known to compile with:
 
- - Coq version 8.18.0 / 8.19.1 / 8.20.1 / Rocq 9.0.1 / 9.1.0
+ - Rocq version 9.0.1 / 9.1.0
 
 Generally we always aim to support the last two stable Rocq releases. Support for
 older versions will be dropped when it is convenient.
