@@ -3,9 +3,10 @@ API-breaking change is listed.
 
 ## std++ master
 
-The opam packages have been renamed from `coq-*` to `rocq-*`.
+This version of std++ newly supports Rocq 9.1, and drops support for Coq 8.18,
+8.19, and 8.20.
 
-This version of std++ newly supports Rocq 9.1.
+The opam packages have been renamed from `coq-*` to `rocq-*`.
 
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
