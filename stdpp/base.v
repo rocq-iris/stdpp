@@ -12,9 +12,9 @@ From Stdlib Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8
 From Stdlib Require Import Permutation.
 Export ListNotations.
 From Stdlib.Program Require Export Basics Syntax.
-
-(* notations _.1 and _.2 below, TODO: remove when requiring Coq > 8.19 *)
-From Stdlib.ssr Require Import (notations) ssrfun.
+(* This does not load the ssrflect tactics (since we do not [Import]), but it
+does load (and export!) some tacticals like [first] and [last]. *)
+From Stdlib Require ssreflect.
 
 From stdpp Require Import options.
 

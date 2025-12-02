@@ -179,12 +179,6 @@ Context {A : Type}.
 Implicit Types x y z : A.
 Implicit Types l k : list A.
 
-(* TODO: Coq 8.20 has the same lemma under the same name, so remove our version
-once we require Coq 8.20. In Coq 8.19 and before, this lemma is called
-[app_length]. *)
-Lemma length_app (l l' : list A) : length (l ++ l') = length l + length l'.
-Proof. induction l; f_equal/=; auto. Qed.
-
 Lemma app_inj_1 (l1 k1 l2 k2 : list A) :
   length l1 = length k1 → l1 ++ l2 = k1 ++ k2 → l1 = k1 ∧ l2 = k2.
 Proof. revert k1. induction l1; intros [|??]; naive_solver. Qed.

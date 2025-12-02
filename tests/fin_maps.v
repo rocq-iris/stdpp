@@ -455,11 +455,10 @@ Inductive gtest_rel `{Countable K} : relation (gtest K) :=
 This is particularly important when using [map_Forall] in a premise of a mutually
 inductive predicate, since such predicates are typically eliminated via [Fixpoint]
 because Rocq does not generate the right induction scheme automatically. *)
-(** TODO: Needs Rocq 9.0
 Fixpoint gtest_pred_fixpoint `{Countable K} (t : gtest K) :
   gtest_pred t → gtest_pred t.
 Proof.
   intros Ht. destruct Ht as [ts Hts].
   apply GTest_pred. eapply map_Forall_impl; first apply Hts; simpl.
   intros _. apply gtest_pred_fixpoint.
-Qed. *)
+Qed.
