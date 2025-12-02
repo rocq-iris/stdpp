@@ -6,7 +6,7 @@ naming conventions in this development. *)
 about people having too much fun with type indices. See
 <https://github.com/coq/coq/pull/18032> for discussion. Let's just silence that. *)
 Local Set Warnings "-stdlib-vector".
-From Coq Require Vector.
+From Stdlib Require Vector.
 From stdpp Require Import countable.
 From stdpp Require Export fin list.
 From stdpp Require Import options.

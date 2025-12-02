@@ -1,5 +1,5 @@
 From stdpp Require Import strings.
-From Coq Require Import Ascii.
+From Stdlib Require Import Ascii.
 
 Check "a". (* should be string *)
 

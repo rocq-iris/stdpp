@@ -7,7 +7,7 @@ about people having too much fun with type indices. See
 <https://github.com/coq/coq/pull/18032> for discussion. The warning is also emitted by [Fin].
 Let's just silence that. *)
 Local Set Warnings "-stdlib-vector".
-From Coq Require Fin.
+From Stdlib Require Fin.
 From stdpp Require Export base tactics.
 From stdpp Require Import options.
 
@@ -24,7 +24,7 @@ Notation FS := Fin.FS.
 Declare Scope fin_scope.
 Delimit Scope fin_scope with fin.
 Bind Scope fin_scope with fin.
-Global Arguments Fin.FS _ _%fin : assert.
+Global Arguments Fin.FS _ _%_fin : assert.
 
 (** Allow any non-negative number literal to be parsed as a [fin]. For example
 [42%fin : fin 64], or [42%fin : fin _], or [42%fin : fin (43 + _)]. *)

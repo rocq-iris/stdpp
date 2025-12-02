@@ -1,5 +1,5 @@
 From stdpp Require Import pretty.
-From Coq Require Import Ascii.
+From Stdlib Require Import Ascii.
 
 Section N.
   Local Open Scope N_scope.

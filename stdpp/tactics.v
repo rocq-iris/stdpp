@@ -1,6 +1,6 @@
 (** This file collects general purpose tactics that are used throughout
 the development. *)
-From Coq Require Export Lia.
+From Stdlib Require Export Lia.
 From stdpp Require Export decidable.
 From stdpp Require Import options.
 

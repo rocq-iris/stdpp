@@ -8,13 +8,13 @@ These two functions being defined both in [Coq.Bool] and in [Coq.Peano],
 we must export [Coq.Peano] later than any export of [Coq.Bool]. *)
 (* We also want to ensure that notations from [Coq.Utf8] take precedence
 over the ones of [Coq.Peano] (see Coq PR#12950), so we import [Utf8] last. *)
-From Coq Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8.
-From Coq Require Import Permutation.
+From Stdlib Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8.
+From Stdlib Require Import Permutation.
 Export ListNotations.
-From Coq.Program Require Export Basics Syntax.
-
-(* notations _.1 and _.2 below, TODO: remove when requiring Coq > 8.19 *)
-From Coq.ssr Require Import (notations) ssrfun.
+From Stdlib.Program Require Export Basics Syntax.
+(* This does not load the ssrflect tactics (since we do not [Import]), but it
+does load (and export!) some tacticals like [first] and [last]. *)
+From Stdlib Require ssreflect.
 
 From stdpp Require Import options.
 

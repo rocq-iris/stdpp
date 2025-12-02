@@ -1,4 +1,4 @@
-From Coq Require Import String.
+From Stdlib Require Import String.
 From stdpp Require Import sets gmap listset.
 
 Local Open Scope string_scope.
