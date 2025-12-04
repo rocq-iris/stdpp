@@ -9,7 +9,7 @@
   (with-stdout-to flags.dune
    (pipe-stdout
     (cat config/flags)
-    (bash "grep '^[^#]\\+'")))))
+    (bash "grep '^[^#]\\+' || true")))))
 
 (rule
  (deps
