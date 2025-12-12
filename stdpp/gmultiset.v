@@ -182,6 +182,22 @@ Section basic_lemmas.
     destruct X as [X]; simpl; rewrite elem_of_dom, <-not_eq_None_Some.
     destruct (X !! x); naive_solver lia.
   Qed.
+
+  Global Instance gmultiset_Forall_dec P (m : gmultiset A) :
+    (∀ x : A, Decision (P x)) → Decision (set_Forall P m).
+  Proof.
+    intros Hdec. destruct (decide (set_Forall P (dom m))) as [Ht|Hf].
+    - left. intros ??%gmultiset_elem_of_dom. by eapply Ht.
+    - right. intros Hc. eapply Hf. intros ??%gmultiset_elem_of_dom. by eapply Hc.
+  Qed.
+
+  Global Instance gmultiset_Exists_dec P (m : gmultiset A) :
+    (∀ x : A, Decision (P x)) → Decision (set_Exists P m).
+  Proof.
+    intros Hdec. destruct (decide (set_Exists P (dom m))) as [Ht|Hf].
+    - left. destruct Ht as (x&Hx%gmultiset_elem_of_dom&HP). by exists x.
+    - right. intros (x&Hx%gmultiset_elem_of_dom&HP). eapply Hf; by exists x.
+  Qed.
 End basic_lemmas.
 
 (** * A solver for multisets *)
