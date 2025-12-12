@@ -263,6 +263,8 @@ Proof.
   - intros [k ->]. by left.
 Qed.
 
+(** Swapping the values at positions [i1] and [i2] produces a permutation
+of the original list [l]. *)
 Lemma Permutation_insert_swap l i1 i2 x1 x2 :
   l !! i1 = Some x1 →
   l !! i2 = Some x2 →
