@@ -263,6 +263,28 @@ Proof.
   - intros [k ->]. by left.
 Qed.
 
+Lemma Permutation_insert_swap l i1 i2 x1 x2 :
+  l !! i1 = Some x1 →
+  l !! i2 = Some x2 →
+  <[i2:=x1]> (<[i1:=x2]> l) ≡ₚ l.
+Proof.
+  intros Hi1 Hi2. destruct (decide (i1 = i2)); simplify_eq.
+  { by rewrite list_insert_insert_eq, list_insert_id. }
+  apply list_elem_of_split_length in Hi1 as (l1 & l2 & -> & ->).
+  rewrite insert_app_r_alt, Nat.sub_diag by lia; simpl.
+  apply lookup_app_Some in Hi2 as [Hi2|[? Hi2]].
+  - rewrite insert_app_l by eauto using lookup_lt_Some.
+    apply list_elem_of_split_length in Hi2 as (l1' & l2' & -> & ->).
+    rewrite insert_app_r_alt, Nat.sub_diag by lia; simpl.
+    rewrite <-!Permutation_middle; simpl. by rewrite Permutation_swap.
+  - rewrite insert_app_r_alt by lia. f_equiv.
+    destruct i2 as [|i2]; simplify_eq/=; [done|].
+    rewrite Nat.sub_succ_l in Hi2 |- * by lia; simpl in *.
+    apply list_elem_of_split_length in Hi2 as (l1' & l2' & -> & ->).
+    rewrite insert_app_r_alt, Nat.sub_diag by lia; simpl.
+    rewrite <-!Permutation_middle; simpl. by rewrite Permutation_swap.
+Qed.
+
 Lemma Permutation_cons_inv_r l k x :
   k ≡ₚ x :: l → ∃ k1 k2, k = k1 ++ x :: k2 ∧ l ≡ₚ k1 ++ k2.
 Proof.
