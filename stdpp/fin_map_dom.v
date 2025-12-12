@@ -492,3 +492,39 @@ Proof. unfold_leibniz. apply dom_seq. Qed.
 Global Instance set_unfold_dom_seq `{FinMapDom nat M D} {A} start (xs : list A) i :
   SetUnfoldElemOf i (dom (map_seq start (M:=M A) xs)) (start ≤ i < start + length xs).
 Proof. constructor. by rewrite dom_seq, elem_of_set_seq. Qed.
+
+Lemma kmap_dom_inv `{FinMapDom K M D, !Elements K D, !FinSet K D, FinMapDom K2 M2 D2}
+    {A} (f : K → K2) `{!Inj (=) (=) f} (m : M2 A) (s : D) :
+  dom m ≡ set_map f s →
+  ∃ (m2 : M A), m = kmap f m2.
+Proof.
+  revert s; induction m as [|k v m HNone Hfk IH] using map_first_key_ind; intros s.
+  { intros _. exists ∅. rewrite kmap_empty. done. }
+  rewrite dom_insert. intros Heq.
+  assert (k ∈ (set_map f s : D2)) as (k1&->&Hk1)%elem_of_map.
+  { rewrite <-Heq. set_solver. }
+  destruct (IH (s ∖ {[ k1 ]})) as (m2&->).
+  { intros x. rewrite elem_of_map, elem_of_dom.
+    specialize (Heq x). rewrite elem_of_map, elem_of_union, elem_of_dom in Heq.
+    destruct Heq as [He1 He2]. split.
+    + intros [y Hy]. destruct He1 as (x'&->&Hx'); first by right.
+      exists x'. split; first done. eapply elem_of_difference.
+      split; first done. eapply not_elem_of_singleton.
+      intros <-. rewrite HNone in Hy. done.
+    + intros (y&->&(Hy1&Hy2)%elem_of_difference).
+      destruct He2 as [Heq%elem_of_singleton|?]; last done.
+      1: by exists y.
+      simplify_eq. by eapply not_elem_of_singleton in Hy2. }
+  exists (<[ k1 := v ]> m2).
+  rewrite kmap_insert; done.
+Qed.
+
+Lemma kmap_dom_inv_L `{FinMapDom K M D, !Elements K D, !FinSet K D, FinMapDom K2 M2 D2}
+    {A} (f : K → K2) `{!Inj (=) (=) f} (m : M2 A) (s : D) :
+  dom m = set_map f s →
+  ∃ (m2 : M A), m = kmap f m2.
+Proof.
+  intros Heq.
+  eapply kmap_dom_inv; first tc_solve.
+  by rewrite Heq.
+Qed.
