@@ -3230,19 +3230,15 @@ Proof.
     rewrite map_disjoint_alt in Hcd_disj; naive_solver.
 Qed.
 
-Lemma map_merge_disjoint_is_union {B} (m1 m2 : M B) f :
+Lemma map_disjoint_merge_as_union {A} (m1 m2 : M A) f :
   m1 ##ₘ m2 →
-  (∀ v1, f (Some v1) None = Some v1) →
-  (∀ v2, f None (Some v2) = Some v2) →
+  (∀ x1, f (Some x1) None = Some x1) →
+  (∀ x2, f None (Some x2) = Some x2) →
   merge f m1 m2 = m1 ∪ m2.
 Proof.
-  intros Hdisj Hf1 Hf2. eapply map_eq_iff.
-  intros k. rewrite lookup_union, lookup_merge.
-  destruct (m1 !! k) eqn:Hm1, (m2 !! k) eqn:Hm2.
-  - exfalso. eapply map_disjoint_spec. 1: eassumption. all: done.
-  - simpl. rewrite Hf1. done.
-  - simpl. rewrite Hf2. done.
-  - done.
+  intros Hdisj ??. apply map_eq; intros k. specialize (Hdisj k).
+  rewrite lookup_union, lookup_merge.
+  destruct (m1 !! k), (m2 !! k); naive_solver.
 Qed.
 
 (** The following lemma shows that folding over two maps separately (using the
