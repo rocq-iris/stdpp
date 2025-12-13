@@ -183,21 +183,23 @@ Section basic_lemmas.
     destruct (X !! x); naive_solver lia.
   Qed.
 
-  Global Instance gmultiset_Forall_dec P (m : gmultiset A) :
-    (∀ x : A, Decision (P x)) → Decision (set_Forall P m).
-  Proof.
-    intros Hdec. destruct (decide (set_Forall P (dom m))) as [Ht|Hf].
-    - left. intros ??%gmultiset_elem_of_dom. by eapply Ht.
-    - right. intros Hc. eapply Hf. intros ??%gmultiset_elem_of_dom. by eapply Hc.
-  Qed.
+  Lemma gmultiset_Forall_dom P X : set_Forall P (dom X) ↔ set_Forall P X.
+  Proof. apply forall_proper; intros x. by rewrite gmultiset_elem_of_dom. Qed.
+  Lemma gmultiset_Exists_dom P X : set_Exists P (dom X) ↔ set_Exists P X.
+  Proof. apply exist_proper; intros x. by rewrite gmultiset_elem_of_dom. Qed.
 
-  Global Instance gmultiset_Exists_dec P (m : gmultiset A) :
-    (∀ x : A, Decision (P x)) → Decision (set_Exists P m).
+  Global Instance gmultiset_Forall_dec P X :
+    (∀ x, Decision (P x)) → Decision (set_Forall P X).
   Proof.
-    intros Hdec. destruct (decide (set_Exists P (dom m))) as [Ht|Hf].
-    - left. destruct Ht as (x&Hx%gmultiset_elem_of_dom&HP). by exists x.
-    - right. intros (x&Hx%gmultiset_elem_of_dom&HP). eapply Hf; by exists x.
-  Qed.
+    refine (λ _, cast_if (decide (set_Forall P (dom X))));
+      by rewrite <-gmultiset_Forall_dom.
+  Defined.
+  Global Instance gmultiset_Exists_dec P X :
+    (∀ x, Decision (P x)) → Decision (set_Exists P X).
+  Proof.
+    refine (λ _, cast_if (decide (set_Exists P (dom X))));
+      by rewrite <-gmultiset_Exists_dom.
+  Defined.
 End basic_lemmas.
 
 (** * A solver for multisets *)
