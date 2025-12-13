@@ -584,6 +584,14 @@ Section map.
   Proof. unfold_leibniz. apply list_to_set_fmap. Qed.
 End map.
 
+Lemma set_map_difference `{Set_ B D} (f : A → B) `{!Inj (=) (=) f} (X Y : C) :
+  set_map (D:=D) f (X ∖ Y) ≡ set_map (D:=D) f X ∖ set_map (D:=D) f Y.
+Proof. set_solver. Qed.
+Lemma set_map_difference_L `{Set_ B D, !LeibnizEquiv D}
+    (f : A → B) `{!Inj (=) (=) f} (X Y : C) :
+  set_map (D:=D) f (X ∖ Y) = set_map (D:=D) f X ∖ set_map (D:=D) f Y.
+Proof. unfold_leibniz. by apply set_map_difference. Qed.
+
 (** * Bind *)
 Section set_bind.
   Context `{SemiSet B SB}.
