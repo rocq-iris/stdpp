@@ -210,6 +210,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Make lemma `tc_ind_r_weak` local. Use the stronger lemma `tc_ind_r` instead.
 - Add induction scheme `tc_ind_r`.
 - Add lemma `Permutation_insert_swap`.
+- Add lemmas `set_map_difference` and `set_map_difference_L`.
+- Add lemma `kmap_dom_inv` and `kmap_dom_inv_L`. (by Johannes Hostert)
 
 **Changes in `stdpp_bitvector`:**
 

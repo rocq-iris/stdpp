@@ -489,6 +489,30 @@ Lemma dom_seq_L `{FinMapDom nat M D, !LeibnizEquiv D} {A} start (xs : list A) :
   dom (map_seq (M:=M A) start xs) = set_seq start (length xs).
 Proof. unfold_leibniz. apply dom_seq. Qed.
 
+Lemma kmap_dom_inv
+    `{FinMapDom K1 M1 D1, !Elements K1 D1, !FinSet K1 D1, FinMapDom K2 M2 D2}
+    {A} (f : K1 → K2) `{!Inj (=) (=) f} (m' : M2 A) (X : D1) :
+  dom m' ≡ set_map f X →
+  ∃ m : M1 A, m' = kmap f m ∧ dom m ≡ X.
+Proof.
+  revert X. induction m' as [|k' x m' Hk IH] using map_ind; intros X Hm'.
+  { exists ∅. rewrite dom_empty in Hm'. assert (X ≡ ∅) as -> by set_solver.
+    by rewrite kmap_empty, dom_empty. }
+  apply not_elem_of_dom in Hk. rewrite dom_insert in Hm'.
+  assert (k' ∈ set_map (D:=D2) f X) as (k & -> & ?)%elem_of_map by set_solver.
+  destruct (IH (X ∖ {[ k ]})) as (m & -> & HX').
+  { rewrite (set_map_difference _), <-Hm'. set_solver. }
+  exists (<[k:=x]> m). split; [by rewrite kmap_insert|].
+  rewrite dom_insert, HX'. intros k''. destruct (decide (k'' = k)); set_solver.
+Qed.
+Lemma kmap_dom_inv_L
+    `{FinMapDom K1 M1 D1, !Elements K1 D1, !FinSet K1 D1, FinMapDom K2 M2 D2,
+      !LeibnizEquiv D1, !LeibnizEquiv D2}
+    {A} (f : K1 → K2) `{!Inj (=) (=) f} (m' : M2 A) (X : D1) :
+  dom m' = set_map f X →
+  ∃ m : M1 A, m' = kmap f m ∧ dom m = X.
+Proof. unfold_leibniz. by apply kmap_dom_inv. Qed.
+
 Global Instance set_unfold_dom_seq `{FinMapDom nat M D} {A} start (xs : list A) i :
   SetUnfoldElemOf i (dom (map_seq start (M:=M A) xs)) (start ≤ i < start + length xs).
 Proof. constructor. by rewrite dom_seq, elem_of_set_seq. Qed.
