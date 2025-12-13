@@ -28,6 +28,47 @@ Definition from_option {A B} (f : A → B) (y : B) (mx : option A) : B :=
 Global Instance: Params (@from_option) 2 := {}.
 Global Arguments from_option {_ _} _ _ !_ / : assert.
 
+(** Predicate over member of [option A].
+We define it with [Inductive] to allow [option_Forall] to be used in other
+inductively defined predicates. *)
+Inductive option_Forall {A} (P : A → Prop) : option A → Prop :=
+  | Forall_None : option_Forall P None
+  | Forall_Some x : P x → option_Forall P (Some x).
+Global Instance: Params (@option_Forall) 1 := {}.
+
+Section Forall.
+  Context {A : Type}.
+  Implicit Types x : A.
+  Implicit Types mx : option A.
+  Implicit Types P : A → Prop.
+
+  Lemma option_Forall_from_option P mx :
+    option_Forall P mx ↔ from_option P True mx.
+  Proof. split; [by destruct 1|]. destruct mx; by constructor. Qed.
+
+  Lemma option_Forall_true P mx : (∀ x, P x) → option_Forall P mx.
+  Proof. destruct mx; constructor; auto. Qed.
+
+  Lemma option_Forall_impl P1 P2 mx :
+    option_Forall P1 mx → (∀ x, P1 x → P2 x) → option_Forall P2 mx.
+  Proof. rewrite !option_Forall_from_option. destruct mx; naive_solver. Qed.
+
+  Lemma option_Forall_iff P1 P2 mx :
+    (∀ a, P1 a ↔ P2 a) → (option_Forall P1 mx ↔ option_Forall P2 mx).
+  Proof. rewrite !option_Forall_from_option. destruct mx; naive_solver. Qed.
+
+  Lemma option_Forall_and P1 P2 mx :
+    option_Forall (λ a, P1 a ∧ P2 a) mx
+    ↔ option_Forall P1 mx ∧ option_Forall P2 mx.
+  Proof. rewrite !option_Forall_from_option. destruct mx; naive_solver. Qed.
+
+  Global Instance option_Forall_proper :
+    Proper (pointwise_relation _ (↔) ==> (=) ==> (↔)) (@option_Forall A).
+  Proof.
+    intros P1 P2 HP [x|] ? <-; rewrite !option_Forall_from_option; simpl; auto.
+  Qed.
+End Forall.
+
 (** The eliminator with the identity function. *)
 Notation default := (from_option id).
 
@@ -227,6 +268,13 @@ Proof. intros; destruct mx; f_equal/=; auto. Qed.
 Lemma option_fmap_equiv_ext {A} `{Equiv B} (f g : A → B) (mx : option A) :
   (∀ x, f x ≡ g x) → f <$> mx ≡ g <$> mx.
 Proof. destruct mx; constructor; auto. Qed.
+
+Lemma from_option_fmap {A B C} (f : A → B) (g : B → C) z (mx : option A) :
+  from_option g z (f <$> mx) = from_option (g ∘ f) z mx.
+Proof. by destruct mx. Qed.
+Lemma option_Forall_fmap {A B} (P : B → Prop) (f : A → B) (mx : option A) :
+  option_Forall P (f <$> mx) ↔ option_Forall (P ∘ f) mx.
+Proof. by rewrite !option_Forall_from_option, from_option_fmap. Qed.
 
 Lemma option_fmap_bind {A B C} (f : A → B) (g : B → option C) mx :
   (f <$> mx) ≫= g = mx ≫= g ∘ f.
