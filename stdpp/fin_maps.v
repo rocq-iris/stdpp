@@ -3230,6 +3230,17 @@ Proof.
     rewrite map_disjoint_alt in Hcd_disj; naive_solver.
 Qed.
 
+Lemma map_disjoint_merge_as_union {A} (m1 m2 : M A) f :
+  m1 ##ₘ m2 →
+  (∀ x1, f (Some x1) None = Some x1) →
+  (∀ x2, f None (Some x2) = Some x2) →
+  merge f m1 m2 = m1 ∪ m2.
+Proof.
+  intros Hdisj ??. apply map_eq; intros k. specialize (Hdisj k).
+  rewrite lookup_union, lookup_merge.
+  destruct (m1 !! k), (m2 !! k); naive_solver.
+Qed.
+
 (** The following lemma shows that folding over two maps separately (using the
 result of the first fold as input for the second fold) is equivalent to folding
 over the union, *if* the function is idempotent for the elements that will be

@@ -214,6 +214,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add lemma `kmap_dom_inv` and `kmap_dom_inv_L`. (by Johannes Hostert)
 - Add lemma `from_option_fmap`. (by Rudy Peterson)
 - Add predicate `option_Forall` and some associated lemmas. (by Rudy Peterson)
+- Add lemma `map_disjoint_merge_as_union`. (by Johannes Hostert)
 
 **Changes in `stdpp_bitvector`:**
 
