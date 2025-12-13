@@ -215,6 +215,8 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add lemma `from_option_fmap`. (by Rudy Peterson)
 - Add predicate `option_Forall` and some associated lemmas. (by Rudy Peterson)
 - Add lemma `map_disjoint_merge_as_union`. (by Johannes Hostert)
+- Add `Decision` instances for `set_Forall` and `set_Exists` on `gmultiset`.
+  (by Johannes Hostert)
 
 **Changes in `stdpp_bitvector`:**
 
