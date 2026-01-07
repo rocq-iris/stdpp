@@ -821,8 +821,8 @@ Proof.
   rewrite !list_elem_of_lookup. intros [j Hj].
   rewrite list_lookup_delete in Hj. case_decide; eauto.
 Qed.
-Lemma list_elem_of_foldr_delete_inv x is l : x ∈ foldr delete l is → x ∈ l.
-Proof. induction is; simpl; eauto using list_elem_of_delete_inv. Qed.
+Lemma list_elem_of_foldr_delete_inv x js l : x ∈ foldr delete l js → x ∈ l.
+Proof. induction js; simpl; eauto using list_elem_of_delete_inv. Qed.
 
 Lemma not_elem_of_app_cons_inv_l x y l1 l2 k1 k2 :
   x ∉ k1 → y ∉ l1 →

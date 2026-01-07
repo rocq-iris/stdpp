@@ -827,26 +827,26 @@ Lemma sublist_drop l i : drop i l `sublist_of` l.
 Proof. rewrite <-(take_drop i l) at 2. by apply sublist_inserts_l. Qed.
 Lemma sublist_delete l i : delete i l `sublist_of` l.
 Proof. revert i. by induction l; intros [|?]; simpl; constructor. Qed.
-Lemma sublist_foldr_delete l is : foldr delete l is `sublist_of` l.
+Lemma sublist_foldr_delete l js : foldr delete l js `sublist_of` l.
 Proof.
-  induction is as [|i is IH]; simpl; [done |].
-  trans (foldr delete l is); auto using sublist_delete.
+  induction js as [|i js IH]; simpl; [done |].
+  trans (foldr delete l js); auto using sublist_delete.
 Qed.
-Lemma sublist_alt l1 l2 : l1 `sublist_of` l2 ↔ ∃ is, l1 = foldr delete l2 is.
+Lemma sublist_alt l1 l2 : l1 `sublist_of` l2 ↔ ∃ js, l1 = foldr delete l2 js.
 Proof.
-  split; [|intros [is ->]; apply sublist_foldr_delete].
-  intros Hl12. cut (∀ k, ∃ is, k ++ l1 = foldr delete (k ++ l2) is).
+  split; [|intros [js ->]; apply sublist_foldr_delete].
+  intros Hl12. cut (∀ k, ∃ js, k ++ l1 = foldr delete (k ++ l2) js).
   { intros help. apply (help []). }
   induction Hl12 as [|x l1 l2 _ IH|x l1 l2 _ IH]; intros k.
   - by eexists [].
-  - destruct (IH (k ++ [x])) as [is His]. exists is.
+  - destruct (IH (k ++ [x])) as [js His]. exists js.
     by rewrite <-!(assoc_L (++)) in His.
-  - destruct (IH k) as [is His]. exists (is ++ [length k]).
+  - destruct (IH k) as [js His]. exists (js ++ [length k]).
     rewrite fold_right_app. simpl. by rewrite delete_middle.
 Qed.
 
 Lemma sublist_subseteq l1 l2 : l1 `sublist_of` l2 → l1 ⊆ l2.
-Proof. intros [is ->]%sublist_alt x. apply list_elem_of_foldr_delete_inv. Qed.
+Proof. intros [js ->]%sublist_alt x. apply list_elem_of_foldr_delete_inv. Qed.
 Lemma elem_of_sublist l1 l2 x : x ∈ l1 → l1 `sublist_of` l2 → x ∈ l2.
 Proof. intros. by eapply sublist_subseteq. Qed.
 
@@ -988,7 +988,7 @@ Lemma submseteq_drop l i : drop i l ⊆+ l.
 Proof. auto using sublist_drop, sublist_submseteq. Qed.
 Lemma submseteq_delete l i : delete i l ⊆+ l.
 Proof. auto using sublist_delete, sublist_submseteq. Qed.
-Lemma submseteq_foldr_delete l is : foldr delete l is `sublist_of` l.
+Lemma submseteq_foldr_delete l js : foldr delete l js `sublist_of` l.
 Proof. auto using sublist_foldr_delete, sublist_submseteq. Qed.
 Lemma submseteq_sublist_l l1 l3 : l1 ⊆+ l3 ↔ ∃ l2, l1 `sublist_of` l2 ∧ l2 ≡ₚ l3.
 Proof.
