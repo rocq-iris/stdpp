@@ -23,8 +23,8 @@ stepping through are up-to-date. To build a single file, you can use, e.g.,
 `dune build stdpp/options.vo`. To build only the `stdpp` folder, you can do
 `dune build stdpp`.
 
-Alternatively, you can configure your editor to invoke `dune coq top` instead
-of `coqtop`, but that is non-trivial for most editors.
+Alternatively, you can configure your editor to invoke `dune rocq top` instead
+of `rocq repl`, but that is non-trivial for most editors.
 
 ### Extra `_CoqProject` flags
 
