@@ -1862,9 +1862,9 @@ Section map_Forall.
     setoid_rewrite fmap_Some. naive_solver.
   Qed.
 
-  Lemma map_Forall_foldr_delete m is :
-    map_Forall P m → map_Forall P (foldr delete m is).
-  Proof. induction is; eauto using map_Forall_delete. Qed.
+  Lemma map_Forall_foldr_delete m js :
+    map_Forall P m → map_Forall P (foldr delete m js).
+  Proof. induction js; eauto using map_Forall_delete. Qed.
   Lemma map_Forall_ind (Q : M A → Prop) :
     Q ∅ →
     (∀ m i x, m !! i = None → P i x → map_Forall P m → Q m → Q (<[i:=x]>m)) →
@@ -1941,9 +1941,9 @@ Section map_Exists.
   Lemma map_Exists_lookup_2 m i x :
     m !! i = Some x → P i x → map_Exists P m.
   Proof. rewrite map_Exists_lookup. by eauto. Qed.
-  Lemma map_Exists_foldr_delete m is :
-    map_Exists P (foldr delete m is) → map_Exists P m.
-  Proof. induction is; eauto using map_Exists_delete. Qed.
+  Lemma map_Exists_foldr_delete m js :
+    map_Exists P (foldr delete m js) → map_Exists P m.
+  Proof. induction js; eauto using map_Exists_delete. Qed.
 
   Lemma map_Exists_ind (Q : M A → Prop) :
     (∀ i x, P i x → Q {[ i := x ]}) →
@@ -2881,12 +2881,12 @@ Section union_with.
   Lemma delete_union_with m1 m2 i :
     delete i (union_with f m1 m2) = union_with f (delete i m1) (delete i m2).
   Proof. by apply partial_alter_merge. Qed.
-  Lemma foldr_delete_union_with (m1 m2 : M A) is :
-    foldr delete (union_with f m1 m2) is =
-      union_with f (foldr delete m1 is) (foldr delete m2 is).
+  Lemma foldr_delete_union_with (m1 m2 : M A) js :
+    foldr delete (union_with f m1 m2) js =
+      union_with f (foldr delete m1 js) (foldr delete m2 js).
   Proof.
-    induction is as [|?? IHis]; simpl; [done|].
-    by rewrite IHis, delete_union_with.
+    induction js as [|?? IHjs]; simpl; [done|].
+    by rewrite IHjs, delete_union_with.
   Qed.
   Lemma insert_union_with m1 m2 i x y z :
     f x y = Some z →
@@ -3435,61 +3435,61 @@ Proof.
 Qed.
 
 (** ** Properties of the folding the [delete] function *)
-Lemma lookup_foldr_delete {A} (m : M A) is j :
-  j ∈ is → foldr delete m is !! j = None.
+Lemma lookup_foldr_delete {A} (m : M A) js j :
+  j ∈ js → foldr delete m js !! j = None.
 Proof. induction 1; simpl; rewrite lookup_delete; case_decide; naive_solver. Qed.
-Lemma lookup_foldr_delete_not_elem_of {A} (m : M A) is j :
-  j ∉ is → foldr delete m is !! j = m !! j.
+Lemma lookup_foldr_delete_not_elem_of {A} (m : M A) js j :
+  j ∉ js → foldr delete m js !! j = m !! j.
 Proof.
-  induction is; simpl; [done |]. rewrite elem_of_cons; intros.
+  induction js; simpl; [done |]. rewrite elem_of_cons; intros.
   rewrite lookup_delete_ne; intuition.
 Qed.
-Lemma lookup_foldr_delete_Some {A} (m : M A) is j y :
-  foldr delete m is !! j = Some y ↔ j ∉ is ∧ m !! j = Some y.
-Proof. induction is; simpl; rewrite ?lookup_delete_Some; set_solver. Qed.
-Lemma foldr_delete_id {A} (m : M A) is :
-  Forall (λ i, m !! i = None) is → foldr delete m is = m.
+Lemma lookup_foldr_delete_Some {A} (m : M A) js j y :
+  foldr delete m js !! j = Some y ↔ j ∉ js ∧ m !! j = Some y.
+Proof. induction js; simpl; rewrite ?lookup_delete_Some; set_solver. Qed.
+Lemma foldr_delete_id {A} (m : M A) js :
+  Forall (λ i, m !! i = None) js → foldr delete m js = m.
 Proof. induction 1; simpl; [done |]. rewrite delete_id; congruence. Qed.
 
-Lemma delete_foldr_delete {A} (m : M A) is j :
-  delete j (foldr delete m is) = foldr delete (delete j m) is.
+Lemma delete_foldr_delete {A} (m : M A) js j :
+  delete j (foldr delete m js) = foldr delete (delete j m) js.
 Proof.
-  induction is as [|?? IH]; simpl; [done|]. by rewrite delete_delete, IH.
+  induction js as [|?? IH]; simpl; [done|]. by rewrite delete_delete, IH.
 Qed.
 
-Lemma foldr_delete_insert_in {A} (m : M A) is j x :
-  j ∈ is → foldr delete (<[j:=x]>m) is = foldr delete m is.
+Lemma foldr_delete_insert_in {A} (m : M A) js j x :
+  j ∈ js → foldr delete (<[j:=x]>m) js = foldr delete m js.
 Proof.
-  induction 1 as [i is|j i is ? IH]; simpl; [|by rewrite IH].
+  induction 1 as [i js|j i js ? IH]; simpl; [|by rewrite IH].
   by rewrite !delete_foldr_delete, delete_insert_eq.
 Qed.
-Lemma foldr_delete_insert_notin {A} (m : M A) is j x :
-  j ∉ is → foldr delete (<[j:=x]>m) is = <[j:=x]>(foldr delete m is).
+Lemma foldr_delete_insert_notin {A} (m : M A) js j x :
+  j ∉ js → foldr delete (<[j:=x]>m) js = <[j:=x]>(foldr delete m js).
 Proof.
-  induction is as [|?? IHis]; simpl; [done |]. rewrite elem_of_cons. intros.
-  rewrite IHis, delete_insert_ne; intuition.
+  induction js as [|?? IHjs]; simpl; [done |]. rewrite elem_of_cons. intros.
+  rewrite IHjs, delete_insert_ne; intuition.
 Qed.
-Lemma foldr_delete_insert {A} (m : M A) is j x :
-  foldr delete (<[j:=x]>m) is =
-    if decide (j ∈ is) then foldr delete m is else <[j:=x]>(foldr delete m is).
+Lemma foldr_delete_insert {A} (m : M A) js j x :
+  foldr delete (<[j:=x]>m) js =
+    if decide (j ∈ js) then foldr delete m js else <[j:=x]>(foldr delete m js).
 Proof.
   case_decide; auto using foldr_delete_insert_in, foldr_delete_insert_notin.
 Qed.
 
-Lemma map_disjoint_foldr_delete_l {A} (m1 m2 : M A) is :
-  m1 ##ₘ m2 → foldr delete m1 is ##ₘ m2.
-Proof. induction is; simpl; auto using map_disjoint_delete_l. Qed.
-Lemma map_disjoint_foldr_delete_r {A} (m1 m2 : M A) is :
-  m1 ##ₘ m2 → m1 ##ₘ foldr delete m2 is.
-Proof. induction is; simpl; auto using map_disjoint_delete_r. Qed.
-Lemma map_agree_foldr_delete_l {A} (m1 m2 : M A) is :
-  map_agree m1 m2 → map_agree (foldr delete m1 is) m2.
-Proof. induction is; simpl; auto using map_agree_delete_l. Qed.
-Lemma map_agree_foldr_delete_r {A} (m1 m2 : M A) is :
-  map_agree m1 m2 → map_agree m1 (foldr delete m2 is).
-Proof. induction is; simpl; auto using map_agree_delete_r. Qed.
-Lemma foldr_delete_union {A} (m1 m2 : M A) is :
-  foldr delete (m1 ∪ m2) is = foldr delete m1 is ∪ foldr delete m2 is.
+Lemma map_disjoint_foldr_delete_l {A} (m1 m2 : M A) js :
+  m1 ##ₘ m2 → foldr delete m1 js ##ₘ m2.
+Proof. induction js; simpl; auto using map_disjoint_delete_l. Qed.
+Lemma map_disjoint_foldr_delete_r {A} (m1 m2 : M A) js :
+  m1 ##ₘ m2 → m1 ##ₘ foldr delete m2 js.
+Proof. induction js; simpl; auto using map_disjoint_delete_r. Qed.
+Lemma map_agree_foldr_delete_l {A} (m1 m2 : M A) js :
+  map_agree m1 m2 → map_agree (foldr delete m1 js) m2.
+Proof. induction js; simpl; auto using map_agree_delete_l. Qed.
+Lemma map_agree_foldr_delete_r {A} (m1 m2 : M A) js :
+  map_agree m1 m2 → map_agree m1 (foldr delete m2 js).
+Proof. induction js; simpl; auto using map_agree_delete_r. Qed.
+Lemma foldr_delete_union {A} (m1 m2 : M A) js :
+  foldr delete (m1 ∪ m2) js = foldr delete m1 js ∪ foldr delete m2 js.
 Proof. apply foldr_delete_union_with. Qed.
 
 (** ** Properties on conversion to lists that depend on [∪] and [##ₘ] *)
@@ -3511,26 +3511,26 @@ Qed.
 Lemma map_disjoint_list_to_map_r {A} (m : M A) ixs :
   m ##ₘ list_to_map ixs ↔ Forall (λ ix, m !! ix.1 = None) ixs.
 Proof. by rewrite (symmetry_iff map_disjoint), map_disjoint_list_to_map_l. Qed.
-Lemma map_disjoint_list_to_map_zip_l {A} (m : M A) is xs :
-  length is = length xs →
-  list_to_map (zip is xs) ##ₘ m ↔ Forall (λ i, m !! i = None) is.
+Lemma map_disjoint_list_to_map_zip_l {A} (m : M A) js xs :
+  length js = length xs →
+  list_to_map (zip js xs) ##ₘ m ↔ Forall (λ i, m !! i = None) js.
 Proof.
   intro. rewrite map_disjoint_list_to_map_l.
-  rewrite <-(fst_zip is xs) at 2 by lia. by rewrite Forall_fmap.
+  rewrite <-(fst_zip js xs) at 2 by lia. by rewrite Forall_fmap.
 Qed.
-Lemma map_disjoint_list_to_map_zip_r {A} (m : M A) is xs :
-  length is = length xs →
-  m ##ₘ list_to_map (zip is xs) ↔ Forall (λ i, m !! i = None) is.
+Lemma map_disjoint_list_to_map_zip_r {A} (m : M A) js xs :
+  length js = length xs →
+  m ##ₘ list_to_map (zip js xs) ↔ Forall (λ i, m !! i = None) js.
 Proof.
   intro. by rewrite (symmetry_iff map_disjoint), map_disjoint_list_to_map_zip_l.
 Qed.
-Lemma map_disjoint_list_to_map_zip_l_2 {A} (m : M A) is xs :
-  length is = length xs → Forall (λ i, m !! i = None) is →
-  list_to_map (zip is xs) ##ₘ m.
+Lemma map_disjoint_list_to_map_zip_l_2 {A} (m : M A) js xs :
+  length js = length xs → Forall (λ i, m !! i = None) js →
+  list_to_map (zip js xs) ##ₘ m.
 Proof. intro. by rewrite map_disjoint_list_to_map_zip_l. Qed.
-Lemma map_disjoint_list_to_map_zip_r_2 {A} (m : M A) is xs :
-  length is = length xs → Forall (λ i, m !! i = None) is →
-  m ##ₘ list_to_map (zip is xs).
+Lemma map_disjoint_list_to_map_zip_r_2 {A} (m : M A) js xs :
+  length js = length xs → Forall (λ i, m !! i = None) js →
+  m ##ₘ list_to_map (zip js xs).
 Proof. intro. by rewrite map_disjoint_list_to_map_zip_r. Qed.
 
 Lemma map_Forall2_union_inv_l {A B} (R : K → A → B → Prop)
@@ -3609,12 +3609,12 @@ Section intersection_with.
     delete i (intersection_with f m1 m2) =
       intersection_with f (delete i m1) (delete i m2).
   Proof. by apply (partial_alter_merge _). Qed.
-  Lemma foldr_delete_intersection_with (m1 m2 : M A) is :
-    foldr delete (intersection_with f m1 m2) is =
-      intersection_with f (foldr delete m1 is) (foldr delete m2 is).
+  Lemma foldr_delete_intersection_with (m1 m2 : M A) js :
+    foldr delete (intersection_with f m1 m2) js =
+      intersection_with f (foldr delete m1 js) (foldr delete m2 js).
   Proof.
-    induction is as [|?? IHis]; simpl; [done|].
-    by rewrite IHis, delete_intersection_with.
+    induction js as [|?? IHjs]; simpl; [done|].
+    by rewrite IHjs, delete_intersection_with.
   Qed.
   Lemma insert_intersection_with m1 m2 i x y z :
     f x y = Some z →
