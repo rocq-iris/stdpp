@@ -755,7 +755,7 @@ Proof.
 Qed.
 
 (** ** Properties of the [insert] operation *)
-Lemma lookup_insert {A} (m : M A) i j x : 
+Lemma lookup_insert {A} (m : M A) i j x :
   <[i:=x]>m !! j = if decide (i = j) then Some x else m !! j.
 Proof. apply lookup_partial_alter. Qed.
 Lemma lookup_insert_eq {A} (m : M A) i x : <[i:=x]>m !! i = Some x.
@@ -763,7 +763,7 @@ Proof. apply lookup_partial_alter_eq. Qed.
 Lemma lookup_insert_ne {A} (m : M A) i j x : i ≠ j → <[i:=x]>m !! j = m !! j.
 Proof. apply lookup_partial_alter_ne. Qed.
 
-Lemma lookup_total_insert `{!Inhabited A} (m : M A) i j x : 
+Lemma lookup_total_insert `{!Inhabited A} (m : M A) i j x :
   <[i:=x]>m !!! j = if decide (i = j) then x else m !!! j.
 Proof. apply lookup_total_partial_alter. Qed.
 Lemma lookup_total_insert_eq `{!Inhabited A} (m : M A) i x : <[i:=x]>m !!! i = x.
@@ -3624,9 +3624,9 @@ Section intersection_with.
 End intersection_with.
 
 (** ** Properties of the [intersection] operation *)
-Global Instance map_empty_interaction {A} : LeftAbsorb (=@{M A}) ∅ (∩) := _.
-Global Instance map_interaction_empty {A} : RightAbsorb (=@{M A}) ∅ (∩) := _.
-Global Instance map_interaction_assoc {A} : Assoc (=@{M A}) (∩).
+Global Instance map_empty_intersection {A} : LeftAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance map_intersection_empty {A} : RightAbsorb (=@{M A}) ∅ (∩) := _.
+Global Instance map_intersection_assoc {A} : Assoc (=@{M A}) (∩).
 Proof.
   intros m1 m2 m3.
   unfold intersection, map_intersection, intersection_with, map_intersection_with.

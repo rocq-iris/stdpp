@@ -217,6 +217,9 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Add lemma `map_disjoint_merge_as_union`. (by Johannes Hostert)
 - Add `Decision` instances for `set_Forall` and `set_Exists` on `gmultiset`.
   (by Johannes Hostert)
+- Rename typeclass instances `map_empty_interaction` → `map_empty_intersection`,
+  `map_interaction_empty` → `map_intersection_empty`,
+  `map_interaction_assoc` → `map_intersection_assoc`. (by Nikhil Chatterjee)
 
 **Changes in `stdpp_bitvector`:**
 
@@ -369,6 +372,11 @@ s/\bstrict_transitive_l\b/strict_trans_l/g
 s/\bstrict_transitive_r\b/strict_trans_r/g
 s/\brtc_transitive\b/rtc_trans/g
 s/\btc_transitive\b/tc_trans/g
+
+# map intersection typos
+s/\bmap_empty_interaction\b/map_empty_intersection/g
+s/\bmap_interaction_empty\b/map_intersection_empty/g
+s/\bmap_interaction_assoc\b/map_intersection_assoc/g
 EOF
 ```
 
