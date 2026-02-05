@@ -220,6 +220,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
 - Rename typeclass instances `map_empty_interaction` → `map_empty_intersection`,
   `map_interaction_empty` → `map_intersection_empty`,
   `map_interaction_assoc` → `map_intersection_assoc`. (by Nikhil Chatterjee)
+- Add lemmas `disjoint_top_{l,r}` and `disjoint_top_{l,r}_L`.
 
 **Changes in `stdpp_bitvector`:**
 
