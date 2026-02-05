@@ -517,6 +517,15 @@ Section semi_set.
   Lemma disjoint_union_r X Y1 Y2 : X ## Y1 ∪ Y2 ↔ X ## Y1 ∧ X ## Y2.
   Proof. set_solver. Qed.
 
+  Lemma disjoint_top_l `{!Top C, !TopSet A C} X : ⊤ ## X ↔ X ≡ ∅.
+  Proof.
+    split; [|intros ->; apply disjoint_empty_r].
+    intros Hdisj. apply elem_of_equiv_empty; intros x Hx.
+    eapply Hdisj, Hx. by apply elem_of_top'.
+  Qed.
+  Lemma disjoint_top_r `{!Top C, !TopSet A C} X : X ## ⊤ ↔ X ≡ ∅.
+  Proof. rewrite (symmetry_iff disjoint). apply disjoint_top_l. Qed.
+
   (** Big unions *)
   Lemma elem_of_union_list Xs x : x ∈ ⋃ Xs ↔ ∃ X, X ∈ Xs ∧ x ∈ X.
   Proof.
@@ -612,6 +621,12 @@ Section semi_set.
     (** Singleton *)
     Lemma non_empty_singleton_L x : {[ x ]} ≠@{C} ∅.
     Proof. unfold_leibniz. apply non_empty_singleton. Qed.
+
+  (** Disjointness *)
+    Lemma disjoint_top_l_L `{!Top C, !TopSet A C} X : ⊤ ## X ↔ X = ∅.
+    Proof. unfold_leibniz. apply disjoint_top_l. Qed.
+    Lemma disjoint_top_r_L `{!Top C, !TopSet A C} X : X ## ⊤ ↔ X = ∅.
+    Proof. unfold_leibniz. apply disjoint_top_r. Qed.
 
     (** Big unions *)
     Lemma union_list_singleton_L X : ⋃ [X] = X.
