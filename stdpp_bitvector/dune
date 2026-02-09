@@ -2,4 +2,5 @@
 (rocq.theory
  (name stdpp.bitvector)
  (package rocq-stdpp-bitvector)
+ (generate_project_file)
  (theories Stdlib stdpp))

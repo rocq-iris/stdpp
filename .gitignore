@@ -15,8 +15,8 @@
 .coq-native/
 Makefile.coq
 Makefile.coq.conf
-_CoqProject
-_CoqProject.*
+_RocqProject
+_RocqProject.*
 Makefile.package.*
 .Makefile.package.*
 *.crashcoqide

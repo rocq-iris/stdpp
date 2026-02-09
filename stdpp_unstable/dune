@@ -2,4 +2,5 @@
 (rocq.theory
  (name stdpp.unstable)
  (package rocq-stdpp-unstable)
+ (generate_project_file)
  (theories Stdlib stdpp stdpp.bitvector))
