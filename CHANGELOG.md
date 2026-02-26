@@ -222,7 +222,7 @@ The opam packages have been renamed from `coq-*` to `rocq-*`.
   `map_interaction_assoc` → `map_intersection_assoc`. (by Nikhil Chatterjee)
 - Add lemmas `disjoint_top_{l,r}` and `disjoint_top_{l,r}_L`.
 - Switch to `rocq makefile` and `_RocqProject` for Makefile generation.
-* Improve dune support: properly generate `_RocqProject` and update to
+- Improve dune support: properly generate `_RocqProject` and update to
   `rocq.theory`. (by Rodolphe Lepigre)
 
 **Changes in `stdpp_bitvector`:**
