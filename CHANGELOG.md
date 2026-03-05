@@ -1,7 +1,7 @@
 This file lists "large-ish" changes to the std++ Rocq library, but not every
 API-breaking change is listed.
 
-## std++ 1.13.0 (2026-02-12)
+## std++ 1.13.0 (2026-03-05)
 
 This version of std++ supports Rocq 9.0, 9.1, and 9.2.
 Support for Coq 8.18, 8.19, and 8.20 has been dropped.
@@ -21,6 +21,7 @@ Sanjit Bhat, Simcha van Collem, Tej Chajed, and Tesla Zhang.
 
 **Detailed list of changes:**
 
+- Add lemmas `Forall_vinsert` and `Forall_vreplicate`. (by Rudy Peterson)
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
 - Add lemma `map_fmap_imap`. (by Rudy Peterson)
@@ -408,7 +409,6 @@ Rudy Peterson, and Marijn van Wezel. Thanks a lot to everyone involved.
 
 **Detailed list of changes:**
 
-- Add lemmas `Forall_vinsert` and `Forall_vreplicate`. (by Rudy Peterson)
 - Add `disj_union_list` and associated lemmas for `gmultiset`. (by Marijn van Wezel)
 - Add lemma `lookup_total_fmap`.
 - Add lemmas about `last` and `head`: `last_app_Some`, `last_app_None`,
