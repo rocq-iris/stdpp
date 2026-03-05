@@ -1,12 +1,25 @@
-This file lists "large-ish" changes to the std++ Coq library, but not every
+This file lists "large-ish" changes to the std++ Rocq library, but not every
 API-breaking change is listed.
 
-## std++ master
+## std++ 1.13.0 (2026-02-12)
 
-This version of std++ newly supports Rocq 9.1, and drops support for Coq 8.18,
-8.19, and 8.20.
-
+This version of std++ supports Rocq 9.0, 9.1, and 9.2.
+Support for Coq 8.18, 8.19, and 8.20 has been dropped.
 The opam packages have been renamed from `coq-*` to `rocq-*`.
+
+The main change in this release is that the lemmas for `lookup` and commuting
+operations on lists and maps have been made more ergonomic (particularly, new
+lemmas combine the cases for `=` and `≠`) and made more consistent.
+
+This release was managed by Jesper Bengtson, Ralf Jung and Robbert Krebbers,
+with contributions from Andres Erbsen, Benjamin Peters, Brian Campbell,
+Egor Namakonov, François Pottier, Isaac van Bakel, Jan-Oliver Kaiser,
+Johannes Hostert, Jonas Kastberg Hinrichsen, Kimaya Bedarkar,
+Marijn van Wezel, Michael Sammler, Nikhil Chatterjee, Niklas Mück,
+Pierre Roux, Ralf Jung, Robbert Krebbers, Rodolphe Lepigre, Rudy Peterson,
+Sanjit Bhat, Simcha van Collem, Tej Chajed, and Tesla Zhang.
+
+**Detailed list of changes:**
 
 - Declare the internals of `coPset` as `Local`.
 - Improve documentation of `coPset`. (by François Pottier)
