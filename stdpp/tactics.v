@@ -878,12 +878,14 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | H : ?P → ?Q, H2 : ?P |- _ => specialize (H H2)
   | H : Is_true (bool_decide _) |- _ => apply (bool_decide_unpack _) in H
   | H : Is_true (_ && _) |- _ => apply andb_True in H; destruct H
+  | H : Is_true (negb _) |- _ => apply negb_True in H
   (**i simplify and solve equalities *)
   | |- _ => progress simplify_eq/=
   (**i operations that generate more subgoals *)
   | |- _ ∧ _ => split
   | |- Is_true (bool_decide _) => apply (bool_decide_pack _)
   | |- Is_true (_ && _) => apply andb_True; split
+  | |- Is_true (negb _) => apply negb_True
   | H : _ ∨ _ |- _ =>
      let H1 := fresh in destruct H as [H1|H1]; try clear H
   | H : Is_true (_ || _) |- _ =>
