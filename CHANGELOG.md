@@ -1,6 +1,12 @@
 This file lists "large-ish" changes to the std++ Rocq library, but not every
 API-breaking change is listed.
 
+## std++ master
+
+**Detailed list of changes:**
+
+(currently empty)
+
 ## std++ 1.13.0 (2026-03-05)
 
 This version of std++ supports Rocq 9.0, 9.1, and 9.2.
