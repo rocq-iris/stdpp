@@ -872,6 +872,14 @@ Proof.
   destruct (decide (P x)); auto using sublist_skip, sublist_cons.
 Qed.
 
+Lemma sublist_filter_mono P `{!∀ x : A, Decision (P x)} l1 l2 :
+  l1 `sublist_of` l2 →
+  filter P l1 `sublist_of` filter P l2.
+Proof.
+  induction 1; rewrite ?filter_nil, ?filter_cons;
+    repeat case_decide; eauto using sublist.
+Qed.
+
 Lemma Permutation_sublist l1 l2 l3 :
   l1 ≡ₚ l2 → l2 `sublist_of` l3 → ∃ l4, l1 `sublist_of` l4 ∧ l4 ≡ₚ l3.
 Proof.

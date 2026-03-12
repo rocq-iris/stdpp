@@ -5,7 +5,7 @@ API-breaking change is listed.
 
 **Detailed list of changes:**
 
-(currently empty)
+- Add lemma `sublist_filter_mono`. (by Benjamin Peters)
 
 ## std++ 1.13.0 (2026-03-05)
 
