@@ -46,9 +46,19 @@ Lemma exists_proj1_pi `(P : A → Prop) `{∀ x, ProofIrrel (P x)}
   (x : sig P) p : `x ↾ p = x.
 Proof. apply (sig_eq_pi _); reflexivity. Qed.
 
-Global Instance existT_inj_2 {A} {B : A → Type} (a : A) `{!ProofIrrel (a = a)} :
+Lemma existT_inj_2 {A} {B : A → Type} (a : A) `{!ProofIrrel (a = a)} :
   Inj (=) (=@{sigT B}) (existT a).
 Proof.
   intros b1 b2 [Ha Hb]%EqdepFacts.eq_sigT_sig_eq.
   rewrite (proof_irrel Ha eq_refl) in Hb. apply Hb.
 Qed.
+
+(** We make this a [Hint Extern] so that we can give [B] to [existT_inj_2].
+If this was a normal instance, then typeclass resolution would just try
+to [simple apply @existT_inj_2], which can then lead unification into
+inferring a wrong [B]. The other two arguments remain wildcards, so that
+they can be unified with [eq], allowing this instance to apply in more cases,
+as is the case for normal instances under [Hint Mode Inj - - -]. In particular,
+these arguments are allowed to be evars. *)
+Global Hint Extern 0 (Inj _ _ (@existT ?A ?B ?a)) => 
+  simple apply (@existT_inj_2 A B a) : typeclass_instances.

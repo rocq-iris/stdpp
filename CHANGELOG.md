@@ -6,6 +6,9 @@ API-breaking change is listed.
 **Detailed list of changes:**
 
 - Add lemma `sublist_filter_mono`. (by Benjamin Peters)
+- Turn the `existT_inj_2` instance into a `Hint Extern` to work
+  around it failing to apply properly due to higher-order unification
+  going wrong. (by Johannes Hostert)
 
 ## std++ 1.13.0 (2026-03-05)
 

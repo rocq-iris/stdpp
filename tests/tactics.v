@@ -435,6 +435,11 @@ Example existT_inj2_test_proof_irrel {A} {B : A → Type}
   existT a b1 = existT a b2 → b1 = b2.
 Proof. intros. by simplify_eq. Qed.
 
+Example existT_inj2_test_proof_irrel_more_dependent
+    `{!ProofIrrel (x = x)} (b1 b2 : Fin.t (S x)) :
+  @existT nat (λ y, Fin.t (S y)) x b1 = existT x b2 → b1 = b2.
+Proof. intros. by simplify_eq. Qed.
+
 (** Test that if the [a]s are different, we obtain [a1 = a2] and [b1 = b2]. Note
 that this result is provable without the [ProofIrrel] assumption through a
 manual proof, but the present [simplify_eq] is not smart enough for that. *)
