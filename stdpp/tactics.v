@@ -898,11 +898,20 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | |- _ ∨ _ => first [left; go n | right; go n]
   | |- Is_true (_ || _) => apply orb_True; first [left; go n | right; go n]
   | _ =>
-    (**i instantiations of assumptions. *)
+    (** The following clauses can cause loops, so we decrease the fuel *)
     lazymatch n with
     | S ?n' =>
-      (**i we give priority to assumptions that fit on the conclusion. *)
       match goal with
+      (** If the goal is decidable, introduce [¬P] into the context (assuming
+      we do not already have it. *)
+      | |- ?P =>
+        match goal with
+        | H : ¬P |- _ => fail 1
+        | _ => let H := fresh in apply dec_stable; intros H; apply H; go n'
+        end
+      (** Instantiations of assumptions. We give priority to assumptions that
+      fit on the conclusion (using [eapply H]) and otherwise just specialize
+      them (using [opose proof*]). *)
       | H : _ → _ |- _ =>
         is_non_dependent H;
         no_new_unsolved_evars

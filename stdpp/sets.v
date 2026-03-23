@@ -358,8 +358,6 @@ Tactic Notation "set_solver" "by" tactic3(tac) :=
   try fast_done;
   intros; setoid_subst;
   set_unfold;
-  intros; setoid_subst;
-  try match goal with |- _ ∈ _ => apply dec_stable end;
   naive_solver tac.
 Tactic Notation "set_solver" "-" hyp_list(Hs) "by" tactic3(tac) :=
   clear Hs; set_solver by tac.
@@ -646,15 +644,15 @@ Section semi_set.
 
   Lemma not_elem_of_iff `{!RelDecision (∈@{C})} X Y x :
     (x ∈ X ↔ x ∈ Y) ↔ (x ∉ X ↔ x ∉ Y).
-  Proof. destruct (decide (x ∈ X)), (decide (x ∈ Y)); tauto. Qed.
+  Proof. set_solver. Qed.
 
   Section dec.
     Context `{!RelDecision (≡@{C})}.
 
     Lemma set_subseteq_inv X Y : X ⊆ Y → X ⊂ Y ∨ X ≡ Y.
-    Proof. destruct (decide (X ≡ Y)); [by right|left;set_solver]. Qed.
+    Proof. destruct (decide (X ≡ Y)); set_solver. Qed.
     Lemma set_not_subset_inv X Y : X ⊄ Y → X ⊈ Y ∨ X ≡ Y.
-    Proof. destruct (decide (X ≡ Y)); [by right|left;set_solver]. Qed.
+    Proof. destruct (decide (X ≡ Y)); set_solver. Qed.
 
     Lemma non_empty_union X Y : X ∪ Y ≢ ∅ ↔ X ≢ ∅ ∨ Y ≢ ∅.
     Proof. destruct (decide (X ≡ ∅)); set_solver. Qed.
@@ -846,33 +844,24 @@ Section set.
     Context `{!RelDecision (∈@{C})}.
 
     Lemma not_elem_of_intersection x X Y : x ∉ X ∩ Y ↔ x ∉ X ∨ x ∉ Y.
-    Proof. rewrite elem_of_intersection. destruct (decide (x ∈ X)); tauto. Qed.
+    Proof. set_solver. Qed.
     Lemma not_elem_of_difference x X Y : x ∉ X ∖ Y ↔ x ∉ X ∨ x ∈ Y.
-    Proof. rewrite elem_of_difference. destruct (decide (x ∈ Y)); tauto. Qed.
+    Proof. set_solver. Qed.
     Lemma union_difference X Y : X ⊆ Y → Y ≡ X ∪ Y ∖ X.
-    Proof.
-      intros ? x; split; rewrite !elem_of_union, elem_of_difference; [|intuition].
-      destruct (decide (x ∈ X)); intuition.
-    Qed.
+    Proof. set_solver. Qed.
     Lemma union_difference_singleton x Y : x ∈ Y → Y ≡ {[x]} ∪ Y ∖ {[x]}.
     Proof. intros ?. apply union_difference. set_solver. Qed.
     Lemma difference_union X Y : X ∖ Y ∪ Y ≡ X ∪ Y.
-    Proof.
-      intros x. rewrite !elem_of_union; rewrite elem_of_difference.
-      split; [ | destruct (decide (x ∈ Y)) ]; intuition.
-    Qed.
+    Proof. set_solver. Qed.
     Lemma difference_difference_r X Y Z : X ∖ (Y ∖ Z) ≡ (X ∖ Y) ∪ (X ∩ Z).
-    Proof. intros x. destruct (decide (x ∈ Z)); set_solver. Qed.
+    Proof. set_solver. Qed.
     Lemma difference_union_intersection X Y : (X ∖ Y) ∪ (X ∩ Y) ≡ X.
-    Proof. rewrite union_intersection_l, difference_union. set_solver. Qed.
+    Proof. set_solver. Qed.
 
     Lemma subseteq_disjoint_union X Y : X ⊆ Y ↔ ∃ Z, Y ≡ X ∪ Z ∧ X ## Z.
-    Proof.
-      split; [|set_solver].
-      exists (Y ∖ X); split; [auto using union_difference|set_solver].
-    Qed.
+    Proof. split; [|set_solver]. exists (Y ∖ X); set_solver. Qed.
     Lemma non_empty_difference X Y : X ⊂ Y → Y ∖ X ≢ ∅.
-    Proof. intros [HXY1 HXY2] Hdiff. destruct HXY2. set_solver. Qed.
+    Proof. set_solver. Qed.
     Lemma empty_difference_subseteq X Y : X ∖ Y ≡ ∅ → X ⊆ Y.
     Proof. set_solver. Qed.
     Lemma singleton_union_difference X Y x :

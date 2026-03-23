@@ -348,8 +348,7 @@ Proof.
       + apply list_elem_of_lookup_2 in Hj2. set_solver.
       + intros ->. pose proof (NoDup_elements (X ∪ Y)).
         by eapply Hj, NoDup_lookup.
-    - rewrite <-!elements_disj_union by set_solver. f_equiv; intros x.
-      destruct (decide (x ∈ X)), (decide (x ∈ Y)); set_solver. }
+    - rewrite <-!elements_disj_union by set_solver. f_equiv; set_solver. }
   trans (foldr f (foldr f b (elements (X ∩ Y) ++ elements (X ∖ Y)))
     (elements (Y ∖ X) ++ elements (X ∩ Y))).
   { rewrite !foldr_app. apply Hff. apply (foldr_idemp_strong (flip R)).
@@ -368,8 +367,7 @@ Proof.
       + intros ->. assert (NoDup (elements (Y ∖ X) ++ elements (X ∩ Y))).
         { rewrite <-elements_disj_union by set_solver. apply NoDup_elements. }
         by eapply Hj, NoDup_lookup.
-    - rewrite <-!elements_disj_union by set_solver. f_equiv; intros x.
-      destruct (decide (x ∈ X)); set_solver. }
+    - rewrite <-!elements_disj_union by set_solver. f_equiv; set_solver. }
   apply Hff. apply (foldr_permutation R f _).
   - intros j1 x1 j2 x2 b' Hj Hj1 Hj2. apply Hfcomm.
     + apply list_elem_of_lookup_2 in Hj1. set_solver.
@@ -377,8 +375,7 @@ Proof.
     + intros ->. assert (NoDup (elements (X ∩ Y) ++ elements (X ∖ Y))).
       { rewrite <-elements_disj_union by set_solver. apply NoDup_elements. }
       by eapply Hj, NoDup_lookup.
-  - rewrite <-!elements_disj_union by set_solver. f_equiv; intros x.
-    destruct (decide (x ∈ Y)); set_solver.
+  - rewrite <-!elements_disj_union by set_solver. f_equiv; set_solver.
 Qed.
 Lemma set_fold_union (f : A → A → A) (b : A) X Y :
   IdemP (=) f →
@@ -497,7 +494,7 @@ Section filter.
   Lemma disjoint_filter_complement X : filter P X ## filter (λ x, ¬P x) X.
   Proof. set_solver. Qed.
   Lemma filter_union_complement X : filter P X ∪ filter (λ x, ¬P x) X ≡ X.
-  Proof. intros x. destruct (decide (P x)); set_solver. Qed.
+  Proof. set_solver. Qed.
 
   Section leibniz_equiv.
     Context `{!LeibnizEquiv C}.

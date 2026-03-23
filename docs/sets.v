@@ -113,21 +113,6 @@ Proof.
   set_solver.
 Qed.
 
-Lemma set_solver_fail_classic `{Countable A} (X Y Z : gset A) :
-  X ∪ Y = Y → Y ∪ Y = X ∪ Y ∖ X.
-Proof.
-  intros.
-  Fail set_solver.
-  Search gset difference union. (* nothing useful *)
-  Search Set_ difference union. (* plenty of results *)
-
-  (** The relevant lemma is [union_difference_L], note the [_L]. *)
-  (** We massage the goal a bit using the lemma and use [set_solver] to prove
-  the side-condition and remaining goal. *)
-  rewrite <-union_difference_L by set_solver.
-  set_solver.
-Abort.
-
 
 (** * Computation via [vm_compute] *)
 
