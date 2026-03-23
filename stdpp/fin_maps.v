@@ -5384,8 +5384,8 @@ Tactic Notation "simpl_map" := simpl_map by eauto with simpl_map map_disjoint.
 
 Global Hint Extern 80 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_l : simpl_map.
 Global Hint Extern 81 ((_ ∪ _) !! _ = Some _) => apply lookup_union_Some_r : simpl_map.
-Global Hint Extern 80 ({[ _:=_ ]} !! _ = Some _) => apply lookup_singleton : simpl_map.
-Global Hint Extern 80 (<[_:=_]> _ !! _ = Some _) => apply lookup_insert : simpl_map.
+Global Hint Extern 80 ({[ _:=_ ]} !! _ = Some _) => apply lookup_singleton_eq : simpl_map.
+Global Hint Extern 80 (<[_:=_]> _ !! _ = Some _) => apply lookup_insert_eq : simpl_map.
 
 (** Now we take everything together and also discharge conflicting look ups,
 simplify overlapping look ups, and perform cancellations of equalities

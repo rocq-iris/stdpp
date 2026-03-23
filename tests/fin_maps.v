@@ -462,3 +462,19 @@ Proof.
   apply GTest_pred. eapply map_Forall_impl; first apply Hts; simpl.
   intros _. apply gtest_pred_fixpoint.
 Qed.
+
+Section tactics.
+
+  (** See https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/695 *)
+  Lemma simpl_map_regression_695_lookup (m1 m2 : gmap Z nat) (l : Z) :
+    ((<[l:=42]> m1) ∪ m2) !! l = Some 42.
+  Proof.
+    simpl_map. done.
+  Qed.
+  Lemma simpl_map_regression_695_singleton (m1 m2 : gmap Z nat) (l : Z) :
+    ({[l:=42]} ∪ m2) !! l = Some 42.
+  Proof.
+    simpl_map. done.
+  Qed.
+
+End tactics.
