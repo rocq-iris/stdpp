@@ -106,3 +106,13 @@ build-rocq.9.0.1:
   variables:
     OPAM_PINS: "rocq-core version 9.0.1  rocq-stdlib version 9.0.0"
     DENY_WARNINGS: "1"
+
+trigger-rocq.dev:
+  <<: *template
+  variables:
+    OPAM_PINS: "coq version $NIGHTLY_COQ"
+    CI_COQCHK: "1"
+  rules:
+  - if: $CI_PROJECT_NAMESPACE != "iris"
+    when: never
+  - if: $CI_PIPELINE_SOURCE =~ /^(trigger|api|schedule)$/
