@@ -1126,6 +1126,36 @@ Lemma singleton_submseteq x y :
   [x] ⊆+ [y] ↔ x = y.
 Proof. rewrite singleton_submseteq_l. apply list_elem_of_singleton. Qed.
 
+Lemma submseteq_inj l1 l2 :
+  l1 ⊆+ l2 ↔ ∃ f : nat → nat, Inj (=) (=) f ∧ ∀ i : nat, l1 !! i = l2 !! f i.
+Proof.
+  split.
+  - induction 1 as [|x l1 l2 _ [f [??]]|x y l|x l1 l2 _ [f [??]]
+                    |l1 l2 l3 _ [f [? Hf]] _ [g [? Hg]]].
+    + exists id; split; [apply _|done].
+    + exists (λ i, match i with 0 => 0 | S i => S (f i) end); split.
+      * by intros [|i] [|j] ?; simplify_eq/=.
+      * intros [|i]; simpl; auto.
+    + exists (λ i, match i with 0 => 1 | 1 => 0 | _ => i end); split.
+      * intros [|[|i]] [|[|j]]; congruence.
+      * by intros [|[|i]].
+    + exists (S ∘ f). split; [apply _|]. done.
+    + exists (g ∘ f); split; [apply _|]. intros i; simpl. by rewrite <-Hg, <-Hf.
+  - intros (f & Hf & Hl). revert l2 f Hf Hl.
+    induction l1 as [|x l1 IH]; intros l2 f Hf Hl; [apply submseteq_nil_l|].
+    rewrite (delete_Permutation l2 (f 0) x) by (by rewrite <-Hl).
+    pose (g n := let m := f (S n) in if lt_eq_lt_dec m (f 0) then m else m - 1).
+    apply submseteq_skip, (IH _ g).
+    + unfold g. intros i j Hg.
+      repeat destruct (lt_eq_lt_dec _ _) as [[?|?]|?]; simplify_eq/=; try lia.
+      apply (inj S), (inj f); lia.
+    + intros i. unfold g. destruct (lt_eq_lt_dec _ _) as [[?|?]|?].
+      * by rewrite list_lookup_delete_lt, <-Hl.
+      * simplify_eq.
+      * rewrite list_lookup_delete_ge, <-Nat.sub_succ_l by lia; simpl.
+        by rewrite Nat.sub_0_r, <-Hl.
+Qed.
+
 Section submseteq_dec.
   Context `{!EqDecision A}.
 

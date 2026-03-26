@@ -9,6 +9,10 @@ API-breaking change is listed.
 - Turn the `existT_inj_2` instance into a `Hint Extern` to work
   around it failing to apply properly due to higher-order unification
   going wrong. (by Johannes Hostert)
+- Add lemmas `size_difference_le`, `size_union_le`, `filter_subseteq`,
+  `size_filter_le`, `filter_id[_L]`, `size_set_map`, `join_cons`, `foldr_join`,
+  `foldl_foldr`, `foldr_foldl`, `submseteq_inj`,
+  `subseteq_difference_inj_{l,r}[_L]`. (by emilia-h)
 
 ## std++ 1.13.0 (2026-03-05)
 

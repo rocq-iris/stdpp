@@ -453,6 +453,7 @@ Section bind.
   Qed.
 End bind.
 
+(** ** Properties of [mjoin] on lists *)
 Global Instance list_join_proper `{!Equiv A} :
   Proper ((≡) ==> (≡@{list A})) mjoin.
 Proof. induction 1; simpl; [constructor|solve_proper]. Qed.
@@ -478,6 +479,8 @@ Section ret_join.
   Proof. by rewrite join_nil. Qed.
   Lemma join_nil_2 (ls : list (list A)) : Forall (.= []) ls → mjoin ls = [].
   Proof. by rewrite join_nil. Qed.
+  Lemma join_cons (l : list A) ls : mjoin (l :: ls) = l ++ mjoin ls.
+  Proof. done. Qed.
 
   Lemma join_app (l1 l2 : list (list A)) :
     mjoin (l1 ++ l2) = mjoin l1 ++ mjoin l2.
@@ -905,6 +908,13 @@ Lemma foldr_comm_acc {A B} (f : A → B → B) (g : B → B) (b : B) l :
   foldr f (g b) l = g (foldr f b l).
 Proof. intros. apply (foldr_comm_acc_strong _); [solve_proper|done]. Qed.
 
+Lemma foldr_join {A B} (ls : list (list A)) (f : A → B → B) x :
+  foldr f x (mjoin ls) = foldr (λ l y, foldr f y l) x ls.
+Proof.
+  induction ls as [|l ls IH]; simpl; [done|].
+  by rewrite foldr_app, IH.
+Qed.
+
 Lemma foldl_app {A B} (f : A → B → A) (l k : list B) (a : A) :
   foldl f a (l ++ k) = foldl f (foldl f a l) k.
 Proof. revert a. induction l; simpl; auto. Qed.
@@ -914,6 +924,16 @@ Proof. rewrite foldl_app. done. Qed.
 Lemma foldl_fmap {A B C} (f : A → B → A) x (l : list C) g :
   foldl f x (g <$> l) = foldl (λ a b, f a (g b)) x l.
 Proof. revert x. induction l; f_equal/=; auto. Qed.
+
+Lemma foldl_foldr {A B} (f : A → B → A) l a :
+  foldl f a l = foldr (flip f) a (reverse l).
+Proof.
+  revert a. induction l as [|x l IH]; intros a; simpl; [done|].
+  by rewrite reverse_cons, foldr_snoc, IH.
+Qed.
+Lemma foldr_foldl {A B} (f : A → B → B) l a :
+  foldr f a l = foldl (flip f) a (reverse l).
+Proof. by rewrite foldl_foldr, reverse_involutive. Qed.
 
 (** ** Properties of the [zip_with] and [zip] functions *)
 Global Instance zip_with_proper `{!Equiv A, !Equiv B, !Equiv C} :

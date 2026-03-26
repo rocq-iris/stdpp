@@ -865,6 +865,12 @@ Section set.
     Proof. intros x. destruct (decide (x ∈ Z)); set_solver. Qed.
     Lemma difference_union_intersection X Y : (X ∖ Y) ∪ (X ∩ Y) ≡ X.
     Proof. rewrite union_intersection_l, difference_union. set_solver. Qed.
+    Lemma subseteq_difference_inj_l X1 X2 X3 :
+      X3 ⊆ X1 → X3 ⊆ X2 → X1 ∖ X3 ≡ X2 ∖ X3 → X1 ≡ X2.
+    Proof. split; set_solver. (* TODO prove without split, see !696. *) Qed.
+    Lemma subseteq_difference_inj_r X1 X2 X3 :
+      X3 ⊆ X1 → X2 ⊆ X1 → X1 ∖ X2 ≡ X1 ∖ X3 → X2 ≡ X3.
+    Proof. split; set_solver. (* TODO prove without split, see !696. *) Qed.
 
     Lemma subseteq_disjoint_union X Y : X ⊆ Y ↔ ∃ Z, Y ≡ X ∪ Z ∧ X ## Z.
     Proof.
@@ -902,7 +908,12 @@ Section set.
     Proof. unfold_leibniz. apply difference_difference_r. Qed.
     Lemma difference_union_intersection_L X Y : (X ∖ Y) ∪ (X ∩ Y) = X.
     Proof. unfold_leibniz. apply difference_union_intersection. Qed.
-
+    Lemma subseteq_difference_inj_l_L X1 X2 X3 :
+      X3 ⊆ X1 → X3 ⊆ X2 → X1 ∖ X3 = X2 ∖ X3 → X1 = X2.
+    Proof. unfold_leibniz. apply subseteq_difference_inj_l. Qed.
+    Lemma subseteq_difference_inj_r_L X1 X2 X3 :
+      X3 ⊆ X1 → X2 ⊆ X1 → X1 ∖ X2 = X1 ∖ X3 → X2 = X3.
+    Proof. unfold_leibniz. apply subseteq_difference_inj_r. Qed.
   End dec_leibniz.
 End set.
 

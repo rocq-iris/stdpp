@@ -218,6 +218,11 @@ Proof.
   intros. rewrite <-size_difference by set_solver.
   apply set_size_proper. set_solver.
 Qed.
+Lemma size_difference_le X1 X2 : size (X1 ∖ X2) ≤ size X1.
+Proof. rewrite size_difference_alt. lia. Qed.
+
+Lemma size_union_le X1 X2 : size (X1 ∪ X2) ≤ size X1 + size X2.
+Proof. rewrite size_union_alt, size_difference_alt. lia. Qed.
 
 Lemma set_subseteq_size_equiv X1 X2 : X1 ⊆ X2 → size X2 ≤ size X1 → X1 ≡ X2.
 Proof.
@@ -499,6 +504,13 @@ Section filter.
   Lemma filter_union_complement X : filter P X ∪ filter (λ x, ¬P x) X ≡ X.
   Proof. intros x. destruct (decide (P x)); set_solver. Qed.
 
+  Lemma filter_subseteq X : filter P X ⊆ X.
+  Proof. set_solver. Qed.
+  Lemma size_filter_le X : size (filter P X) ≤ size X.
+  Proof. apply subseteq_size, filter_subseteq. Qed.
+  Lemma filter_id X : filter P X ≡ X ↔ ∀ x, x ∈ X → P x.
+  Proof. set_solver. Qed.
+
   Section leibniz_equiv.
     Context `{!LeibnizEquiv C}.
 
@@ -520,6 +532,9 @@ Section filter.
     Proof. unfold_leibniz. apply filter_union. Qed.
     Lemma filter_union_complement_L X Y : filter P X ∪ filter (λ x, ¬P x) X = X.
     Proof. unfold_leibniz. apply filter_union_complement. Qed.
+
+    Lemma filter_id_L X : filter P X = X ↔ ∀ x, x ∈ X → P x.
+    Proof. unfold_leibniz. apply filter_id. Qed.
   End leibniz_equiv.
 End filter.
 
@@ -847,4 +862,17 @@ Proof.
   rewrite <-list_to_set_seq, size_list_to_set.
   2:{ apply NoDup_seq. }
   rewrite length_seq. done.
+Qed.
+
+(* This is placed outside of the section because [set_ind] could not work with
+[C:=D] if it was inside. *)
+Lemma size_set_map `{FinSet A C, FinSet B D} (f : A → B) (X : C) :
+  size (C:=D) (set_map f X) ≤ size X.
+Proof.
+  pattern X. apply set_ind; clear X.
+  - by intros ?? ->.
+  - by rewrite set_map_empty, !size_empty.
+  - intros x X ? IH. rewrite set_map_union, set_map_singleton.
+    rewrite size_union_alt, size_difference_alt.
+    rewrite (size_union _ X), !size_singleton by set_solver. lia.
 Qed.
