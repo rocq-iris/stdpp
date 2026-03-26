@@ -50,9 +50,12 @@ This list is incomplete, but notable side-effects include:
 This version is known to compile with:
 
  - Rocq version 9.0.1 / 9.1.0 / 9.2.0
+ - Rocq stdlib version 9.1.0
 
-Generally we always aim to support the last two stable Rocq releases. Support for
-older versions will be dropped when it is convenient.
+Generally we always aim to support the last two stable Rocq releases. Support
+for older versions will be dropped when it is convenient. For stdlib, we support
+the most recent version, and any further versions that are needed to ensure all
+supported Rocq versions can be used.
 
 ## Installing via opam
 
