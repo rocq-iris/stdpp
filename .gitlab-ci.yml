@@ -73,7 +73,7 @@ build-rocq.9.1.0:
   <<: *template
   <<: *only_branches
   variables:
-    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.0.0"
+    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.1.0"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
     CI_COQCHK: "1"
@@ -88,7 +88,7 @@ build-rocq.9.1.0-mr:
   <<: *template
   <<: *only_mr
   variables:
-    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.0.0"
+    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.1.0"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
 
