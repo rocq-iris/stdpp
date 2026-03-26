@@ -60,5 +60,5 @@ inferring a wrong [B]. The other two arguments remain wildcards, so that
 they can be unified with [eq], allowing this instance to apply in more cases,
 as is the case for normal instances under [Hint Mode Inj - - -]. In particular,
 these arguments are allowed to be evars. *)
-Global Hint Extern 0 (Inj _ _ (@existT ?A ?B ?a)) => 
+Global Hint Extern 0 (Inj _ _ (@existT ?A ?B ?a)) =>
   simple apply (@existT_inj_2 A B a) : typeclass_instances.
