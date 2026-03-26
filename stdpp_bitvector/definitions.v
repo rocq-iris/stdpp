@@ -214,7 +214,7 @@ Lemma bv_wrap_bv_wrap n1 n2 bv :
   bv_wrap n1 (bv_wrap n2 bv) = bv_wrap n1 bv.
 Proof.
   intros ?. unfold bv_wrap.
-  rewrite <-Znumtheory.Zmod_div_mod; [done| apply bv_modulus_pos.. |].
+  rewrite Z.mod_mod_divide; [done| apply bv_modulus_pos.. |].
   unfold bv_modulus. eexists (2 ^ (Z.of_N n2 - Z.of_N n1)).
   rewrite <-Z.pow_add_r by lia. f_equal. lia.
 Qed.
@@ -551,7 +551,7 @@ Program Definition bv_divu {n} (x y : bv n) : bv n := (* SMT: bvudiv *)
 Next Obligation.
   intros n x y. apply bv_wf_in_range. bv_saturate.
   destruct (decide (bv_unsigned y = 0)) as [->|?].
-  { rewrite Zdiv_0_r. lia. }
+  { rewrite Z.div_0_r. lia. }
   split; [ apply Z.div_pos; lia |].
   apply (Z.le_lt_trans _ (bv_unsigned x)); [|lia].
   apply Z.div_le_upper_bound; [ lia|]. nia.
@@ -561,7 +561,7 @@ Program Definition bv_modu {n} (x y : bv n) : bv n := (* SMT: bvurem *)
 Next Obligation.
   intros n x y. apply bv_wf_in_range. bv_saturate.
   destruct (decide (bv_unsigned y = 0)) as [->|?].
-  { rewrite Zmod_0_r. lia. }
+  { rewrite Z.mod_0_r. lia. }
   split; [ apply Z.mod_pos; lia |].
   apply (Z.le_lt_trans _ (bv_unsigned x)); [|lia].
   apply Z.mod_le; lia.
