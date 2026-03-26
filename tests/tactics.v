@@ -1,7 +1,7 @@
 (** Basic tests for atctics that don't import anything else
 (and hence can be run even when nothing else even builds. *)
 From Stdlib Require Import Logic.EqdepFacts.
-From Stdlib Require Import String.
+From Stdlib Require Import String Fin.
 From stdpp Require Import tactics.
 
 Local Unset Mangle Names. (* for stable goal printing *)
