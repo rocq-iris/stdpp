@@ -1,8 +1,8 @@
 (** Basic tests for atctics that don't import anything else
 (and hence can be run even when nothing else even builds. *)
 From Stdlib Require Import Logic.EqdepFacts.
-From Stdlib Require Import String Fin.
-From stdpp Require Import tactics.
+From Stdlib Require Import String.
+From stdpp Require Import tactics fin.
 
 Local Unset Mangle Names. (* for stable goal printing *)
 Local Open Scope string_scope.
@@ -436,8 +436,8 @@ Example existT_inj2_test_proof_irrel {A} {B : A → Type}
 Proof. intros. by simplify_eq. Qed.
 
 Example existT_inj2_test_proof_irrel_more_dependent
-    `{!ProofIrrel (x = x)} (b1 b2 : Fin.t (S x)) :
-  @existT nat (λ y, Fin.t (S y)) x b1 = existT x b2 → b1 = b2.
+    `{!ProofIrrel (x = x)} (b1 b2 : fin (S x)) :
+  @existT nat (λ y, fin (S y)) x b1 = existT x b2 → b1 = b2.
 Proof. intros. by simplify_eq. Qed.
 
 (** Test that if the [a]s are different, we obtain [a1 = a2] and [b1 = b2]. Note
