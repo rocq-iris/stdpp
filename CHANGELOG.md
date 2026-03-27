@@ -13,6 +13,8 @@ API-breaking change is listed.
   `size_filter_le`, `filter_id[_L]`, `size_set_map`, `join_cons`, `foldr_join`,
   `foldl_foldr`, `foldr_foldl`, `submseteq_inj`,
   `subseteq_difference_inj_{l,r}[_L]`. (by emilia-h)
+- Change the level of notation `_.*1` and `_.*2` from 2 to 1 for
+  compatibility with mathcomp. (by Kimaya Bedarkar)
 
 ## std++ 1.13.0 (2026-03-05)
 
