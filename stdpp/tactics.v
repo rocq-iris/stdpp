@@ -853,6 +853,12 @@ Lemma forall_and_distr (A : Type) (P Q : A → Prop) :
   (∀ x, P x ∧ Q x) ↔ (∀ x, P x) ∧ (∀ x, Q x).
 Proof. firstorder. Qed.
 
+Lemma or_introl_dec P Q `{!Decision Q} : (¬Q → P) → P ∨ Q.
+Proof. destruct (decide Q); tauto. Qed.
+
+Lemma or_intror_dec P Q `{!Decision P} : (¬P → Q) → P ∨ Q.
+Proof. destruct (decide P); tauto. Qed.
+
 Tactic Notation "naive_solver" tactic(tac) :=
   unfold iff, not in *;
   repeat match goal with
@@ -895,27 +901,28 @@ Tactic Notation "naive_solver" tactic(tac) :=
   match goal with
   (**i instantiation of the conclusion *)
   | |- ∃ x, _ => no_new_unsolved_evars ltac:(eexists; go n)
-  | |- _ ∨ _ => first [left; go n | right; go n]
+  | |- _ ∨ _ =>
+     first [first [apply (or_introl_dec _ _); unfold not; intros ?|left]; go n
+           |first [apply (or_introl_dec _ _); unfold not; intros ?|right]; go n]
   | |- Is_true (_ || _) => apply orb_True; first [left; go n | right; go n]
   | _ =>
     (** The following clauses can cause loops, so we decrease the fuel *)
     lazymatch n with
     | S ?n' =>
       match goal with
-      (** If the goal is decidable, introduce [¬P] into the context (assuming
-      we do not already have it. *)
-      | |- ?P =>
-        match goal with
-        | H : ¬P |- _ => fail 1
-        | _ => let H := fresh in apply dec_stable; intros H; apply H; go n'
-        end
       (** Instantiations of assumptions. We give priority to assumptions that
       fit on the conclusion (using [eapply H]) and otherwise just specialize
       them (using [opose proof*]). *)
-      | H : _ → _ |- _ =>
+      | H : _ → _ |- ?P =>
         is_non_dependent H;
         no_new_unsolved_evars
-          ltac:(first [eapply H | opose proof* H]; clear H; go n')
+          ltac:(first
+            [eapply H
+            |match goal with
+             | HnegP : ¬P |- _ => fail 1
+             | _ => apply dec_stable; unfold not; intros ?; eapply H
+             end
+            |opose proof* H]; clear H; go n')
       end
     end
   end
