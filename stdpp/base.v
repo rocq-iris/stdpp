@@ -1282,9 +1282,9 @@ Notation "x ;; z" := (x ≫= λ _, z)
   (at level 100, z at level 200, only parsing, right associativity): stdpp_scope.
 
 Notation "ps .*1" := (fmap (M:=list) fst ps)
-  (at level 2, left associativity, format "ps .*1").
+  (at level 1, left associativity, format "ps .*1").
 Notation "ps .*2" := (fmap (M:=list) snd ps)
-  (at level 2, left associativity, format "ps .*2").
+  (at level 1, left associativity, format "ps .*2").
 
 (** For any monad that has a builtin way to throw an exception/error *)
 Class MThrow (E : Type) (M : Type → Type) := mthrow : ∀ {A}, E → M A.
