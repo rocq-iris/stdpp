@@ -926,5 +926,5 @@ Tactic Notation "naive_solver" tactic(tac) :=
       end
     end
   end
-  in iter (fun n' => go n') (eval compute in (seq 1 6)).
+  in go 6.
 Tactic Notation "naive_solver" := naive_solver eauto.
