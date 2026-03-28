@@ -926,5 +926,5 @@ Tactic Notation "naive_solver" tactic(tac) :=
       end
     end
   end
-  in go 4.
+  in go 3.
 Tactic Notation "naive_solver" := naive_solver eauto.
