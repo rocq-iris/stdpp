@@ -4700,6 +4700,9 @@ Section kmap.
     induction l as [|[i x] l IH]; simpl; first by rewrite kmap_empty.
     by rewrite kmap_insert, IH.
   Qed.
+
+  Lemma map_size_kmap {A} (m : M1 A) : size (kmap f m) = size m.
+  Proof. by rewrite <-!length_map_to_list, map_to_list_kmap, length_fmap. Qed.
 End kmap.
 
 Section preimg.
