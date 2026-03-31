@@ -16,6 +16,7 @@ API-breaking change is listed.
 - Change the level of notation `_.*1` and `_.*2` from 2 to 1 for
   compatibility with mathcomp. (by Kimaya Bedarkar)
 - Add support for `negb` to `naive_solver` tactic. (by Janggun Lee)
+- Add lemma `map_size_alter`. (by Alban Reynaud Michez)
 
 ## std++ 1.13.0 (2026-03-05)
 

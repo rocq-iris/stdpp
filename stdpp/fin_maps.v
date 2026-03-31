@@ -1522,6 +1522,9 @@ Lemma map_size_delete_None {A} i (m : M A) :
   m !! i = None → size (delete i m) = size m.
 Proof. intros Hi. by rewrite map_size_delete, Hi. Qed.
 
+Lemma map_size_alter {A} i f (m : M A) : size (alter f i m) = size m.
+Proof. rewrite alter_alt. case_match; eauto using map_size_insert_Some. Qed.
+
 Lemma map_size_fmap {A B} (f : A -> B) (m : M A) : size (f <$> m) = size m.
 Proof.
   intros. by rewrite <-!length_map_to_list, map_to_list_fmap_weak, length_fmap.
