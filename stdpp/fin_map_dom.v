@@ -100,24 +100,24 @@ Proof.
   destruct (decide (i = j)); simplify_map_eq/=; eauto.
   destruct (m !! j); naive_solver.
 Qed.
-Lemma dom_insert {A} (m : M A) i x : dom (<[i:=x]>m) ≡ {[ i ]} ∪ dom m.
+Lemma dom_insert {A} (m : M A) i x : dom (<[i:=x]> m) ≡ {[ i ]} ∪ dom m.
 Proof.
   apply set_equiv. intros j. rewrite elem_of_union, !elem_of_dom.
   unfold is_Some. setoid_rewrite lookup_insert_Some.
   destruct (decide (i = j)); set_solver.
 Qed.
 Lemma dom_insert_lookup {A} (m : M A) i x :
-  is_Some (m !! i) → dom (<[i:=x]>m) ≡ dom m.
+  is_Some (m !! i) → dom (<[i:=x]> m) ≡ dom m.
 Proof.
   intros Hindom. assert (i ∈ dom m) by by apply elem_of_dom.
   rewrite dom_insert. set_solver.
 Qed.
-Lemma dom_insert_subseteq {A} (m : M A) i x : dom m ⊆ dom (<[i:=x]>m).
+Lemma dom_insert_subseteq {A} (m : M A) i x : dom m ⊆ dom (<[i:=x]> m).
 Proof. rewrite (dom_insert _). set_solver. Qed.
 Lemma dom_insert_subseteq_compat_l {A} (m : M A) i x X :
-  X ⊆ dom m → X ⊆ dom (<[i:=x]>m).
+  X ⊆ dom m → X ⊆ dom (<[i:=x]> m).
 Proof. intros. trans (dom m); eauto using dom_insert_subseteq. Qed.
-Lemma dom_singleton {A} (i : K) (x : A) : dom ({[i := x]} : M A) ≡ {[ i ]}.
+Lemma dom_singleton {A} (i : K) (x : A) : dom ({[i:=x]} : M A) ≡ {[ i ]}.
 Proof. rewrite <-insert_empty, dom_insert, dom_empty; set_solver. Qed.
 Lemma dom_delete {A} (m : M A) i : dom (delete i m) ≡ dom m ∖ {[ i ]}.
 Proof.
@@ -128,7 +128,7 @@ Lemma delete_partial_alter_dom {A} (m : M A) i f :
   i ∉ dom m → delete i (partial_alter f i m) = m.
 Proof. rewrite not_elem_of_dom. apply delete_partial_alter_id. Qed.
 Lemma delete_insert_dom {A} (m : M A) i x :
-  i ∉ dom m → delete i (<[i:=x]>m) = m.
+  i ∉ dom m → delete i (<[i:=x]> m) = m.
 Proof. rewrite not_elem_of_dom. apply delete_insert_id. Qed.
 Lemma map_disjoint_dom {A} (m1 m2 : M A) : m1 ##ₘ m2 ↔ dom m1 ## dom m2.
 Proof.
@@ -274,7 +274,7 @@ Lemma subseteq_dom_eq {A} (m1 m2 : M A) :
 Proof. intros. apply map_subseteq_size_eq; auto using dom_subseteq_size. Qed.
 
 Lemma dom_singleton_inv {A} (m : M A) i :
-  dom m ≡ {[i]} → ∃ x, m = {[i := x]}.
+  dom m ≡ {[i]} → ∃ x, m = {[i:=x]}.
 Proof.
   intros Hdom. assert (is_Some (m !! i)) as [x ?].
   { apply (elem_of_dom (D:=D)); set_solver. }
@@ -377,12 +377,12 @@ Section leibniz.
   Proof. by intros; apply dom_empty_inv; unfold_leibniz. Qed.
   Lemma dom_alter_L {A} f (m : M A) i : dom (alter f i m) = dom m.
   Proof. unfold_leibniz; apply dom_alter. Qed.
-  Lemma dom_insert_L {A} (m : M A) i x : dom (<[i:=x]>m) = {[ i ]} ∪ dom m.
+  Lemma dom_insert_L {A} (m : M A) i x : dom (<[i:=x]> m) = {[ i ]} ∪ dom m.
   Proof. unfold_leibniz; apply dom_insert. Qed.
   Lemma dom_insert_lookup_L {A} (m : M A) i x :
-    is_Some (m !! i) → dom (<[i:=x]>m) = dom m.
+    is_Some (m !! i) → dom (<[i:=x]> m) = dom m.
   Proof. unfold_leibniz; apply dom_insert_lookup. Qed.
-  Lemma dom_singleton_L {A} (i : K) (x : A) : dom ({[i := x]} : M A) = {[ i ]}.
+  Lemma dom_singleton_L {A} (i : K) (x : A) : dom ({[i:=x]} : M A) = {[ i ]}.
   Proof. unfold_leibniz; apply dom_singleton. Qed.
   Lemma dom_delete_L {A} (m : M A) i : dom (delete i m) = dom m ∖ {[ i ]}.
   Proof. unfold_leibniz; apply dom_delete. Qed.
@@ -406,7 +406,7 @@ Section leibniz.
     dom (list_to_map l : M A) = list_to_set l.*1.
   Proof. unfold_leibniz. apply dom_list_to_map. Qed.
   Lemma dom_singleton_inv_L {A} (m : M A) i :
-    dom m = {[i]} → ∃ x, m = {[i := x]}.
+    dom m = {[i]} → ∃ x, m = {[i:=x]}.
   Proof. unfold_leibniz. apply dom_singleton_inv. Qed.
   Lemma dom_map_zip_with_L {A B C} (f : A → B → C) (ma : M A) (mb : M B) :
     dom (map_zip_with f ma mb) = dom ma ∩ dom mb.
@@ -445,7 +445,7 @@ Proof.
     (set_unfold_elem_of _ (dom _) _), elem_of_singleton.
 Qed.
 Global Instance set_unfold_dom_singleton {A} i j x :
-  SetUnfoldElemOf i (dom ({[ j := x ]} : M A)) (i = j).
+  SetUnfoldElemOf i (dom ({[j:=x]} : M A)) (i = j).
 Proof. constructor. by rewrite dom_singleton, elem_of_singleton. Qed.
 Global Instance set_unfold_dom_union {A} i (m1 m2 : M A) Q1 Q2 :
   SetUnfoldElemOf i (dom m1) Q1 → SetUnfoldElemOf i (dom m2) Q2 →
