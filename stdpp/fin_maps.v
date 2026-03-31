@@ -4706,15 +4706,15 @@ Section kmap.
 End kmap.
 
 Section map_kmap_compose.
-  Context `{FinMap K1 M1} `{FinMap K2 M2} `{FinMap K3 M3}.
+  Context `{FinMap K1 M1, FinMap K2 M2, FinMap K3 M3}.
   Context (f : K1 → K2) `{!Inj (=) (=) f}.
   Context (g : K2 → K3) `{!Inj (=) (=) g}.
+
   Lemma map_kmap_compose {A} (m : M1 A) :
-    kmap (M1:=M1) (M2:=M3) (g ∘ f) m = kmap g (M1:=M2) (M2:=M3) (kmap (M1:=M1) (M2:=M2) f m).
+    kmap (g ∘ f) m =@{M3 A} kmap g (M1:=M2) (kmap f m).
   Proof.
     apply map_eq; intros i. apply option_eq; intros x.
-    repeat setoid_rewrite lookup_kmap_Some; [ | typeclasses eauto..].
-    naive_solver.
+    repeat setoid_rewrite (lookup_kmap_Some _). naive_solver.
   Qed.
 End map_kmap_compose.
 
