@@ -415,6 +415,9 @@ Proof. naive_solver. Qed.
 Lemma naive_solver_negb_andb (b : bool) : negb b && b → False.
 Proof. naive_solver. Qed.
 
+Lemma naive_solver_negb_involutive (b : bool) : b → negb (negb b). 
+Proof. naive_solver. Qed.
+
 (** Regression tests for [naive_solver].
 Requires a bunch of other tactics to work so it comes last in this file. *)
 Lemma naive_solver_issue_115 (P : nat → Prop) (x : nat) :
