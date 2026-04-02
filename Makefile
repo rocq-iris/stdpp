@@ -1,6 +1,6 @@
 # Default target
-all: Makefile.coq
-	+@$(MAKE) -f Makefile.coq all
+all: Makefile.rocq
+	+@$(MAKE) -f Makefile.rocq all
 .PHONY: all
 
 # Build with dune.
@@ -17,24 +17,24 @@ _RocqProject: gen_RocqProject.sh config/paths config/flags config/source-list $(
 	@./$< > $@
 
 # Forward most targets to Coq makefile (with some trick to make this phony)
-%: Makefile.coq phony
+%: Makefile.rocq phony
 	@#echo "Forwarding $@"
-	+@$(MAKE) -f Makefile.coq $@
+	+@$(MAKE) -f Makefile.rocq $@
 phony: ;
 .PHONY: phony
 
-clean: Makefile.coq
-	+@$(MAKE) -f Makefile.coq clean
+clean: Makefile.rocq
+	+@$(MAKE) -f Makefile.rocq clean
 	@# Make sure not to enter the `_opam` folder.
 	find [a-z]*/ \( -name "*.d" -o -name "*.vo" -o -name "*.vo[sk]" -o -name "*.aux" -o -name "*.cache" -o -name "*.glob" -o -name "*.vio" \) -print -delete || true
-	rm -rf Makefile.coq Makefile.coq.conf .lia.cache builddep/* _build */_RocqProject
+	rm -rf Makefile.rocq Makefile.rocq.conf .lia.cache builddep/* _build */_RocqProject
 	# We do not clean _RocqProject since ProofGeneral and other editors need that,
 	# and 'make clean' is often needed to remove the .vo files after a dependency update.
 .PHONY: clean
 
 # Create Coq Makefile.
-Makefile.coq: _RocqProject Makefile
-	"$(COQBIN)rocq" makefile -f _RocqProject -o Makefile.coq $(EXTRA_COQFILES)
+Makefile.rocq: _RocqProject Makefile
+	"$(COQBIN)rocq" makefile -f _RocqProject -o Makefile.rocq $(EXTRA_COQFILES)
 
 # Install build-dependencies
 OPAMFILES=$(wildcard *.opam)
@@ -62,6 +62,6 @@ builddep: builddep-opamfiles
 build-dep: builddep
 .PHONY: build-dep
 
-# Some files that do *not* need to be forwarded to Makefile.coq.
+# Some files that do *not* need to be forwarded to Makefile.rocq.
 # ("::" lets Makefile.local overwrite this.)
 Makefile Makefile.local config/paths config/flags config/source-list config/local $(OPAMFILES):: ;
