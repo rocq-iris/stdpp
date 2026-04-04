@@ -620,10 +620,10 @@ Section set_bind.
   Qed.
 
   Global Instance set_unfold_set_bind (f : A → SB) (X : C)
-       (y : B) (P : A → B → Prop) (Q : A → Prop) :
-    (∀ x y, SetUnfoldElemOf y (f x) (P x y)) →
+       (y : B) (P : A → Prop) (Q : A → Prop) :
+    (∀ x, SetUnfoldElemOf y (f x) (P x)) →
     (∀ x, SetUnfoldElemOf x X (Q x)) →
-    SetUnfoldElemOf y (set_bind f X) (∃ x, Q x ∧ P x y).
+    SetUnfoldElemOf y (set_bind f X) (∃ x, Q x ∧ P x).
   Proof.
     intros HSU1 HSU2. constructor.
     rewrite elem_of_set_bind. set_solver.
