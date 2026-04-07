@@ -3,6 +3,8 @@ API-breaking change is listed.
 
 ## std++ master
 
+This version of std++ requires Rocq-Stdlib 9.1.0.
+
 **Detailed list of changes:**
 
 - Add lemma `sublist_filter_mono`. (by Benjamin Peters)
