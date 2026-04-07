@@ -330,6 +330,10 @@ Section set_unfold_list.
   Global Instance set_unfold_list_seqZ (x n m : Z) :
     SetUnfoldElemOf x (seqZ n m) (n ≤ x < n + m)%Z.
   Proof. constructor. by rewrite elem_of_seqZ. Qed.
+
+  Global Instance set_unfold_enum `{Finite A} x :
+    SetUnfoldElemOf x (enum A) True.
+  Proof. constructor. split; [done|intros; apply elem_of_enum]. Qed.
 End set_unfold_list.
 
 Tactic Notation "set_unfold" :=

@@ -19,6 +19,8 @@ API-breaking change is listed.
 - Add lemma `map_size_alter`. (by Alban Reynaud Michez)
 - Add lemma `map_size_kmap`. (by Alban Reynaud Michez)
 - Add lemma `map_kmap_compose`. (by Alban Reynaud Michez)
+- Prevent unfolding `enum` by declaring it `simpl never`. (by Janggun Lee)
+- Support `enum` in `set_solver`. (by Janggun Lee)
 
 ## std++ 1.13.0 (2026-03-05)
 

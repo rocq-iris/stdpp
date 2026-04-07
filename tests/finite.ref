@@ -1,0 +1,8 @@
+"enum_simpl_never_and_set_solver"
+     : string
+1 goal
+  
+  n : nat
+  i : fin n
+  ============================
+  i ∈ enum (fin n)
