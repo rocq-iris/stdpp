@@ -9,7 +9,8 @@ Class Finite A `{EqDecision A} := {
 }.
 Global Hint Mode Finite ! - : typeclass_instances.
 Global Arguments enum : clear implicits.
-Global Arguments enum _ {_ _} : assert.
+(* Prevent unfolding via [simpl] as that makes lemmas inapplicable. *)
+Global Arguments enum _ {_ _} : simpl never, assert.
 Global Arguments NoDup_enum : clear implicits.
 Global Arguments NoDup_enum _ {_ _} : assert.
 Definition card A `{Finite A} := length (enum A).
@@ -20,7 +21,7 @@ Program Definition finite_countable `{Finite A} : Countable A := {|
   decode := λ p, enum A !! pred (Pos.to_nat p)
 |}.
 Next Obligation.
-  intros ?? [xs Hxs HA] x; unfold encode, decode; simpl.
+  intros ?? [xs Hxs HA] x; unfold encode, decode, enum.
   destruct (list_find_elem_of (x =.) xs x) as [[i y] Hi]; auto.
   rewrite Nat2Pos.id by done; simpl; rewrite Hi; simpl.
   destruct (list_find_Some (x =.) xs i y); naive_solver.
@@ -32,7 +33,8 @@ Definition find `{Finite A} (P : A → Prop) `{∀ x, Decision (P x)} : option A
 
 Lemma encode_lt_card `{finA: Finite A} (x : A) : encode_nat x < card A.
 Proof.
-  destruct finA as [xs Hxs HA]; unfold encode_nat, encode, card; simpl.
+  destruct finA as [xs Hxs HA].
+  unfold finite_countable, encode_nat, encode, card, enum.
   rewrite Nat2Pos.id by done; simpl.
   destruct (list_find _ xs) as [[i y]|] eqn:HE; simpl.
   - apply list_find_Some in HE as (?&?&?); eauto using lookup_lt_Some.
@@ -43,7 +45,7 @@ Lemma encode_decode A `{finA: Finite A} i :
   i < card A → ∃ x : A, decode_nat i = Some x ∧ encode_nat x = i.
 Proof.
   destruct finA as [xs Hxs HA].
-  unfold encode_nat, decode_nat, encode, decode, card; simpl.
+  unfold finite_countable, encode_nat, decode_nat, encode, decode, card, enum.
   intros Hi. apply lookup_lt_is_Some in Hi. destruct Hi as [x Hx].
   exists x. rewrite !Nat2Pos.id by done; simpl.
   destruct (list_find_elem_of (x =.) xs x) as [[j y] Hj]; auto.
@@ -53,7 +55,8 @@ Qed.
 Lemma find_Some `{finA: Finite A} (P : A → Prop) `{∀ x, Decision (P x)} (x : A) :
   find P = Some x → P x.
 Proof.
-  destruct finA as [xs Hxs HA]; unfold find, decode_nat, decode; simpl.
+  destruct finA as [xs Hxs HA]. 
+  unfold find, finite_countable, decode_nat, decode, enum.
   intros Hx. destruct (list_find _ _) as [[i y]|] eqn:Hi; simplify_eq/=.
   rewrite !Nat2Pos.id in Hx by done.
   destruct (list_find_Some P xs i y); naive_solver.
@@ -61,7 +64,7 @@ Qed.
 Lemma find_is_Some `{finA: Finite A} (P : A → Prop) `{∀ x, Decision (P x)} (x : A) :
   P x → ∃ y, find P = Some y ∧ P y.
 Proof.
-  destruct finA as [xs Hxs HA]; unfold find, decode; simpl.
+  destruct finA as [xs Hxs HA]; unfold find, decode, enum.
   intros Hx. destruct (list_find_elem_of P xs x) as [[i y] Hi]; auto.
   rewrite Hi; unfold decode_nat, decode; simpl. rewrite !Nat2Pos.id by done.
   simpl. apply list_find_Some in Hi; naive_solver.
@@ -216,7 +219,7 @@ Section enc_finite.
     split; auto. by apply list_elem_of_lookup_2 with (to_nat x), lookup_seq.
   Qed.
   Lemma enc_finite_card : card A = c.
-  Proof. unfold card. simpl. by rewrite length_fmap, length_seq. Qed.
+  Proof. unfold card, enum, enc_finite. by rewrite length_fmap, length_seq. Qed.
 End enc_finite.
 
 (** If we have a surjection [f : A → B] and [A] is finite, then [B] is finite
@@ -297,7 +300,7 @@ Next Obligation.
     [left|right]; (eexists; split; [done|apply elem_of_enum]).
 Qed.
 Lemma sum_card `{Finite A, Finite B} : card (A + B) = card A + card B.
-Proof. unfold card. simpl. by rewrite length_app, !length_fmap. Qed.
+Proof. unfold card, enum at 1, sum_finite. by rewrite length_app, !length_fmap. Qed.
 
 Global Program Instance prod_finite `{Finite A, Finite B} : Finite (A * B)%type :=
   {| enum := a ← enum A; (a,.) <$> enum B |}.
@@ -314,7 +317,7 @@ Next Obligation.
 Qed.
 Lemma prod_card `{Finite A} `{Finite B} : card (A * B) = card A * card B.
 Proof.
-  unfold card; simpl. induction (enum A); simpl; auto.
+  unfold card, enum at 1, prod_finite. induction (enum A); csimpl; auto.
   rewrite length_app, length_fmap. auto.
 Qed.
 
@@ -340,7 +343,7 @@ Next Obligation.
 Qed.
 Lemma vec_card `{Finite A} n : card (vec A n) = card A ^ n.
 Proof.
-  unfold card; simpl. induction n as [|n IH]; simpl; [done|].
+  unfold card, enum at 1, vec_finite. induction n as [|n IH]; simpl; [done|].
   rewrite <-IH. clear IH. generalize (vec_enum (enum A) n).
   induction (enum A) as [|x xs IH]; intros l; csimpl; auto.
   by rewrite length_app, length_fmap, IH.
@@ -354,7 +357,10 @@ Proof.
       apply (sig_eq_pi _), vec_to_list_to_vec).
 Defined.
 Lemma list_card `{Finite A} n : card { l : list A | length l = n } = card A ^ n.
-Proof. unfold card; simpl. rewrite length_fmap. apply vec_card. Qed.
+Proof.
+  unfold card, enum at 1, list_finite, bijective_finite.
+  rewrite length_fmap. apply vec_card.
+Qed.
 
 Fixpoint fin_enum (n : nat) : list (fin n) :=
   match n with 0 => [] | S n => 0%fin :: (FS <$> fin_enum n) end.
@@ -369,7 +375,10 @@ Next Obligation.
     rewrite elem_of_cons, ?list_elem_of_fmap; eauto.
 Qed.
 Lemma fin_card n : card (fin n) = n.
-Proof. unfold card; simpl. induction n; simpl; rewrite ?length_fmap; auto. Qed.
+Proof.
+  unfold card, enum, fin_finite.
+  induction n; simpl; rewrite ?length_fmap; auto.
+Qed.
 
 (* shouldn’t be an instance (cycle with [sig_finite]): *)
 Lemma finite_sig_dec `{!EqDecision A} (P : A → Prop) `{Finite (sig P)} x :
@@ -415,7 +424,10 @@ Section sig_finite.
     split; [by destruct p | apply elem_of_enum].
   Qed.
   Lemma sig_card : card (sig P) = length (filter P (enum A)).
-  Proof. by rewrite <-list_filter_sig_filter, length_fmap. Qed.
+  Proof.
+    unfold card, enum at 1, sig_finite.
+    by rewrite <-list_filter_sig_filter, length_fmap.
+  Qed.
 End sig_finite.
 
 Lemma finite_pigeonhole `{Finite A} `{Finite B} (f : A → B) :
