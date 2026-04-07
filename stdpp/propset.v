@@ -13,7 +13,7 @@ Global Arguments propset_car {_} _ _ : assert.
     and https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/533#note_98003.
     We don't set a level to be consistent with the notation for singleton sets. *)
 Notation "{[ x | P ]}" := (PropSet (λ x, P))
-  (at level 1, x as pattern, format "{[  x  |  P  ]}") : stdpp_scope.
+  (at level 0, x as pattern, format "{[  x  |  P  ]}") : stdpp_scope.
 
 Global Instance propset_elem_of {A} : ElemOf A (propset A) := λ x X, propset_car X x.
 

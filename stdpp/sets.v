@@ -407,6 +407,7 @@ Tactic Notation "set_solver" := set_solver by eauto.
 Tactic Notation "set_solver" "-" hyp_list(Hs) := clear Hs; set_solver.
 Tactic Notation "set_solver" "+" hyp_list(Hs) := clear -Hs; set_solver.
 
+Create HintDb set_solver.
 Global Hint Extern 1000 (_ ∉ _) => set_solver : set_solver.
 Global Hint Extern 1000 (_ ∈ _) => set_solver : set_solver.
 Global Hint Extern 1000 (_ ⊆ _) => set_solver : set_solver.

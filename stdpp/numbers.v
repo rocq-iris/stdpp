@@ -595,6 +595,7 @@ Module Z.
   Lemma mod_pos x y : 0 < y → 0 ≤ x `mod` y.
   Proof. apply Z.mod_pos_bound. Qed.
 
+  Create HintDb zpos discriminated.
   Global Hint Resolve Z.lt_le_incl : zpos.
   Global Hint Resolve Z.add_nonneg_pos Z.add_pos_nonneg Z.add_nonneg_nonneg : zpos.
   Global Hint Resolve Z.mul_nonneg_nonneg Z.mul_pos_pos : zpos.

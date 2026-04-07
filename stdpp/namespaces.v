@@ -142,4 +142,5 @@ Ltac solve_ndisj :=
   | H : _ ∪ _ ⊆ _ |- _ => apply union_subseteq in H as [??]
   end;
   solve [eauto 12 with ndisj].
+Create HintDb solve_ndisj.
 Global Hint Extern 1000 => solve_ndisj : solve_ndisj.

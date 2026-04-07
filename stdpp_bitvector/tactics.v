@@ -330,7 +330,7 @@ Proof.
   destruct w, s; rewrite ?bv_not_signed, ?bv_not_unsigned, ?Hz; bv_wrap_simplify_solve.
 Qed.
 Global Hint Resolve bv_unfold_not | 10 : bv_unfold_db.
-Lemma bv_unfold_zero_extend s w n n' b z `{!TCFastDone (n' <=? n = true)%N} :
+Lemma bv_unfold_zero_extend s w n n' b z `{!TCFastDone ((n' <=? n) = true)%N} :
   BvUnfold n' false false b z →
   BvUnfold n s w (bv_zero_extend n b) (if w then z else if s then bv_swrap n z else z).
 Proof.
@@ -341,7 +341,7 @@ Proof.
   - done.
 Qed.
 Global Hint Resolve bv_unfold_zero_extend | 10 : bv_unfold_db.
-Lemma bv_unfold_sign_extend s w n n' b z `{!TCFastDone (n' <=? n = true)%N} :
+Lemma bv_unfold_sign_extend s w n n' b z `{!TCFastDone ((n' <=? n) = true)%N} :
   BvUnfold n' true false b z →
   BvUnfold n s w (bv_sign_extend n b) (if w then z else if s then z else bv_wrap n z).
 Proof.
