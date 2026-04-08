@@ -5045,6 +5045,14 @@ Lemma map_img_kmap_L `{FinMap K M, FinMap K2 M2, SemiSet A SA, !LeibnizEquiv SA}
     (f : K → K2) `{!Inj (=) (=) f} m :
   map_img (kmap (M2:=M2) f m) =@{SA} map_img m.
 Proof. unfold_leibniz. by apply map_img_kmap. Qed.
+Global Instance set_unfold_map_img_kmap `{FinMap K M, FinMap K2 M2, SemiSet A SA}
+    (f : K → K2) `{!Inj (=) (=) f} (m : M A) x Q :
+  SetUnfoldElemOf x (map_img (SA:=SA) m) Q →
+  SetUnfoldElemOf x (map_img (SA:=SA) (kmap (M2:=M2) f m)) Q.
+Proof.
+  constructor. rewrite map_img_kmap; [|done].
+  by setoid_rewrite (set_unfold_elem_of _ (map_img m)).
+Qed.
 
 (** ** The [map_compose] operation *)
 Section map_compose.

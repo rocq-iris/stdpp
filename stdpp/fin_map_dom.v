@@ -315,12 +315,18 @@ Proof.
       naive_solver.
 Qed.
 
+(* Does not require [FinSet K D] *)
+Lemma elem_of_dom_kmap `{FinMapDom K2 M2 D2}
+    {A} (f : K → K2) `{!Inj (=) (=) f} (m : M A) i :
+  i ∈ dom (kmap (M2:=M2) f m) ↔ ∃ x, i = f x ∧ x ∈ dom m.
+Proof. setoid_rewrite elem_of_dom. rewrite (lookup_kmap_is_Some _). naive_solver. Qed.
+
 Lemma dom_kmap `{!Elements K D, !FinSet K D, FinMapDom K2 M2 D2}
     {A} (f : K → K2) `{!Inj (=) (=) f} (m : M A) :
   dom (kmap (M2:=M2) f m) ≡@{D2} set_map f (dom m).
 Proof.
   apply set_equiv. intros i.
-  rewrite !elem_of_dom, (lookup_kmap_is_Some _), elem_of_map.
+  rewrite (elem_of_dom_kmap _), elem_of_map.
   by setoid_rewrite elem_of_dom.
 Qed.
 
@@ -472,10 +478,18 @@ Global Instance set_unfold_dom_fmap {A B} (f : A → B) i (m : M A) Q :
   SetUnfoldElemOf i (dom m) Q →
   SetUnfoldElemOf i (dom (f <$> m)) Q.
 Proof. constructor. by rewrite dom_fmap, (set_unfold_elem_of _ (dom _) _). Qed.
-Global Instance set_unfold_map_disjoint {A} (m1 m2 : M A) Q :
-  SetUnfold (dom m1 ## dom m2) Q →
-  SetUnfold (m1 ##ₘ m2) Q.
-Proof. constructor. by rewrite map_disjoint_dom, (set_unfold (_ ## _)). Qed.
+Global Instance set_unfold_dom_kmap `{FinMapDom K2 M2 D2}
+    {A} (f : K → K2) `{!Inj (=) (=) f} i (m : M A) Q :
+  (∀ x, SetUnfoldElemOf x (dom m) (Q x)) →
+  SetUnfoldElemOf i (dom (kmap (M2:=M2) f m)) (∃ x, i = f x ∧ Q x).
+Proof.
+  constructor. rewrite (elem_of_dom_kmap _).
+  by setoid_rewrite (set_unfold_elem_of _ (dom _) _).
+Qed.
+Global Instance set_unfold_map_disjoint {A} (m1 m2 : M A) P Q :
+  (∀ x, SetUnfoldElemOf x (dom m1) (P x)) → (∀ x, SetUnfoldElemOf x (dom m2) (Q x)) →
+  SetUnfold (m1 ##ₘ m2) (∀ x, P x → Q x → False).
+Proof. constructor. by rewrite map_disjoint_dom, (set_unfold (_ ## _) _). Qed.
 End fin_map_dom.
 
 Lemma dom_seq `{FinMapDom nat M D} {A} start (xs : list A) :

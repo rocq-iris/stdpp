@@ -315,14 +315,48 @@ Section set_unfold_list.
     constructor. rewrite list_elem_of_fmap. f_equiv; intros x.
     by rewrite (set_unfold_elem_of x l (P x)).
   Qed.
+
+  Global Instance set_unfold_list_omap {B} (f : A → option B) (y : B) l P :
+    (∀ x, SetUnfoldElemOf x l (P x)) →
+    SetUnfoldElemOf y (omap f l) (∃ x, P x ∧ f x = Some y).
+  Proof.
+    constructor. rewrite list_elem_of_omap. f_equiv; intros x.
+    by rewrite (set_unfold_elem_of x l (P x)).
+  Qed.
+
+  Global Instance set_unfold_list_filter x l P Q `{!∀ x, Decision (P x)} :
+    SetUnfoldElemOf x l Q →
+    SetUnfoldElemOf x (filter P l) (P x ∧ Q).
+  Proof.
+    constructor. rewrite list_elem_of_filter.
+    by rewrite (set_unfold_elem_of x l Q).
+  Qed.
+
   Global Instance set_unfold_rotate x l P n:
     SetUnfoldElemOf x l P → SetUnfoldElemOf x (rotate n l) P.
   Proof. constructor. by rewrite elem_of_rotate, (set_unfold_elem_of x l P). Qed.
+
+  Global Instance set_unfold_replicate x y n :
+    SetUnfoldElemOf x (replicate n y) (x = y ∧ n ≠ 0).
+  Proof. constructor. by rewrite elem_of_replicate. Qed.
 
   Global Instance set_unfold_list_bind {B} (f : A → list B) l P Q y :
     (∀ x, SetUnfoldElemOf x l (P x)) → (∀ x, SetUnfoldElemOf y (f x) (Q x)) →
     SetUnfoldElemOf y (l ≫= f) (∃ x, Q x ∧ P x).
   Proof. constructor. rewrite list_elem_of_bind. naive_solver. Qed.
+
+  Global Instance set_unfold_list_ret (x y : A) : 
+    SetUnfoldElemOf x (@mret list _ _ y) (x = y).
+  Proof. constructor. by rewrite list_elem_of_ret. Qed.
+
+  (* No [SetUnfoldElemOf] premise for [x ∈ l], as [l] is existential. *)
+  Global Instance set_unfold_list_join (x : A) (ls : list (list A)) P :
+    (∀ l, SetUnfoldElemOf l ls (P l)) →
+    SetUnfoldElemOf x (mjoin ls) (∃ l, x ∈ l ∧ P l).
+  Proof.
+    constructor. rewrite list_elem_of_join. f_equiv; intros l.
+    by rewrite (set_unfold_elem_of l ls (P l)).
+  Qed.
 
   Global Instance set_unfold_list_seq (x n m : nat) :
     SetUnfoldElemOf x (seq n m) (n ≤ x < n + m)%nat.

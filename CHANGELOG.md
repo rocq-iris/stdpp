@@ -23,6 +23,10 @@ This version of std++ requires Rocq-Stdlib 9.1.0.
 - Add lemma `map_kmap_compose`. (by Alban Reynaud Michez)
 - Prevent unfolding `enum` by declaring it `simpl never`. (by Janggun Lee)
 - Support `enum` in `set_solver`. (by Janggun Lee)
+- Add support for `list`'s `filter`, `omap`, `replicate`, `mret` and 
+  `mjoin` in `set_solver`. (by Janggun Lee)
+- Add support for `fin_map`'s `map_img`/`dom` + `kmap` in `set_solver`. (by Janggun Lee)
+- Improve support for `gmultiset`'s `dom` in `set_solver`. (by Janggun Lee)
 
 ## std++ 1.13.0 (2026-03-05)
 
