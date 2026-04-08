@@ -95,14 +95,14 @@ build-rocq.9.2.0-dune:
 build-rocq.9.1.1:
   <<: *template
   variables:
-    OPAM_PINS: "rocq-core version 9.1.1   rocq-stdlib version 9.1.0"
+    OPAM_PINS: "rocq-core version 9.1.1   rocq-stdlib version 9.0.0"
 
 # The oldest version runs in MRs, without name mangling.
 build-rocq.9.0.1:
   <<: *template
   <<: *branches_and_mr
   variables:
-    OPAM_PINS: "rocq-core version 9.0.1  rocq-stdlib version 9.1.0"
+    OPAM_PINS: "rocq-core version 9.0.1  rocq-stdlib version 9.0.0"
     DENY_WARNINGS: "1"
 
 trigger-rocq.dev:
