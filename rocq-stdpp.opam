@@ -34,7 +34,7 @@ tags: [
 
 depends: [
   "rocq-core" { (>= "9.0" & < "9.3~") | (= "dev") }
-  "rocq-stdlib" { (>= "9.1") | (= "dev") }
+  "rocq-stdlib" { (>= "9.0") | (= "dev") }
 ]
 conflicts: [
   "coq-stdpp"

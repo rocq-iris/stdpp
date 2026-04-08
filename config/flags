@@ -2,3 +2,7 @@
 # Syntax:
 # - One flag per line with no leading/trailing blanks.
 # - Empty lines and lines starting with '#' are ignored.
+
+# Needs Stdlib 9.1
+-w
+-deprecated-reference-since-9.1
