@@ -61,6 +61,9 @@ Section test.
   Lemma test_elem_of_dom x X : x ∈ dom X ↔ x ∈ X.
   Proof. multiset_solver. Qed.
 
+  Lemma test_elem_of_dom_union x X Y : x ∈ dom (X ∪ Y) ↔ x ∈ X ∨ x ∈ Y.
+  Proof. multiset_solver. Qed.
+
   (** Tests where the goals do not involve the multiset connectives *)
   Lemma test_goal_1 x y X : {[+ x +]} ∪ X ⊆ {[+ y +]} → x = y.
   Proof. multiset_solver. Qed.

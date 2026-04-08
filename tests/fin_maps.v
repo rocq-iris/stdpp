@@ -37,6 +37,12 @@ Section map_dom.
 
   Lemma set_solver_dom_disjoint {A} (X : D) : dom (∅ : M A) ## X.
   Proof. set_solver. Qed.
+
+  Lemma set_solver_dom_kmap {A} `{FinMapDom K2 M2 D2}
+      (f : K → K2) `{!Inj (=) (=) f} (m1 m2 : M A) :
+    dom m1 ⊆ dom m2 ↔
+    dom (kmap (M2:=M2) f m1) ⊆ dom (kmap (M2:=M2) f m2).
+  Proof. set_solver. Qed.
 End map_dom.
 
 Section map_img.
@@ -45,6 +51,12 @@ Section map_img.
   Lemma set_solver_map_img i x :
     map_img (∅ : M A) ⊆@{SA} map_img ({[ i := x ]} : M A).
   Proof. set_unfold. set_solver. Qed.
+
+  Lemma set_solver_map_img_kmap `{FinMap K2 M2, SemiSet A SA}
+      (f : K → K2) `{!Inj (=) (=) f} (m1 m2 : M A) :
+    map_img m1 ⊆@{SA} map_img m2 ↔
+    map_img (kmap (M2:=M2) f m1) ⊆@{SA} map_img (kmap (M2:=M2) f m2).
+  Proof. set_solver. Qed.
 End map_img.
 
 (** * Tests for the [Pmap] and [gmap] instances. *)

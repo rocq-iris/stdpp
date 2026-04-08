@@ -1,8 +1,6 @@
 From Stdlib Require Import String.
 From stdpp Require Import sets gmap listset.
 
-Local Open Scope string_scope.
-
 Lemma foo `{Set_ A C} (x : A) (X Y : C) : x ∈ X ∩ Y → x ∈ X.
 Proof. intros Hx. set_unfold in Hx. tauto. Qed.
 
@@ -73,6 +71,8 @@ Section perennial_369_listset.
 End perennial_369_listset.
 
 Section set_solver_seq.
+  Local Open Scope string_scope.
+
   Check "set_solver_elem_of_seq".
   Lemma set_solver_elem_of_seq (n m : nat) :
     n < m →
@@ -91,3 +91,29 @@ Section set_solver_seq.
     set_solver by lia.
   Qed.
 End set_solver_seq.
+
+(* Other misc operations *)
+
+Lemma set_solver_list_filter {A} (l : list A) x : 
+  (x ∈ filter (λ _, True) l ↔ x ∈ l) ∧ (x ∈ filter (λ _, False) l ↔ x ∈ []).
+Proof. set_solver. Qed.
+
+Lemma set_solver_list_omap {A} (l : list A) x : 
+  (x ∈ omap Some l ↔ x ∈ l) ∧ (x ∈ omap (λ _, None) l ↔ x ∈ []).
+Proof. set_solver. Qed.
+
+Lemma set_solver_list_omap_more {A B} (l : list A) (f : A → option B) x : 
+  x ∈ l → (∃ y, f x = Some y) → ∃ y, y ∈ omap f l.
+Proof. set_solver. Qed.
+
+Lemma set_solver_replicate {A} (n : nat) (x : A) :
+  0 < n → x ∈ replicate n x.
+Proof. set_solver by lia. Qed.
+
+Lemma set_solver_list_ret {A} (x : A) :
+  x ∈@{list A} mret x.
+Proof. set_solver. Qed.
+
+Lemma set_solver_list_join {A} (l : list A) (ls ls' : list (list A)) (x : A) :
+  x ∈ mjoin (l :: ls ++ [] ++ ls') ↔ x ∈ l ∨ x ∈ mjoin ls ∨ x ∈ mjoin ls'.
+Proof. set_solver. Qed.

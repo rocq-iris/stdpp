@@ -353,9 +353,13 @@ Section multiset_unfold.
     by rewrite gmultiset_elem_of_filter, (set_unfold_elem_of x X Q).
   Qed.
 
-  Global Instance set_unfold_gmultiset_dom x X :
-    SetUnfoldElemOf x (dom X) (x ∈ X).
-  Proof. constructor. apply gmultiset_elem_of_dom. Qed.
+  Global Instance set_unfold_gmultiset_dom x X P :
+    SetUnfoldElemOf x X P →
+    SetUnfoldElemOf x (dom X) P.
+  Proof.
+    constructor.
+    by rewrite gmultiset_elem_of_dom, (set_unfold_elem_of x X P). 
+  Qed.
 End multiset_unfold.
 
 (** Step 3: instantiate hypotheses *)
