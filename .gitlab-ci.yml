@@ -61,19 +61,12 @@ build-rocq.dev:
     OCAML: "ocaml-base-compiler.4.14.0" # for faster rebuilds
     OPAM_PINS: "rocq-core version dev"
 
-# Check the upcoming 9.2 release.
-build-rocq.9.2.dev:
-  <<: *template
-  variables:
-    OCAML: "ocaml-base-compiler.4.14.0" # for faster rebuilds
-    OPAM_PINS: "rocq-core version 9.2.dev   rocq-stdlib version 9.1.0"
-
 # The newest version runs with timing, outside MRs.
-build-rocq.9.1.0:
+build-rocq.9.2.0:
   <<: *template
   <<: *only_branches
   variables:
-    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.1.0"
+    OPAM_PINS: "rocq-core version 9.2.0   rocq-stdlib version 9.1.0"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
     CI_COQCHK: "1"
@@ -84,20 +77,25 @@ build-rocq.9.1.0:
   interruptible: false
 
 # The newest version also runs in MRs, without timing.
-build-rocq.9.1.0-mr:
+build-rocq.9.2.0-mr:
   <<: *template
   <<: *only_mr
   variables:
-    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.1.0"
+    OPAM_PINS: "rocq-core version 9.2.0   rocq-stdlib version 9.1.0"
     DENY_WARNINGS: "1"
     MANGLE_NAMES: "1"
 
-# Also ensure Dune works (broken on older Rocq versions due to Stdlib split).
-build-rocq.9.1.0-dune:
+# Also ensure Dune works.
+build-rocq.9.2.0-dune:
   <<: *template
   variables:
-    OPAM_PINS: "rocq-core version 9.1.0   rocq-stdlib version 9.1.0"
+    OPAM_PINS: "rocq-core version 9.2.0   rocq-stdlib version 9.1.0"
     MAKE_TARGET: "dune"
+
+build-rocq.9.1.1:
+  <<: *template
+  variables:
+    OPAM_PINS: "rocq-core version 9.1.1   rocq-stdlib version 9.1.0"
 
 # The oldest version runs in MRs, without name mangling.
 build-rocq.9.0.1:

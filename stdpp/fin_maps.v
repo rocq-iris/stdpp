@@ -5352,11 +5352,11 @@ Global Hint Extern 2 (_ ##ₘ <[_:=_]>_) => apply map_disjoint_insert_r_2 : map_
 Global Hint Extern 2 (delete _ _ ##ₘ _) => apply map_disjoint_delete_l : map_disjoint.
 Global Hint Extern 2 (_ ##ₘ delete _ _) => apply map_disjoint_delete_r : map_disjoint.
 Global Hint Extern 2 (list_to_map _ ##ₘ _) =>
-  apply map_disjoint_list_to_map_zip_l_2 : mem_disjoint.
+  apply map_disjoint_list_to_map_zip_l_2 : map_disjoint.
 Global Hint Extern 2 (_ ##ₘ list_to_map _) =>
-  apply map_disjoint_list_to_map_zip_r_2 : mem_disjoint.
-Global Hint Extern 2 (⋃ _ ##ₘ _) => apply map_disjoint_union_list_l_2 : mem_disjoint.
-Global Hint Extern 2 (_ ##ₘ ⋃ _) => apply map_disjoint_union_list_r_2 : mem_disjoint.
+  apply map_disjoint_list_to_map_zip_r_2 : map_disjoint.
+Global Hint Extern 2 (⋃ _ ##ₘ _) => apply map_disjoint_union_list_l_2 : map_disjoint.
+Global Hint Extern 2 (_ ##ₘ ⋃ _) => apply map_disjoint_union_list_r_2 : map_disjoint.
 Global Hint Extern 2 (foldr delete _ _ ##ₘ _) =>
   apply map_disjoint_foldr_delete_l : map_disjoint.
 Global Hint Extern 2 (_ ##ₘ foldr delete _ _) =>

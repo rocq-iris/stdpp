@@ -6,3 +6,16 @@
 # Needs Stdlib 9.1
 -w
 -deprecated-reference-since-9.1
+
+# Needs Rocq 9.2.
+-w
+-notation-for-abbreviation
+
+# Needs Rocq 9.2.
+-w
+-implicit-create-rewrite-hint-db
+
+# The ltac_expr case of this is very annoying to deal with so we are hoping for
+# better alternatives (https://github.com/rocq-prover/rocq/issues/21896).
+-w
+-level-tolerance

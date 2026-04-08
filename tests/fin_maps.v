@@ -324,7 +324,28 @@ Proof. reflexivity. Qed.
 (** Make sure that [pmap] and [gmap] can be used in nested inductive
 definitions *)
 
+Section nested_inductives.
+(* Rocq anyway can't generate meaningful induction schemes for
+these nested inductives. *)
+Unset Elimination Schemes.
+
 Inductive test := Test : Pmap test → test.
+
+Inductive gtest K `{Countable K} := GTest : gmap K (gtest K) → gtest K.
+Global Arguments GTest {_ _ _} _.
+
+(** Test that [map_Forall P] and [map_Forall2 P] can be used in an inductive
+definition with a recursive occurence in the predicate/relation [P] without
+bothering the positivity checker. *)
+Inductive gtest_pred `{Countable K} : gtest K → Prop :=
+  | GTest_pred ts :
+     map_Forall (λ _, gtest_pred) ts → gtest_pred (GTest ts).
+
+Inductive gtest_rel `{Countable K} : relation (gtest K) :=
+  | GTest_rel ts1 ts2 :
+     map_Forall2 (λ _, gtest_rel) ts1 ts2 → gtest_rel (GTest ts1) (GTest ts2).
+
+End nested_inductives.
 
 Fixpoint test_size (t : test) : nat :=
   let 'Test ts := t in S (map_fold (λ _ t', plus (test_size t')) 0 ts).
@@ -349,9 +370,6 @@ Proof.
     | Test ts1, Test ts2 => cast_if (decide (ts1 = ts2))
     end); abstract congruence.
 Defined.
-
-Inductive gtest K `{Countable K} := GTest : gmap K (gtest K) → gtest K.
-Arguments GTest {_ _ _} _.
 
 Fixpoint gtest_size `{Countable K} (t : gtest K) : nat :=
   let 'GTest ts := t in S (map_fold (λ _ t', plus (gtest_size t')) 0 ts).
@@ -451,17 +469,6 @@ of [map_imap]. *)
 Fixpoint gtest_imap `{Countable K} (j : K) (t : gtest K) : gtest K :=
   let '(GTest ts) := t in
   GTest (map_imap (λ i t, guard (i = j);; Some (gtest_imap j t)) ts).
-
-(** Test that [map_Forall P] and [map_Forall2 P] can be used in an inductive
-definition with a recursive occurence in the predicate/relation [P] without
-bothering the positivity checker. *)
-Inductive gtest_pred `{Countable K} : gtest K → Prop :=
-  | GTest_pred ts :
-     map_Forall (λ _, gtest_pred) ts → gtest_pred (GTest ts).
-
-Inductive gtest_rel `{Countable K} : relation (gtest K) :=
-  | GTest_rel ts1 ts2 :
-     map_Forall2 (λ _, gtest_rel) ts1 ts2 → gtest_rel (GTest ts1) (GTest ts2).
 
 (** Test that recursive calls are allowed after applying [map_Forall_impl].
 This is particularly important when using [map_Forall] in a premise of a mutually

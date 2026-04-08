@@ -1092,10 +1092,10 @@ not commonly enough used. *)
 Class Singleton A B := singleton: A → B.
 Global Hint Mode Singleton - ! : typeclass_instances.
 Global Instance: Params (@singleton) 3 := {}.
-Notation "{[ x ]}" := (singleton x) (at level 1) : stdpp_scope.
+Notation "{[ x ]}" := (singleton x) (at level 0) : stdpp_scope.
 Notation "{[ x ; y ; .. ; z ]}" :=
   (union .. (union (singleton x) (singleton y)) .. (singleton z))
-  (at level 1) : stdpp_scope.
+  (at level 0) : stdpp_scope.
 
 Class SubsetEq A := subseteq: relation A.
 Global Hint Mode SubsetEq ! : typeclass_instances.
@@ -1163,10 +1163,10 @@ Class SingletonMS A B := singletonMS: A → B.
 Global Hint Mode SingletonMS - ! : typeclass_instances.
 Global Instance: Params (@singletonMS) 3 := {}.
 Notation "{[+ x +]}" := (singletonMS x)
-  (at level 1, format "{[+  x  +]}") : stdpp_scope.
+  (at level 0, format "{[+  x  +]}") : stdpp_scope.
 Notation "{[+ x ; y ; .. ; z +]}" :=
   (disj_union .. (disj_union (singletonMS x) (singletonMS y)) .. (singletonMS z))
-  (at level 1, format "{[+  x ;  y ;  .. ;  z  +]}") : stdpp_scope.
+  (at level 0, format "{[+  x ;  y ;  .. ;  z  +]}") : stdpp_scope.
 
 Definition option_to_set `{Singleton A C, Empty C} (mx : option A) : C :=
   match mx with None => ∅ | Some x => {[ x ]} end.
@@ -1200,7 +1200,7 @@ Infix "∈" := elem_of (at level 70) : stdpp_scope.
 Notation "(∈)" := elem_of (only parsing) : stdpp_scope.
 Notation "( x ∈.)" := (elem_of x) (only parsing) : stdpp_scope.
 Notation "(.∈ X )" := (λ x, elem_of x X) (only parsing) : stdpp_scope.
-Notation "x ∉ X" := (¬x ∈ X) (at level 80) : stdpp_scope.
+Notation "x ∉ X" := (¬x ∈ X) (at level 70) : stdpp_scope.
 Notation "(∉)" := (λ x X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "( x ∉.)" := (λ X, x ∉ X) (only parsing) : stdpp_scope.
 Notation "(.∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
@@ -1208,7 +1208,7 @@ Notation "(.∉ X )" := (λ x, x ∉ X) (only parsing) : stdpp_scope.
 Infix "∈@{ B }" := (@elem_of _ B _) (at level 70, only parsing) : stdpp_scope.
 Notation "(∈@{ B } )" := (@elem_of _ B _) (only parsing) : stdpp_scope.
 
-Notation "x ∉@{ B } X" := (¬x ∈@{B} X) (at level 80, only parsing) : stdpp_scope.
+Notation "x ∉@{ B } X" := (¬x ∈@{B} X) (at level 70, only parsing) : stdpp_scope.
 Notation "(∉@{ B } )" := (λ x X, x ∉@{B} X) (only parsing) : stdpp_scope.
 
 Class Disjoint A := disjoint : A → A → Prop.
@@ -1334,7 +1334,7 @@ Class SingletonM K A M := singletonM: K → A → M.
 Global Hint Mode SingletonM - - ! : typeclass_instances.
 Global Instance: Params (@singletonM) 5 := {}.
 Notation "{[ k := a ]}" := (singletonM k a)
-  (at level 1, format "{[ k := a ]}") : stdpp_scope.
+  (at level 0, format "{[ k := a ]}") : stdpp_scope.
 
 (** The function insert [<[k:=a]>m] should update the element at key [k] with
 value [a] in [m]. *)
@@ -1342,7 +1342,7 @@ Class Insert (K A M : Type) := insert: K → A → M → M.
 Global Hint Mode Insert - - ! : typeclass_instances.
 Global Instance: Params (@insert) 5 := {}.
 Notation "<[ k := a ]>" := (insert k a)
-  (at level 5, right associativity, format "<[ k := a ]>") : stdpp_scope.
+  (at level 0, right associativity, format "<[ k := a ]>") : stdpp_scope.
 Global Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 (** Notation for more elements (up to 13) *)
@@ -1352,63 +1352,63 @@ Global Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 (* The "format" makes sure that linebreaks are placed after the separating semicolons [;] when printing. *)
 Notation "{[ k1 := a1 ; k2 := a2 ]}" :=
   (<[ k1 := a1 ]>{[ k2 := a2 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]>{[ k3 := a3 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]>{[ k4 := a4 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]>{[ k5 := a5 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]>{[ k6 := a6 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]>{[ k7 := a7 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]>{[ k8 := a8 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ; k9 := a9 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]> $ <[ k8 := a8 ]>{[ k9 := a9 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ; ']'  '/' '[' k9 := a9 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ; k9 := a9 ; k10 := a10 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]> $ <[ k8 := a8 ]> $
     <[ k9 := a9 ]>{[ k10 := a10 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ; ']'  '/' '[' k9 := a9 ; ']'  '/' '[' k10 := a10 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ; k9 := a9 ; k10 := a10 ; k11 := a11 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]> $ <[ k8 := a8 ]> $
     <[ k9 := a9 ]> $ <[ k10 := a10 ]>{[ k11 := a11 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ; ']'  '/' '[' k9 := a9 ; ']'  '/' '[' k10 := a10 ; ']'  '/' '[' k11 := a11 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ; k9 := a9 ; k10 := a10 ; k11 := a11 ; k12 := a12 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]> $ <[ k8 := a8 ]> $
     <[ k9 := a9 ]> $ <[ k10 := a10 ]> $ <[ k11 := a11 ]>{[ k12 := a12 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ; ']'  '/' '[' k9 := a9 ; ']'  '/' '[' k10 := a10 ; ']'  '/' '[' k11 := a11 ; ']'  '/' '[' k12 := a12 ']' ']' ]}") : stdpp_scope.
 Notation "{[ k1 := a1 ; k2 := a2 ; k3 := a3 ; k4 := a4 ; k5 := a5 ; k6 := a6 ; k7 := a7 ; k8 := a8 ; k9 := a9 ; k10 := a10 ; k11 := a11 ; k12 := a12 ; k13 := a13 ]}" :=
   (<[ k1 := a1 ]> $ <[ k2 := a2 ]> $ <[ k3 := a3 ]> $ <[ k4 := a4 ]> $
     <[ k5 := a5 ]> $ <[ k6 := a6 ]> $ <[ k7 := a7 ]> $ <[ k8 := a8 ]> $
     <[ k9 := a9 ]> $ <[ k10 := a10 ]> $ <[ k11 := a11 ]> $ <[ k12 := a12 ]>{[ k13 := a13 ]})
-  (at level 1, format
+  (at level 0, format
   "{[ '[hv' '[' k1 := a1 ; ']'  '/' '[' k2 := a2 ; ']'  '/' '[' k3 := a3 ; ']'  '/' '[' k4 := a4 ; ']'  '/' '[' k5 := a5 ; ']'  '/' '[' k6 := a6 ; ']'  '/' '[' k7 := a7 ; ']'  '/' '[' k8 := a8 ; ']'  '/' '[' k9 := a9 ; ']'  '/' '[' k10 := a10 ; ']'  '/' '[' k11 := a11 ; ']'  '/' '[' k12 := a12 ; ']'  '/' '[' k13 := a13 ']' ']' ]}") : stdpp_scope.
 
 (** The function delete [delete k m] should delete the value at key [k] in
