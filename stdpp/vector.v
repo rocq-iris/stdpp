@@ -279,7 +279,7 @@ Global Instance vec_insert A : ∀ m, Insert (fin m) A (vec A m) :=
 
 (* Back-compat notation for [vinsert] *)
 #[deprecated(note="Use `<[_:=_]>` or `insert` instead")]
-Notation vinsert := (insert (Insert:=vec_insert _ _)) (only parsing).
+Notation vinsert := (@insert _ _ _ (@vec_insert _ _)) (only parsing).
 
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :
   vec_to_list (<[i:=x]> v) = <[fin_to_nat i:=x]> (vec_to_list v).
