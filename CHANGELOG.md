@@ -25,6 +25,8 @@ API-breaking change is listed.
   `mjoin` in `set_solver`. (by Janggun Lee)
 - Add support for `fin_map`'s `map_img`/`dom` + `kmap` in `set_solver`. (by Janggun Lee)
 - Improve support for `gmultiset`'s `dom` in `set_solver`. (by Janggun Lee)
+- Move set, multiset, and map literal notations (`{[ x ]}` etc) to level 0.
+- Move `∉` to level 70 (consistent with `∈`).
 
 ## std++ 1.13.0 (2026-03-05)
 
