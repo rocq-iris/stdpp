@@ -27,6 +27,24 @@ API-breaking change is listed.
 - Improve support for `gmultiset`'s `dom` in `set_solver`. (by Janggun Lee)
 - Move set, multiset, and map literal notations (`{[ x ]}` etc) to level 0.
 - Move `∉` to level 70 (consistent with `∈`).
+- Change `vinsert` to use the `Insert` type class, enabling the notation
+  `<[i:=x]> v` on vectors. The old name `vinsert` is deprecated, and remains 
+  available as parsing only notation. (by Janggun Lee).
+- Rename `vlookup_insert_self` → `vlookup_insert_id`.
+- Adjust `vlookup_insert` to cover the "eq" and "ne" case in a single lemma 
+  statement, like list and maps. (by Janggun Lee)
+- Add `vinsert_insert` and friends. (by Janggun Lee)
+
+The following `sed` script should perform most of the renaming
+(on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
+Note that the script is not idempotent, do not run it twice.
+```
+sed -i -E -f- $(find theories -name "*.v") <<EOF
+# vinsert related
+s/\bvlookup_insert_self\b/vlookup_insert_id/g
+s/\bvlookup_insert\b/vlookup_insert_eq/g
+s/\bvinsert\b/insert/g
+```
 
 ## std++ 1.13.0 (2026-03-05)
 

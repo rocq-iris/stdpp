@@ -270,37 +270,57 @@ Proof.
   by rewrite IHv1.
 Qed.
 
-(** Similar to vlookup, we cannot define [vinsert] as an instance of the
-[Insert] type class, as it has a dependent type. *)
-Fixpoint vinsert {A n} (i : fin n) (x : A) : vec A n → vec A n :=
-  match i with
-  | 0%fin => vec_S_inv _ (λ _ v, x ::: v)
-  | FS i => vec_S_inv _ (λ y v, y ::: vinsert i x v)
+Global Instance vec_insert A : ∀ m, Insert (fin m) A (vec A m) :=
+  fix go m i a {struct i} := let _ : ∀ m, Insert _ _ _ := @go in
+  match i in fin m return vec A m → vec A m with
+  | 0%fin => vec_S_inv _ (λ _ v, a ::: v)
+  | FS j => vec_S_inv _ (λ x v, x ::: <[j:=a]> v)
   end.
 
+(* Back-compat notation for [vinsert] *)
+#[deprecated(note="Use `<[_:=_]>` or `insert` instead")]
+Notation vinsert := (insert (Insert:=vec_insert _ _)) (only parsing).
+
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :
-  vec_to_list (vinsert i x v) = insert (fin_to_nat i) x (vec_to_list v).
+  vec_to_list (<[i:=x]> v) = <[fin_to_nat i:=x]> (vec_to_list v).
 Proof. induction v as [|??? IHv]; inv_fin i; [done|]. simpl. intros. by rewrite IHv. Qed.
 
-Lemma vlookup_insert {A n} i x (v : vec A n) : vinsert i x v !!! i = x.
+Lemma vlookup_insert_eq {A n} i x (v : vec A n) : <[i:=x]> v !!! i = x.
 Proof. by induction i; inv_vec v. Qed.
 Lemma vlookup_insert_ne {A n} i j x (v : vec A n) :
-  i ≠ j → vinsert i x v !!! j = v !!! j.
+  i ≠ j → <[i:=x]> v !!! j = v !!! j.
 Proof.
   induction i as [|?? IHi]; inv_fin j; inv_vec v; simpl; try done.
   intros. apply IHi. congruence.
 Qed.
-Lemma vlookup_insert_self {A n} i (v : vec A n) : vinsert i (v !!! i) v = v.
+Lemma vlookup_insert {A n} i j x (v : vec A n) :
+  <[i:=x]> v !!! j = if decide (i = j) then x else v !!! j.
+Proof.
+  case_decide; subst; eauto using vlookup_insert_eq, vlookup_insert_ne.
+Qed.
+Lemma vlookup_insert_id {A n} i (v : vec A n) : <[i:=v !!! i]> v = v.
 Proof. by induction v; inv_fin i; intros; f_equal/=. Qed.
 
+Lemma vinsert_insert_eq {A n} i x y (v : vec A n) : <[i:=x]> (<[i:=y]> v) = <[i:=x]> v.
+Proof. by induction i; inv_vec v; intros; f_equal/=; auto. Qed.
+Lemma vinsert_insert_ne {A n} i j x y (v : vec A n) :
+  i ≠ j → <[i:=x]> (<[j:=y]> v) = <[j:=y]> (<[i:=x]> v).
+Proof. by induction v; inv_fin i; inv_fin j; intros; f_equal/=; naive_solver. Qed.
+Lemma vinsert_insert {A n} i j x y (v : vec A n) :
+  <[i:=x]> (<[j:=y]> v) =
+    if decide (i = j) then <[i:=x]> v else <[j:=y]> (<[i:=x]> v).
+Proof.
+  case_decide; subst; auto using vinsert_insert_eq, vinsert_insert_ne.
+Qed.
+
 Lemma vmap_insert {A B} (f : A → B) (n : nat) i x (v : vec A n) :
-  vmap f (vinsert i x v) = vinsert i (f x) (vmap f v).
+  vmap f (<[i:=x]> v) = <[i:=f x]> (vmap f v).
 Proof. induction v; inv_fin i; intros; f_equal/=; auto. Qed.
 
 Lemma Forall_vinsert {A} (P : A → Prop) {n} (v : vec A n) (i : fin n) (x : A) :
   Forall P v →
   P x →
-  Forall P (vinsert i x v).
+  Forall P (vec_to_list (<[i:=x]> v)).
 Proof. rewrite vec_to_list_insert. apply Forall_insert. Qed.
 
 (** The functions [vtake i v] and [vdrop i v] take the first [i] elements of
