@@ -116,8 +116,10 @@ Module Ascii.
 End Ascii.
 
 Module String.
-  (** Use a name that is consistent with [list]. *)
-  Notation app := String.append.
+  (** Use a name that is consistent with [list]. [only parsing] because it looks
+  like starting with Rocq 9.2, notations in modules that are not imported are
+  anyway not used for printing. *)
+  Notation app := String.append (only parsing).
 
   (** And obtain a proper behavior for [simpl]. *)
   Global Arguments app : simpl never.
