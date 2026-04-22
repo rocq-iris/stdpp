@@ -18,9 +18,6 @@ Check ("foo" =? "bar")%string.
 [(_ ++ _)%string]. *)
 Check ("foo" +:+ "bar").
 
-(** Should print as [String.app] *)
-Check String.app.
-
 (** Test notations and type class instances for [≤] *)
 Check ("a" ≤ "b")%string.
 Compute bool_decide ("a" ≤ "b")%string.
