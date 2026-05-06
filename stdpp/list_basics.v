@@ -1335,9 +1335,9 @@ Section filter.
 
   Lemma filter_singleton x : filter P [x] = if decide (P x) then [x] else [].
   Proof. done. Qed.
-  Lemma filter_singleton_True x l : P x → filter P [x] = [x].
+  Lemma filter_singleton_True x : P x → filter P [x] = [x].
   Proof. intros. by rewrite filter_singleton, decide_True. Qed.
-  Lemma filter_singleton_False x l : ¬P x → filter P [x] = [].
+  Lemma filter_singleton_False x : ¬P x → filter P [x] = [].
   Proof. intros. by rewrite filter_singleton, decide_False. Qed.
 
   Lemma filter_app l1 l2 : filter P (l1 ++ l2) = filter P l1 ++ filter P l2.
