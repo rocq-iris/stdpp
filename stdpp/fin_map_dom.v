@@ -315,6 +315,10 @@ Proof.
       naive_solver.
 Qed.
 
+Lemma dom_set_to_map {A} `{!Elements K D, !FinSet K D} (f : K → A) (X : D) :
+  dom (set_to_map f X : M A) ≡ X.
+Proof. intros i. by rewrite elem_of_dom, lookup_set_to_map_is_Some. Qed.
+
 (* Does not require [FinSet K D] *)
 Lemma elem_of_dom_kmap `{FinMapDom K2 M2 D2}
     {A} (f : K → K2) `{!Inj (=) (=) f} (m : M A) i :
@@ -422,6 +426,9 @@ Section leibniz.
     dom m = X1 ∪ X2 →
     ∃ m1 m2, m = m1 ∪ m2 ∧ m1 ##ₘ m2 ∧ dom m1 = X1 ∧ dom m2 = X2.
   Proof. unfold_leibniz. apply dom_union_inv. Qed.
+  Lemma dom_set_to_map_L {A} `{!Elements K D, !FinSet K D} (f : K → A) (X : D) :
+    dom (set_to_map f X : M A) = X.
+  Proof. unfold_leibniz. apply dom_set_to_map. Qed.
 End leibniz.
 
 Lemma dom_kmap_L `{!Elements K D, !FinSet K D, FinMapDom K2 M2 D2}
