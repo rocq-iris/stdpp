@@ -39,7 +39,7 @@ API-breaking change is listed.
   (given a set `X` with elements `B`). In other words, `f` no longer has the
   freedom to map the set elements to different keys. If you need this freedom,
   combine `set_to_map` with `kmap`.
-- Add lemmas for `set_to_map` involving `lookup`, `singleton`, `insert`,
+- Add lemmas for `set_to_map` involving `lookup`, `Inj`, `singleton`, `insert`,
   `delete`, `subseteq`, `union`, `intersection`, `difference` and `dom`.
 
 The following `sed` script should perform most of the renaming

@@ -1608,6 +1608,17 @@ Section set_to_map.
     by rewrite !lookup_set_to_map_Some, HX.
   Qed.
 
+  (** [set_to_map_inj_L] has a lower cost than [set_to_map_inj] so that it is
+  prefered if the set has [LeibnizEquiv]. *)
+  Global Instance set_to_map_inj f : Inj (≡@{C}) (=@{M A}) (set_to_map f) | 10.
+  Proof.
+    intros X1 X2. rewrite map_eq_iff. setoid_rewrite option_eq.
+    setoid_rewrite lookup_set_to_map_Some. set_solver.
+  Qed.
+  Global Instance set_to_map_inj_L `{!LeibnizEquiv C} f :
+    Inj (=@{C}) (=@{M A}) (set_to_map f) | 0.
+  Proof. intros X1 X2. unfold_leibniz. apply set_to_map_inj. Qed.
+
   Lemma set_to_map_empty (f : K → A) : set_to_map f (∅ : C) =@{M A} ∅.
   Proof.
     apply map_eq; intros i. apply option_eq; intros x.
