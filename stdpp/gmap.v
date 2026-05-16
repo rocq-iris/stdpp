@@ -718,10 +718,9 @@ Section gset.
   Qed.
 
   Lemma gset_to_gmap_set_to_map {A} (X : gset K) (x : A) :
-    gset_to_gmap x X = set_to_map (.,x) X.
+    gset_to_gmap x X = set_to_map (λ _, x) X.
   Proof.
-    apply map_eq; intros k. apply option_eq; intros y.
-    rewrite lookup_gset_to_gmap_Some, lookup_set_to_map; naive_solver.
+    apply map_eq; intros k. by rewrite lookup_gset_to_gmap, lookup_set_to_map.
   Qed.
 
   Lemma map_to_list_gset_to_gmap {A} (X : gset K) (x : A) :

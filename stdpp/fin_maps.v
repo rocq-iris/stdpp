@@ -115,9 +115,10 @@ Definition map_first_key `{MapFold K A M} (m : M) (i : K) :=
 Definition map_to_set `{MapFold K A M,
     Singleton B C, Empty C, Union C} (f : K → A → B) (m : M) : C :=
   list_to_set (uncurry f <$> map_to_list m).
-Definition set_to_map `{Elements B C, Insert K A M, Empty M}
-    (f : B → K * A) (X : C) : M :=
-  list_to_map (f <$> elements X).
+
+Definition set_to_map `{Elements K C, Insert K A M, Empty M}
+    (f : K → A) (X : C) : M :=
+  list_to_map ((λ i, (i, f i)) <$> elements X).
 
 Global Instance map_union_with `{Merge M} {A} : UnionWith A (M A) :=
   λ f, merge (union_with f).
@@ -1576,29 +1577,91 @@ Qed.
 
 (** ** Properties of conversion from sets *)
 Section set_to_map.
-  Context {A : Type} `{FinSet B C}.
+  Context {A : Type} `{FinSet K C}.
 
-  Lemma lookup_set_to_map (f : B → K * A) (Y : C) i x :
-    (∀ y y', y ∈ Y → y' ∈ Y → (f y).1 = (f y').1 → y = y') →
-    (set_to_map f Y : M A) !! i = Some x ↔ ∃ y, y ∈ Y ∧ f y = (i,x).
+  Lemma lookup_set_to_map_Some (f : K → A) (Y : C) i x :
+    (set_to_map f Y : M A) !! i = Some x ↔ i ∈ Y ∧ f i = x.
   Proof.
-    intros Hinj. assert (∀ x',
-      (i, x) ∈ f <$> elements Y → (i, x') ∈ f <$> elements Y → x = x').
-    { intros x'. intros (y&Hx&Hy)%list_elem_of_fmap (y'&Hx'&Hy')%list_elem_of_fmap.
-      rewrite elem_of_elements in Hy, Hy'.
-      cut (y = y'); [congruence|]. apply Hinj; auto. by rewrite <-Hx, <-Hx'. }
-    unfold set_to_map; rewrite <-elem_of_list_to_map' by done.
+    unfold set_to_map; rewrite <-elem_of_list_to_map' by set_solver.
     rewrite list_elem_of_fmap. setoid_rewrite elem_of_elements; naive_solver.
   Qed.
-End set_to_map.
 
-Lemma lookup_set_to_map_id `{FinSet (K * A) C} (X : C) i x :
-  (∀ i y y', (i,y) ∈ X → (i,y') ∈ X → y = y') →
-  (set_to_map id X : M A) !! i = Some x ↔ (i,x) ∈ X.
-Proof.
-  intros. etrans; [apply lookup_set_to_map|naive_solver].
-  intros [] [] ???; simplify_eq/=; eauto with f_equal.
-Qed.
+  Lemma lookup_set_to_map_is_Some (f : K → A) (Y : C) i :
+    is_Some ((set_to_map f Y : M A) !! i) ↔ i ∈ Y.
+  Proof. unfold is_Some. setoid_rewrite lookup_set_to_map_Some. naive_solver. Qed.
+
+  Lemma lookup_set_to_map_None (f : K → A) (Y : C) i :
+    ((set_to_map f Y : M A) !! i) = None ↔ i ∉ Y.
+  Proof. by rewrite !eq_None_not_Some, lookup_set_to_map_is_Some. Qed.
+
+  Lemma lookup_set_to_map `{!RelDecision (∈@{C})} (f : K → A) (Y : C) i :
+    (set_to_map f Y : M A) !! i = (guard (i ∈ Y);; Some (f i)).
+  Proof.
+    apply option_eq; intros x. rewrite lookup_set_to_map_Some.
+    case_guard; naive_solver.
+  Qed.
+
+  Global Instance set_to_map_proper (f : K → A) :
+    Proper ((≡@{C}) ==> (=@{M A})) (set_to_map f).
+  Proof.
+    intros X1 X2 HX. apply map_eq; intros i. apply option_eq; intros x.
+    by rewrite !lookup_set_to_map_Some, HX.
+  Qed.
+
+  (** [set_to_map_inj_L] has a lower cost than [set_to_map_inj] so that it is
+  prefered if the set has [LeibnizEquiv]. *)
+  Global Instance set_to_map_inj f : Inj (≡@{C}) (=@{M A}) (set_to_map f) | 10.
+  Proof.
+    intros X1 X2. rewrite map_eq_iff. setoid_rewrite option_eq.
+    setoid_rewrite lookup_set_to_map_Some. set_solver.
+  Qed.
+  Global Instance set_to_map_inj_L `{!LeibnizEquiv C} f :
+    Inj (=@{C}) (=@{M A}) (set_to_map f) | 0.
+  Proof. intros X1 X2. unfold_leibniz. apply set_to_map_inj. Qed.
+
+  Lemma set_to_map_empty (f : K → A) : set_to_map f (∅ : C) =@{M A} ∅.
+  Proof.
+    apply map_eq; intros i. apply option_eq; intros x.
+    rewrite lookup_set_to_map_Some, lookup_empty. set_solver.
+  Qed.
+
+  Lemma set_to_map_insert (f : K → A) (Y : C) i :
+    set_to_map f ({[ i ]} ∪ Y) =@{M A} <[i:=f i]> (set_to_map f Y).
+  Proof.
+    apply map_eq; intros j. apply option_eq; intros x.
+    rewrite lookup_insert_Some, !lookup_set_to_map_Some.
+    destruct (decide (i = j)); set_solver.
+  Qed.
+
+  Lemma set_to_map_delete (f : K → A) (Y : C) i :
+    set_to_map f (Y ∖ {[ i ]}) =@{M A} delete i (set_to_map f Y).
+  Proof.
+    apply map_eq; intros j. apply option_eq; intros x.
+    rewrite lookup_delete_Some, !lookup_set_to_map_Some.
+    destruct (decide (i = j)); set_solver.
+  Qed.
+
+  Lemma set_to_map_singleton (f : K → A) i :
+    set_to_map f ({[ i ]} : C) =@{M A} {[ i := f i ]}.
+  Proof.
+    by rewrite <-(right_id ∅ (∪) {[ i ]}), set_to_map_insert, set_to_map_empty.
+  Qed.
+
+  Lemma set_to_map_subseteq_ext (f : K → A) (Y1 Y2 : C) :
+    set_to_map f Y1 ⊆@{M A} set_to_map f Y2 ↔ Y1 ⊆ Y2.
+  Proof.
+    rewrite map_subseteq_spec.
+    setoid_rewrite lookup_set_to_map_Some. set_solver.
+  Qed.
+
+  Lemma set_to_map_mono (f : K → A) (Y1 Y2 : C) :
+    Y1 ⊆ Y2 → set_to_map f Y1 ⊆@{M A} set_to_map f Y2.
+  Proof. apply set_to_map_subseteq_ext. Qed.
+
+  Lemma set_to_map_strict_mono (f : K → A) (Y1 Y2 : C) :
+    Y1 ⊂ Y2 → set_to_map f Y1 ⊂@{M A} set_to_map f Y2.
+  Proof. unfold strict. by rewrite !(set_to_map_subseteq_ext f). Qed.
+End set_to_map.
 
 Section map_to_set.
   Context {A : Type} `{SemiSet B C}.
@@ -2818,6 +2881,12 @@ Lemma map_disjoint_agree {A} (m1 m2 : M A) :
   m1 ##ₘ m2 → map_agree m1 m2.
 Proof. rewrite !map_disjoint_spec, !map_agree_spec. naive_solver. Qed.
 
+Lemma map_disjoint_set_to_map {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map (M:=M A) f X ##ₘ set_to_map f Y ↔ X ## Y.
+Proof.
+  rewrite map_disjoint_spec. setoid_rewrite lookup_set_to_map_Some. set_solver.
+Qed.
+
 (** ** Properties of the [union_with] operation *)
 Section union_with.
   Context {A} (f : A → A → option A).
@@ -3242,6 +3311,16 @@ Proof.
   intros Hdisj ??. apply map_eq; intros k. specialize (Hdisj k).
   rewrite lookup_union, lookup_merge.
   destruct (m1 !! k), (m2 !! k); naive_solver.
+Qed.
+
+Lemma set_to_map_union {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map f (X ∪ Y) =@{M A} set_to_map f X ∪ set_to_map f Y.
+Proof.
+  apply map_eq=> j. apply option_eq=> x.
+  rewrite lookup_union_Some_raw, !lookup_set_to_map_Some.
+  destruct (decide ((set_to_map f X : M A) !! j = None)) as [|Hj]; [set_solver|].
+  rewrite lookup_set_to_map_None.
+  rewrite not_eq_None_Some, lookup_set_to_map_is_Some in Hj. set_solver.
 Qed.
 
 (** The following lemma shows that folding over two maps separately (using the
@@ -3695,6 +3774,15 @@ Proof.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
 
+Lemma set_to_map_intersection {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map f (X ∩ Y) =@{M A} set_to_map f X ∩ set_to_map f Y.
+Proof.
+  apply map_eq=> j. apply option_eq=> x.
+  rewrite lookup_intersection_Some,
+    !lookup_set_to_map_Some, lookup_set_to_map_is_Some.
+  set_solver.
+Qed.
+
 (** ** Properties of the [difference] operation *)
 Lemma lookup_difference {A} (m1 m2 : M A) i :
   (m1 ∖ m2) !! i = match m2 !! i with None => m1 !! i | _ => None end.
@@ -3844,6 +3932,15 @@ Lemma map_difference_filter {A} (m1 m2 : M A) :
 Proof.
   apply map_eq; intros i. apply option_eq; intros x.
   by rewrite lookup_difference_Some, map_lookup_filter_Some.
+Qed.
+
+Lemma set_to_map_difference {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map f (X ∖ Y) =@{M A} set_to_map f X ∖ set_to_map f Y.
+Proof.
+  apply map_eq=> j. apply option_eq=> x.
+  rewrite lookup_difference_Some,
+    !lookup_set_to_map_Some, lookup_set_to_map_None.
+  set_solver.
 Qed.
 
 (** ** Misc properties about the order *)

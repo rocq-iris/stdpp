@@ -34,6 +34,13 @@ API-breaking change is listed.
 - Adjust `vlookup_insert` to cover the "eq" and "ne" case in a single lemma 
   statement, like list and maps. (by Janggun Lee)
 - Add `vinsert_insert` and friends. (by Janggun Lee)
+- Specialize the type of `set_to_map f X` (producing a map from `K` to `A`) to
+  `f : K → A` (given a set `X` with elements `K`) instead of `f : B → K * A`
+  (given a set `X` with elements `B`). In other words, `f` no longer has the
+  freedom to map the set elements to different keys. If you need this freedom,
+  combine `set_to_map` with `kmap`.
+- Add lemmas for `set_to_map` involving `lookup`, `Inj`, `singleton`, `insert`,
+  `delete`, `subseteq`, `disjoint`, `union`, `intersection`, `difference` and `dom`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
