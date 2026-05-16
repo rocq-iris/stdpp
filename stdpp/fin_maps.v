@@ -1622,6 +1622,14 @@ Section set_to_map.
     destruct (decide (i = j)); set_solver.
   Qed.
 
+  Lemma set_to_map_delete (f : K → A) (Y : C) i :
+    set_to_map f (Y ∖ {[ i ]}) =@{M A} delete i (set_to_map f Y).
+  Proof.
+    apply map_eq; intros j. apply option_eq; intros x.
+    rewrite lookup_delete_Some, !lookup_set_to_map_Some.
+    destruct (decide (i = j)); set_solver.
+  Qed.
+
   Lemma set_to_map_singleton (f : K → A) i :
     set_to_map f ({[ i ]} : C) =@{M A} {[ i := f i ]}.
   Proof.
@@ -3734,6 +3742,15 @@ Proof.
   destruct (m1 !! i), (m2 !! i); compute; naive_solver.
 Qed.
 
+Lemma set_to_map_intersection {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map f (X ∩ Y) =@{M A} set_to_map f X ∩ set_to_map f Y.
+Proof.
+  apply map_eq=> j. apply option_eq=> x.
+  rewrite lookup_intersection_Some,
+    !lookup_set_to_map_Some, lookup_set_to_map_is_Some.
+  set_solver.
+Qed.
+
 (** ** Properties of the [difference] operation *)
 Lemma lookup_difference {A} (m1 m2 : M A) i :
   (m1 ∖ m2) !! i = match m2 !! i with None => m1 !! i | _ => None end.
@@ -3883,6 +3900,15 @@ Lemma map_difference_filter {A} (m1 m2 : M A) :
 Proof.
   apply map_eq; intros i. apply option_eq; intros x.
   by rewrite lookup_difference_Some, map_lookup_filter_Some.
+Qed.
+
+Lemma set_to_map_difference {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map f (X ∖ Y) =@{M A} set_to_map f X ∖ set_to_map f Y.
+Proof.
+  apply map_eq=> j. apply option_eq=> x.
+  rewrite lookup_difference_Some,
+    !lookup_set_to_map_Some, lookup_set_to_map_None.
+  set_solver.
 Qed.
 
 (** ** Misc properties about the order *)
