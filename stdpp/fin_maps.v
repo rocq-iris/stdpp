@@ -1635,6 +1635,21 @@ Section set_to_map.
   Proof.
     by rewrite <-(right_id ∅ (∪) {[ i ]}), set_to_map_insert, set_to_map_empty.
   Qed.
+
+  Lemma set_to_map_subseteq_ext (f : K → A) (Y1 Y2 : C) :
+    set_to_map f Y1 ⊆@{M A} set_to_map f Y2 ↔ Y1 ⊆ Y2.
+  Proof.
+    rewrite map_subseteq_spec.
+    setoid_rewrite lookup_set_to_map_Some. set_solver.
+  Qed.
+
+  Lemma set_to_map_mono (f : K → A) (Y1 Y2 : C) :
+    Y1 ⊆ Y2 → set_to_map f Y1 ⊆@{M A} set_to_map f Y2.
+  Proof. apply set_to_map_subseteq_ext. Qed.
+
+  Lemma set_to_map_strict_mono (f : K → A) (Y1 Y2 : C) :
+    Y1 ⊂ Y2 → set_to_map f Y1 ⊂@{M A} set_to_map f Y2.
+  Proof. unfold strict. by rewrite !(set_to_map_subseteq_ext f). Qed.
 End set_to_map.
 
 Section map_to_set.
