@@ -116,12 +116,9 @@ Definition map_to_set `{MapFold K A M,
     Singleton B C, Empty C, Union C} (f : K → A → B) (m : M) : C :=
   list_to_set (uncurry f <$> map_to_list m).
 
-Definition set_to_map_gen `{Elements B C, Insert K A M, Empty M}
-    (f : B → K * A) (X : C) : M :=
-  list_to_map (f <$> elements X).
 Definition set_to_map `{Elements K C, Insert K A M, Empty M}
-    (f : K → A) : C → M :=
-  set_to_map_gen (λ i, (i, f i)).
+    (f : K → A) (X : C) : M :=
+  list_to_map ((λ i, (i, f i)) <$> elements X).
 
 Global Instance map_union_with `{Merge M} {A} : UnionWith A (M A) :=
   λ f, merge (union_with f).
@@ -1579,37 +1576,15 @@ Proof.
 Qed.
 
 (** ** Properties of conversion from sets *)
-Section set_to_map_gen.
-  Context {A : Type} `{FinSet B C}.
-
-  Lemma lookup_set_to_map_gen_Some (f : B → K * A) (Y : C) i x :
-    (∀ y y', y ∈ Y → y' ∈ Y → (f y).1 = (f y').1 → y = y') →
-    (set_to_map_gen f Y : M A) !! i = Some x ↔ ∃ y, y ∈ Y ∧ f y = (i,x).
-  Proof.
-    intros Hinj. assert (∀ x',
-      (i, x) ∈ f <$> elements Y → (i, x') ∈ f <$> elements Y → x = x').
-    { intros x'. intros (y&Hx&Hy)%list_elem_of_fmap (y'&Hx'&Hy')%list_elem_of_fmap.
-      rewrite elem_of_elements in Hy, Hy'.
-      cut (y = y'); [congruence|]. apply Hinj; auto. by rewrite <-Hx, <-Hx'. }
-    unfold set_to_map_gen; rewrite <-elem_of_list_to_map' by done.
-    rewrite list_elem_of_fmap. setoid_rewrite elem_of_elements; naive_solver.
-  Qed.
-End set_to_map_gen.
-
-Lemma lookup_set_to_map_gen_id_Some `{FinSet (K * A) C} (X : C) i x :
-  (∀ i y y', (i,y) ∈ X → (i,y') ∈ X → y = y') →
-  (set_to_map_gen id X : M A) !! i = Some x ↔ (i,x) ∈ X.
-Proof.
-  intros. etrans; [apply lookup_set_to_map_gen_Some|naive_solver].
-  intros [] [] ???; simplify_eq/=; eauto with f_equal.
-Qed.
-
 Section set_to_map.
   Context {A : Type} `{FinSet K C}.
 
   Lemma lookup_set_to_map_Some (f : K → A) (Y : C) i x :
     (set_to_map f Y : M A) !! i = Some x ↔ i ∈ Y ∧ f i = x.
-  Proof. unfold set_to_map. rewrite lookup_set_to_map_gen_Some; naive_solver. Qed.
+  Proof.
+    unfold set_to_map; rewrite <-elem_of_list_to_map' by set_solver.
+    rewrite list_elem_of_fmap. setoid_rewrite elem_of_elements; naive_solver.
+  Qed.
 
   Lemma lookup_set_to_map_is_Some (f : K → A) (Y : C) i :
     is_Some ((set_to_map f Y : M A) !! i) ↔ i ∈ Y.
