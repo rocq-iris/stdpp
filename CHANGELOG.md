@@ -40,7 +40,7 @@ API-breaking change is listed.
   freedom to map the set elements to different keys. If you need this freedom,
   combine `set_to_map` with `kmap`.
 - Add lemmas for `set_to_map` involving `lookup`, `Inj`, `singleton`, `insert`,
-  `delete`, `subseteq`, `union`, `intersection`, `difference` and `dom`.
+  `delete`, `subseteq`, `disjoint`, `union`, `intersection`, `difference` and `dom`.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).

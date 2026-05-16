@@ -2881,6 +2881,12 @@ Lemma map_disjoint_agree {A} (m1 m2 : M A) :
   m1 ##ₘ m2 → map_agree m1 m2.
 Proof. rewrite !map_disjoint_spec, !map_agree_spec. naive_solver. Qed.
 
+Lemma map_disjoint_set_to_map {A} `{FinSet K C} (f : K → A) (X Y : C) :
+  set_to_map (M:=M A) f X ##ₘ set_to_map f Y ↔ X ## Y.
+Proof.
+  rewrite map_disjoint_spec. setoid_rewrite lookup_set_to_map_Some. set_solver.
+Qed.
+
 (** ** Properties of the [union_with] operation *)
 Section union_with.
   Context {A} (f : A → A → option A).
