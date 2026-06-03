@@ -224,8 +224,8 @@ Sanjit Bhat, Simcha van Collem, Tej Chajed, and Tesla Zhang.
 - Make `list_union` and `list_dist_union` opaque for type classes.
 - Rename instance `gmultiset_disj_union_list_proper` →
   `gmultiset_disj_union_list_permutation_proper` to ensure consistency with sets.
-- Add lemmas `list_filter_singleton`, `list_filter_singleton_True` and
-  `list_filter_singleton_False`.
+- Add lemmas `filter_singleton`, `filter_singleton_True` and
+  `filter_singleton_False`.
 - Rename lemmas `filter_singleton` → `filter_singleton_True` and
   `filter_singleton_not` → `filter_singleton_False`, and add unified lemma
   `filter_singleton` based on `decide`. This makes the filter lemmas for
