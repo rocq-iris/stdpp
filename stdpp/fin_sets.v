@@ -641,17 +641,62 @@ Section set_bind.
     (∀ x, x ∈ X → x ∈ Y → f x ≡ g x) → X ≡ Y → set_bind f X ≡ set_bind g Y.
   Proof. set_solver. Qed.
 
+  Lemma set_bind_empty f : set_bind f ∅ ≡ ∅.
+  Proof. set_solver. Qed.
+  
   Lemma set_bind_singleton f x : set_bind f {[x]} ≡ f x.
   Proof. set_solver. Qed.
-  Lemma set_bind_singleton_L `{!LeibnizEquiv SB} f x : set_bind f {[x]} = f x.
-  Proof. unfold_leibniz. apply set_bind_singleton. Qed.
-
-  Lemma set_bind_disj_union f (X Y : C) :
-    X ## Y → set_bind f (X ∪ Y) ≡ set_bind f X ∪ set_bind f Y.
+  
+  Lemma set_bind_union f (X Y : C) :
+    set_bind f (X ∪ Y) ≡ set_bind f X ∪ set_bind f Y.
   Proof. set_solver. Qed.
-  Lemma set_bind_disj_union_L `{!LeibnizEquiv SB} f (X Y : C) :
-    X ## Y → set_bind f (X ∪ Y) = set_bind f X ∪ set_bind f Y.
-  Proof. unfold_leibniz. apply set_bind_disj_union. Qed.
+  
+  Lemma set_bind_intersection `{!Intersection SB, !Difference SB, !Set_ B SB} f X Y :
+    (∀ x y, x ∈ X → y ∈ Y → x ≠ y → f x ## f y) →
+    set_bind f (X ∩ Y) ≡ set_bind f X ∩ set_bind f Y.
+  Proof.
+    intros Hinj b. split; first set_solver.
+    rewrite elem_of_intersection, !elem_of_set_bind.
+    setoid_rewrite elem_of_intersection. intros ((x & Hx & Hb1) & (y & Hy & Hb2)).
+    destruct (decide (x = y)); set_solver. 
+  Qed.
+  
+  Lemma set_bind_difference `{!Intersection SB, !Difference SB, !Set_ B SB} X Y f:
+    (∀ x y, x ∈ X → y ∈ Y → x ≠ y → f x ## f y) →
+    set_bind f X ∖ set_bind f Y ≡ set_bind f (X ∖ Y).
+  Proof. set_solver. Qed.
+
+  Section leibniz_equiv.
+    Context `{!LeibnizEquiv SB}.
+
+    Lemma set_bind_ext_L (f g : A → SB) (X Y : C) :
+      (∀ x, x ∈ X → x ∈ Y → f x = g x) → X = Y → set_bind f X = set_bind g Y.
+    Proof. set_solver. Qed.
+    
+    Lemma set_bind_empty_L f : set_bind f ∅ = ∅.
+    Proof. set_solver. Qed.
+
+    Lemma set_bind_singleton_L f x : set_bind f {[x]} = f x.
+    Proof. unfold_leibniz. apply set_bind_singleton. Qed.
+    
+    Lemma set_bind_union_L f (X Y : C) :
+      set_bind f (X ∪ Y) = set_bind f X ∪ set_bind f Y.
+    Proof. set_solver. Qed.
+    
+    Lemma set_bind_intersection_L `{!Intersection SB, !Difference SB, !Set_ B SB}
+        f X Y :
+      (∀ x y, x ∈ X → y ∈ Y → x ≠ y → f x ## f y) →
+      set_bind f (X ∩ Y) = set_bind f X ∩ set_bind f Y.
+    Proof. unfold_leibniz. apply set_bind_intersection. Qed.
+    
+    Lemma set_bind_difference_L `{!Intersection SB, !Difference SB, !Set_ B SB}
+        X Y f:
+      (∀ x y, x ∈ X → y ∈ Y → x ≠ y → f x ## f y) →
+      set_bind f X ∖ set_bind f Y = set_bind f (X ∖ Y).
+    Proof. set_solver. Qed.
+
+  End leibniz_equiv.
+
 End set_bind.
 
 (** * OMap *)
@@ -876,3 +921,11 @@ Proof.
     rewrite size_union_alt, size_difference_alt.
     rewrite (size_union _ X), !size_singleton by set_solver. lia.
 Qed.
+
+Lemma set_bind_set_map `{FinSet A C} `{FinSet B D} `{SemiSet E F} f g (X : C): 
+   set_bind (SB := F) f (set_map (D := D) g X) ≡ set_bind (SB := F) (f ∘ g) X.
+Proof. set_solver. Qed.
+
+Lemma set_bind_set_map_L `{FinSet A C} `{FinSet B D} `{SemiSet E F} `{!LeibnizEquiv F} f g (X : C): 
+   set_bind (SB := F) f (set_map (D := D) g X) = set_bind (SB := F) (f ∘ g) X.
+Proof. set_solver. Qed.
