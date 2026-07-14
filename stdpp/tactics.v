@@ -4,6 +4,11 @@ From Stdlib Require Export Lia.
 From stdpp Require Export decidable.
 From stdpp Require Import options.
 
+Tactic Notation "destruct_clear" hyp(H) :=
+  let H' := fresh in rename H into H'; destruct H'.
+Tactic Notation "destruct_clear" hyp(H) "as" simple_intropattern(pat) :=
+  let H' := fresh in rename H into H'; destruct H' as pat.
+
 Lemma f_equal_dep {A B} (f g : ∀ x : A, B x) x : f = g → f x = g x.
 Proof. intros ->; reflexivity. Qed.
 Lemma f_equal_help {A B} (f g : A → B) x y : f = g → x = y → f x = g y.
@@ -82,7 +87,7 @@ Ltac done :=
     | discriminate
     | contradiction
     | split
-    | match goal with H : is_Some None |- _ => destruct H as [? [=]] end
+    | match goal with H : is_Some None |- _ => destruct_clear H as [? [=]] end
     | match goal with H : ¬_ |- _ => case H; clear H; fast_done end
     ]
   ].
@@ -111,7 +116,6 @@ Tactic Notation "etrans" := etransitivity.
 Note that [split_and] differs from [split] by only splitting conjunctions. The
 [split] tactic splits any inductive with one constructor.
 
-
 - [destruct_and? H] : destruct assumption [H] repeatedly (perhaps zero times)
   while it is of the shape [_ ∧ _].
 - [destruct_and! H] : works similarly, but at least one destruct should succeed.
@@ -134,7 +138,7 @@ Ltac destruct_and_go H :=
   | _ ∧ _ =>
     let H1 := fresh in
     let H2 := fresh in
-    destruct H as [ H1 H2 ];
+    destruct_clear H as [H1 H2];
     destruct_and_go H1; destruct_and_go H2
   | Is_true (bool_decide _) =>
     apply (bool_decide_unpack _) in H;
@@ -167,9 +171,9 @@ Tactic Notation "destruct_and" "!" :=
 Tactic Notation "destruct_or" "?" ident(H) :=
   repeat match type of H with
   | False => destruct H
-  | _ ∨ _ => destruct H as [H|H]
+  | _ ∨ _ => destruct_clear H as [H|H]
   | Is_true (bool_decide _) => apply (bool_decide_unpack _) in H
-  | Is_true (_ || _) => apply orb_True in H; destruct H as [H|H]
+  | Is_true (_ || _) => apply orb_True in H; destruct_clear H as [H|H]
   end.
 Tactic Notation "destruct_or" "!" ident(H) := hnf in H; progress (destruct_or? H).
 
@@ -356,7 +360,7 @@ Tactic Notation "simplify_eq" := repeat
   | H : _ = _ |- _ => discriminate H
   | H : _ ≡ _ |- _ => apply leibniz_equiv in H
   | H : ?f _ = ?f _ |- _ => apply (inj f) in H
-  | H : ?f _ _ = ?f _ _ |- _ => apply (inj2 f) in H; destruct H
+  | H : ?f _ _ = ?f _ _ |- _ => apply (inj2 f) in H; destruct_clear H
     (* before [injection] to circumvent bug #2939 in some situations *)
   | H : ?f _ = ?f _ |- _ => progress injection H as H
     (* first hyp will be named [H], subsequent hyps will be given fresh names *)
@@ -425,7 +429,7 @@ Ltac f_equiv :=
   | |- ?R (match ?x with _ => _ end) (match ?x with _ => _ end) =>
     destruct x
   | H : ?R ?x ?y |- ?R2 (match ?x with _ => _ end) (match ?y with _ => _ end) =>
-     destruct H
+     destruct_clear H
   (* First assume that the arguments need the same relation as the result. We
   check the most restrictive pattern first: [(?f _) (?f _)] requires all but the
   last argument to be syntactically equal. *)
@@ -875,16 +879,11 @@ Tactic Notation "naive_solver" tactic(tac) :=
   (**i simplification of assumptions *)
   | H : False |- _ => destruct H
   | H : is_Some None |- _ => destruct H as [? [=]]
-  | H : _ ∧ _ |- _ =>
-     (* Work around bug https://coq.inria.fr/bugs/show_bug.cgi?id=2901 *)
-     let H1 := fresh in let H2 := fresh in
-     destruct H as [H1 H2]; try clear H
-  | H : ∃ _, _  |- _ =>
-     let x := fresh in let Hx := fresh in
-     destruct H as [x Hx]; try clear H
+  | H : _ ∧ _ |- _ => destruct_clear H
+  | H : ∃ _, _  |- _ => destruct_clear H as [??]
   | H : ?P → ?Q, H2 : ?P |- _ => specialize (H H2)
   | H : Is_true (bool_decide _) |- _ => apply (bool_decide_unpack _) in H
-  | H : Is_true (_ && _) |- _ => apply andb_True in H; destruct H
+  | H : Is_true (_ && _) |- _ => apply andb_True in H; destruct_clear H
   | H : Is_true (negb _) |- _ => apply negb_True in H; unfold not in H
   (**i simplify and solve equalities *)
   | |- _ => progress simplify_eq/=
@@ -893,10 +892,8 @@ Tactic Notation "naive_solver" tactic(tac) :=
   | |- Is_true (bool_decide _) => apply (bool_decide_pack _)
   | |- Is_true (_ && _) => apply andb_True; split
   | |- Is_true (negb _) => apply negb_True; unfold not
-  | H : _ ∨ _ |- _ =>
-     let H1 := fresh in destruct H as [H1|H1]; try clear H
-  | H : Is_true (_ || _) |- _ =>
-     apply orb_True in H; let H1 := fresh in destruct H as [H1|H1]; try clear H
+  | H : _ ∨ _ |- _ => destruct_clear H
+  | H : Is_true (_ || _) |- _ => apply orb_True in H; destruct_clear H
   (**i solve the goal using the user supplied tactic *)
   | |- _ => no_new_unsolved_evars (tac)
   end;
