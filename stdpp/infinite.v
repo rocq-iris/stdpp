@@ -62,15 +62,16 @@ Section search_infinite.
   |}.
   Next Obligation.
     intros xs. unfold fresh.
-    generalize 0 (wf_guard 32 (search_infinite_R_wf xs) 0). revert xs.
-    fix FIX 3; intros xs n [?]; simpl; unfold search_infinite_go at 1; simpl.
-    destruct (decide _); auto.
+    generalize 0 (wf_guard 32 (search_infinite_R_wf xs) 0); intros n acc.
+    induction acc as [n acc IH] using Acc_dep_ind; simpl.
+    unfold search_infinite_go at 1; simpl. destruct (decide _); auto.
   Qed.
   Next Obligation.
     intros xs1 xs2 Hxs. unfold fresh.
-    generalize (wf_guard 32 (search_infinite_R_wf xs1) 0).
-    generalize (wf_guard 32 (search_infinite_R_wf xs2) 0). generalize 0.
-    fix FIX 2. intros n [acc1] [acc2]; simpl; unfold search_infinite_go.
+    generalize 0 (wf_guard 32 (search_infinite_R_wf xs1) 0)
+      (wf_guard 32 (search_infinite_R_wf xs2) 0); intros n acc1.
+    induction acc1 as [n acc1 IH] using Acc_dep_ind;
+      intros [acc2]; simpl; unfold search_infinite_go.
     destruct (decide ( _ ∈ xs1)) as [H1|H1], (decide (_ ∈ xs2)) as [H2|H2]; auto.
     - destruct H2. by rewrite <-Hxs.
     - destruct H1. by rewrite Hxs.
