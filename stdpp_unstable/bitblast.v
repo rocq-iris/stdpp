@@ -36,7 +36,7 @@ for another implementation of the same idea.
 *)
 
 (** * Settings *)
-Local Set SsrOldRewriteGoalsOrder. (* See Coq issue #5706 *)
+Local Set SsrOldRewriteGoalsOrder. (* See Rocq issue #5706 *)
 
 Local Open Scope Z_scope.
 

@@ -4,10 +4,10 @@ abstract interfaces for ordered structures, sets, and various other data
 structures. *)
 
 (* We want to ensure that [le] and [lt] refer to operations on [nat].
-These two functions being defined both in [Coq.Bool] and in [Coq.Peano],
-we must export [Coq.Peano] later than any export of [Coq.Bool]. *)
-(* We also want to ensure that notations from [Coq.Utf8] take precedence
-over the ones of [Coq.Peano] (see Coq PR#12950), so we import [Utf8] last. *)
+These two functions being defined both in [Stdlib.Bool] and in [Stdlib.Peano],
+we must export [Stdlib.Peano] later than any export of [Stdlib.Bool]. *)
+(* We also want to ensure that notations from [Rocq.Utf8] take precedence
+over the ones of [Stdlib.Peano] (see Rocq PR#12950), so we import [Utf8] last. *)
 From Stdlib Require Export Morphisms RelationClasses List Bool Setoid Peano Utf8.
 From Stdlib Require Import Permutation.
 Export ListNotations.
@@ -30,13 +30,13 @@ Notation length := Datatypes.length.
    [`{...}] (i.e., anonymous arguments).  Unfortunately, it also enables
    implicit generalization in [Instance].  We think that the fact that both
    behaviors are coupled together is a [bug in
-   Coq](https://github.com/coq/coq/issues/6030). *)
+   Rocq](https://github.com/rocq-prover/rocq/issues/6030). *)
 Global Generalizable All Variables.
 
 (** * Tweak program *)
 (** 1. Since we only use Program to solve logical side-conditions, they should
 always be made Opaque, otherwise we end up with performance problems due to
-Coq blindly unfolding them.
+Rocq blindly unfolding them.
 
 Note that in most cases we use [Next Obligation. (* ... *) Qed.], for which
 this option does not matter. However, sometimes we write things like
@@ -64,7 +64,8 @@ Global Arguments seal_eq {_ _} _ : assert.
 (** * Solving type class instances *)
 (** The tactic [tc_solve] is used to solve type class goals by invoking type
 class search. It is similar to [apply _], but it is more robust since it does
-not affect unrelated goals/evars due to https://github.com/coq/coq/issues/6583.
+not affect unrelated goals/evars due to
+https://github.com/rocq-prover/rocq/issues/6583.
 
 The tactic [tc_solve] is particularly useful when building custom tactics that
 need tight control over when type class search is invoked. In Iris, many of the
@@ -85,11 +86,11 @@ normally happen when [P] contains evars that could be instanciated in different
 ways depending on which instance is picked, and type class search somewhere else
 depends on this evar.
 
-The proper way of handling this would be by setting Coq's option
-`Typeclasses Unique Instances`. However, this option seems to be broken, see Coq
-issue #6714.
+The proper way of handling this would be by setting Rocq's option
+[Typeclasses Unique Instances]. However, this option seems to be broken, see
+Rocq issue #6714.
 
-See https://gitlab.mpi-sws.org/FP/iris-coq/merge_requests/112 for a rationale
+See https://gitlab.mpi-sws.org/iris/iris/-/merge_requests/112 for a rationale
 of this type class. *)
 Class TCNoBackTrack (P : Prop) := TCNoBackTrack_intro { tc_no_backtrack : P }.
 Global Hint Extern 0 (TCNoBackTrack _) =>
@@ -291,8 +292,8 @@ Global Hint Mode Equiv ! : typeclass_instances.
 type [A] when needed. This allows setoid_rewrite to solve constraints
 of shape [Proper (eq ==> ?R) f] using [Proper (eq ==> (equiv (A:=A))) f]
 when an equivalence relation is available on type [A]. We put this instance
-at level 150 so it does not take precedence over Coq's stdlib instances,
-favoring inference of [eq] (all Coq functions are automatically morphisms
+at level 150 so it does not take precedence over Rocq's stdlib instances,
+favoring inference of [eq] (all Rocq functions are automatically morphisms
 for [eq]). We have [eq] (at 100) < [≡] (at 150) < [⊑] (at 200). *)
 Global Instance equiv_rewrite_relation `{Equiv A} :
   RewriteRelation (@equiv A _) | 150 := {}.
@@ -511,7 +512,7 @@ Lemma cancel_surj `{Cancel A B R1 f g} : Surj R1 f.
 Proof. intros y. exists (g y). auto. Qed.
 
 (** The following lemmas are specific versions of the projections of the above
-type classes for Leibniz equality. These lemmas allow us to enforce Coq not to
+type classes for Leibniz equality. These lemmas allow us to enforce Rocq not to
 use the setoid rewriting mechanism. *)
 Lemma idemp_L {A} f `{!@IdemP A (=) f} x : f x x = x.
 Proof. auto. Qed.
@@ -1346,7 +1347,7 @@ Notation "<[ k := a ]>" := (insert k a)
 Global Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 
 (** Notation for more elements (up to 13) *)
-(* Defining a generic notation does not seem possible with Coq's
+(* Defining a generic notation does not seem possible with Rocq's
    recursive notation system, so we define individual notations
    for some cases relevant in practice. *)
 (* The "format" makes sure that linebreaks are placed after the separating semicolons [;] when printing. *)

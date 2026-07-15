@@ -1,5 +1,5 @@
 (** This files extends the implementation of finite over [positive] to finite
-maps whose keys range over Coq's data type of binary naturals [Z]. *)
+maps whose keys range over Rocq's data type of binary naturals [Z]. *)
 From stdpp Require Import pmap mapset.
 From stdpp Require Export prelude fin_maps.
 From stdpp Require Import options.

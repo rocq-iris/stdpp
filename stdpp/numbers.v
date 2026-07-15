@@ -1,16 +1,16 @@
-(** This file provides various tweaks and extensions to Coq's theory of numbers
+(** This file provides various tweaks and extensions to Rocq's theory of numbers
 (natural numbers [nat] and [N], positive numbers [positive], integers [Z], and
 rationals [Qc]). In addition, this file defines a new type of positive rational
 numbers [Qp], which is used extensively in Iris to represent fractional
 permissions.
 
-The organization of this file follows mostly Coq's standard library.
+The organization of this file follows mostly Rocq's standard library.
 
 - We put all results in modules. For example, the module [Nat] collects the
-  results for type [nat]. Since the Coq stdlib already defines a module [Nat],
-  our module [Nat] exports Coq's module so that our module [Nat] contains the
-  union of the results from the Coq stdlib and std++.
-- We follow the naming convention of Coq's "numbers" library to prefer
+  results for type [nat]. Since the Rocq stdlib already defines a module [Nat],
+  our module [Nat] exports Rocq's module so that our module [Nat] contains the
+  union of the results from the Rocq stdlib and std++.
+- We follow the naming convention of Rocq's "numbers" library to prefer
   [succ]/[add]/[sub]/[mul] over [S]/[plus]/[minus]/[mult].
 - One typically does not [Import] modules such as [Nat], and refers to the
   results using [Nat.lem]. As a consequence, all [Hint]s [Instance]s in the modules in
@@ -18,7 +18,7 @@ The organization of this file follows mostly Coq's standard library.
   the modules, since for them [Global] works like [Export].
 
 The results for [Qc] are not yet in a module. This is in part because they
-still follow the old/non-module style in Coq's standard library. See also
+still follow the old/non-module style in Rocq's standard library. See also
 https://gitlab.mpi-sws.org/iris/stdpp/-/issues/147. *)
 
 From Stdlib Require Export EqdepFacts PArith NArith ZArith.
@@ -48,7 +48,7 @@ Reserved Notation "x ≤ y ≤ z ≤ z'"
 
 Infix "≤" := le : nat_scope.
 (** We do *not* add notation for [≥] mapping to [ge], and we do also not use the
-[>] notation from the Coq standard library. Using such notations leads to
+[>] notation from the Rocq standard library. Using such notations leads to
 annoying problems: if you have [x < y] in the context and need [y > x] for some
 lemma, [assumption] won't work because [x < y] and [y > x] are not
 definitionally equal. It is just generally frustrating to deal with this
@@ -57,7 +57,7 @@ equal ways.
 
 As an alternative, we could define [>] and [≥] as [parsing only] notation that
 maps to [<] and [≤], respectively (similar to math-comp). This would change the
-notation for [<] from the Coq standard library to something that is not
+notation for [<] from the Rocq standard library to something that is not
 definitionally equal, so we avoid that as well.
 
 This concern applies to all number types: [nat], [N], [Z], [positive], [Qc] and
@@ -135,15 +135,15 @@ Module Nat.
   Lemma le_sum (x y : nat) : x ≤ y ↔ ∃ z, y = x + z.
   Proof. split; [exists (y - x); lia | intros [z ->]; lia]. Qed.
 
-  (** This is similar to but slightly different than Coq's
+  (** This is similar to but slightly different than Rocq's
       [add_sub : ∀ n m : nat, n + m - m = n]. *)
   Lemma add_sub' n m : n + m - n = m.
   Proof. lia. Qed.
   Lemma le_add_sub n m : n ≤ m → m = n + (m - n).
   Proof. lia. Qed.
 
-  (** Cancellation for multiplication. Coq's stdlib has these lemmas for [Z],
-  but those for [nat] are missing. We use the naming scheme of Coq's stdlib. *)
+  (** Cancellation for multiplication. Rocq's stdlib has these lemmas for [Z],
+  but those for [nat] are missing. We use the naming scheme of Rocq's stdlib. *)
   Lemma mul_reg_l n m p : p ≠ 0 → p * n = p * m → n = m.
   Proof.
     pose proof (Z.mul_reg_l (Z.of_nat n) (Z.of_nat m) (Z.of_nat p)). lia.

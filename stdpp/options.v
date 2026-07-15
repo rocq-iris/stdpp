@@ -1,4 +1,4 @@
-(** Coq configuration for std++ (not meant to leak to clients).
+(** Rocq configuration for std++ (not meant to leak to clients).
 If you are a user of std++, note that importing this file means
 you are implicitly opting-in to every new option we will add here
 in the future. We are *not* guaranteeing any kind of stability here.

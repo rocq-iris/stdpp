@@ -1,5 +1,5 @@
 (** This file collects general purpose definitions and theorems on the option
-data type that are not in the Coq standard library. *)
+data type that are not in the Rocq standard library. *)
 From stdpp Require Export tactics.
 From stdpp Require Import options.
 

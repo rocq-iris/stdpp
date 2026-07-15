@@ -422,7 +422,7 @@ Qed.
 
 Showing that [gtest K] is countable is not trivial due to its nested-inductive
 nature. We need to write [encode] and [decode] functions, and prove that they
-are inverses. We do this by converting to/from [gen_tree]. This shows that Coq's
+are inverses. We do this by converting to/from [gen_tree]. This shows that Rocq's
 guardedness checker accepts non-trivial recursive definitions involving [gtest],
 and we can do non-trivial induction proofs about [gtest]. *)
 Global Program Instance gtest_countable `{Countable K} : Countable (gtest K) :=

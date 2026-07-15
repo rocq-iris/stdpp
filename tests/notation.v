@@ -11,7 +11,7 @@ Proof. naive_solver. Qed.
 (** Test that notations for maps with multiple elements can be parsed and printed correctly. *)
 Section map_notations.
   (* Avoiding section variables so output is not affected by
-  https://github.com/coq/coq/pull/16208 *)
+  https://github.com/rocq-prover/rocq/pull/16208 *)
   Notation M := (gmap nat).
 
   Definition test_2 : M (M nat) := {[ 10 := {[ 10 := 1 ]}; 20 := {[ 20 := 2]} ]}.

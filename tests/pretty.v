@@ -20,7 +20,7 @@ End N.
 
 (** Minimized version of:
 
-  https://coq.zulipchat.com/#narrow/stream/237977-Coq-users/topic/Stack.20overflow.20in.20Qed.2E
+  https://coq.zulipchat.com/#narrow/stream/237977-Rocq-users/topic/Stack.20overflow.20in.20Qed.2E
 
 Fixed by making the [wp_guard] in [pretty_N_go] proportional to the
 size of the input so that it blocks in case the input is an open term. *)

@@ -1,16 +1,16 @@
 (** This files implements an efficient implementation of finite maps whose keys
-range over Coq's data type of positive binary naturals [positive]. The
+range over Rocq's data type of positive binary naturals [positive]. The
 data structure is based on the "canonical" binary tries representation by Appel
 and Leroy, https://hal.inria.fr/hal-03372247. It has various good properties:
 
 - It guarantees logarithmic-time [lookup] and [partial_alter], and linear-time
-  [merge]. It has a low constant factor for computation in Coq compared to other
+  [merge]. It has a low constant factor for computation in Rocq compared to other
   versions (see the Appel and Leroy paper for benchmarks).
 - It satisfies extensional equality, i.e., [(∀ i, m1 !! i = m2 !! i) → m1 = m2].
 - It can be used in nested recursive definitions, e.g.,
   [Inductive test := Test : Pmap test → test]. This is possible because we do
   _not_ use a Sigma type to ensure canonical representations (a Sigma type would
-  break Coq's strict positivity check). *)
+  break Rocq's strict positivity check). *)
 From stdpp Require Export countable fin_maps fin_map_dom.
 From stdpp Require Import mapset.
 From stdpp Require Import options.
@@ -94,8 +94,8 @@ Global Instance Pmap_empty {A} : Empty (Pmap A) := PEmpty.
 
 (** Block reduction, even on concrete [Pmap]s.
 Marking [Pmap_empty] as [simpl never] would not be enough, because of
-https://github.com/coq/coq/issues/2972 and
-https://github.com/coq/coq/issues/2986.
+https://github.com/rocq-prover/rocq/issues/2972 and
+https://github.com/rocq-prover/rocq/issues/2986.
 And marking [Pmap] consumers as [simpl never] does not work either, see:
 https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/171#note_53216 *)
 Global Opaque Pmap_empty.
@@ -394,10 +394,8 @@ Proof.
     intros i x mt ? Hfold. apply Hinsert; [done|]. apply (Hfold 1).
 Qed.
 
-(** Type annotation [list (positive * A)] seems needed in Coq 8.14, not in more
-recent versions. *)
 Global Program Instance Pmap_countable `{Countable A} : Countable (Pmap A) := {
-  encode m := encode (map_to_list m : list (positive * A));
+  encode m := encode (map_to_list m);
   decode p := list_to_map <$> decode p
 }.
 Next Obligation.

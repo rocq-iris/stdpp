@@ -67,7 +67,7 @@ Check [TEST (x y : nat), x = y].
 (** [tele_arg ..] notation tests.
     These tests mainly test type annotations and casts in the [tele_arg]
     notations.
-    We test that Coq can typecheck literal telescope arguments in two ways:
+    We test that Rocq can typecheck literal telescope arguments in two ways:
     - tactic unification/old unification using [exact]
     - evarconv/new unification using [refine]
  *)

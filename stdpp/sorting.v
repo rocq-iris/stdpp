@@ -1,4 +1,4 @@
-(** Merge sort. Adapted from the implementation of Hugo Herbelin in the Coq
+(** Merge sort. Adapted from the implementation of Hugo Herbelin in the Rocq
 standard library, but without using the module system. *)
 From Stdlib Require Export Sorted.
 From stdpp Require Export orders list.

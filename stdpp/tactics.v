@@ -68,7 +68,7 @@ Global Hint Extern 0 (is_Some _) => eexists; fast_done : core.
 also performs [reflexivity] and uses symmetry of negated equalities. Compared
 to Ssreflect's [done], it does not compute the goal's [hnf] so as to avoid
 unfolding setoid equalities. Note that this tactic performs much better than
-Coq's [easy] tactic as it does not perform [inversion]. *)
+Rocq's [easy] tactic as it does not perform [inversion]. *)
 Ltac done :=
   solve
   [ repeat first
@@ -215,7 +215,7 @@ Tactic Notation "repeat_on_hyps" tactic3(tac) :=
   repeat match goal with H : _ |- _ => progress tac H end.
 
 (** The tactic [clear dependent H1 ... Hn] clears the hypotheses [Hi] and
-their dependencies. This provides an n-ary variant of Coq's standard
+their dependencies. This provides an n-ary variant of Rocq's standard
 [clear dependent]. *)
 Tactic Notation "clear" "dependent" hyp(H1) hyp(H2) :=
   clear dependent H1; clear dependent H2.
@@ -256,7 +256,7 @@ Ltac var_neq x1 x2 := match x1 with x2 => fail 1 | _ => idtac end.
 (** The tactic [mk_evar T] returns a new evar of type [T], without affecting the
 current context.
 
-This is usually a more useful behavior than Coq's [evar], which is a
+This is usually a more useful behavior than Rocq's [evar], which is a
 side-effecting tactic (not returning anything) that introduces a local
 definition into the context that holds the evar.
 Note that the obvious alternative [open_constr (_:T)] has subtly different
@@ -285,7 +285,7 @@ Ltac get_head e :=
 (** The tactic [eunify x y] succeeds if [x] and [y] can be unified, and fails
 otherwise. If it succeeds, it will instantiate necessary evars in [x] and [y].
 
-Contrary to Coq's standard [unify] tactic, which uses [constr] for the arguments
+Contrary to Rocq's standard [unify] tactic, which uses [constr] for the arguments
 [x] and [y], [eunify] uses [open_constr] so that one can use holes (i.e., [_]s).
 For example, it allows one to write [eunify x (S _)], which will test if [x]
 unifies a successor. *)
@@ -300,7 +300,7 @@ Ltac no_new_unsolved_evars tac := solve [unshelve tac].
 appropriately by [simpl]. The tactic [csimpl] uses the [fold_classes] tactics
 to refold recursive calls of [fmap], [mbind], [omap] and [alter]. A
 self-contained example explaining the problem can be found in the following
-Coq-club message:
+Rocq-club message:
 
 https://sympa.inria.fr/sympa/arc/coq-club/2012-10/msg00147.html *)
 Ltac fold_classes :=
@@ -466,7 +466,7 @@ Ltac f_equiv :=
   (* Fallback case: try to infer the relation, and allow the function to not be
      syntactically the same on both sides. Unfortunately, very often, it will
      turn the goal into a Leibniz equality so we get stuck. Furthermore, looking
-     for instances in this order will mean that Coq will try to unify the
+     for instances in this order will mean that Rocq will try to unify the
      remaining arguments that we have not explicitly generalized, which can be
      very slow -- but if we go for the opposite order, we will hit the Leibniz
      equality fallback instance even more often. *)
@@ -483,7 +483,7 @@ Tactic Notation "f_equiv" "/=" := csimpl in *; f_equiv.
 
 (** The typeclass [SolveProperSubrelation] is used by the [solve_proper] tactic
 when the goal is of the form [R1 x y] and there are assumptions of the form [R2
-x y]. We cannot use Coq's [subrelation] class here as adding the [subrelation]
+x y]. We cannot use Rocq's [subrelation] class here as adding the [subrelation]
 instances causes lots of backtracking in the [Proper] hint search, resulting in
 very slow/diverging [rewrite]s due to exponential instance search. *)
 Class SolveProperSubrelation {A} (R R' : relation A) :=
@@ -583,11 +583,11 @@ Ltac num_tac n tac :=
   end.
 
 (** The tactic [inv] is a fixed version of [inversion_clear] from the standard
-library that works around <https://github.com/coq/coq/issues/2465>. It also
+library that works around https://github.com/rocq-prover/rocq/issues/2465. It also
 has a shorter name since clearing is the default for [destruct], why wouldn't
 it also be the default for inversion?
 This is inspired by CompCert's [inv] tactic
-<https://github.com/AbsInt/CompCert/blob/5f761eb8456609d102acd8bc780b6fd3481131ef/lib/Coqlib.v#L30>. *)
+<https://github.com/AbsInt/CompCert/blob/5f761eb8456609d102acd8bc780b6fd3481131ef/lib/Rocqlib.v#L30>. *)
 Tactic Notation "inv" ident(H) "as" simple_intropattern(ipat) :=
   inversion H as ipat; clear H; simplify_eq.
 Tactic Notation "inv" ident(H) :=
@@ -643,7 +643,7 @@ The type of [p] will be normalized by calling the [normalizer] function.
 [_name_guard] is an unused argument where you can pass anything you want. If the
 argument is an intro pattern, those will be taken into account by the [fresh]
 that is inside this tactic, avoiding name collisions that can otherwise arise.
-This is a work-around for https://github.com/coq/coq/issues/18109. *)
+This is a work-around for https://github.com/rocq-prover/rocq/issues/18109. *)
 Ltac evar_foralls p _name_guard normalizer tac :=
   let T := type of p in
   lazymatch normalizer T with
@@ -748,8 +748,8 @@ Tactic Notation "ospecialize" "*" uconstr(p) :=
       pose proof p as H'; clear H; rename H' into H
   )).
 
-(** The block definitions are taken from [Coq.Program.Equality] and can be used
-by tactics to separate their goal from hypotheses they generalize over. *)
+(** The block definitions are taken from [Stdlib.Program.Equality] and can be
+used by tactics to separate their goal from hypotheses they generalize over. *)
 Definition block {A : Type} (a : A) := a.
 
 Ltac block_goal := match goal with [ |- ?T ] => change (block T) end.
@@ -818,7 +818,7 @@ the function (or whether it is opaque or not). This tactic is useful
 for example to decide whether to call [vm_compute] on [t].
 
 This trick was originally suggested by Jason Gross:
-https://coq.zulipchat.com/#narrow/stream/237977-Coq-users/topic/Check.20that.20a.20term.20is.20closed.20in.20Ltac/near/240885618
+https://rocq-prover.zulipchat.com/#narrow/stream/237977-Coq-users/topic/Check.20that.20a.20term.20is.20closed.20in.20Ltac/near/240885618
 *)
 Ltac is_closed_term t :=
   first [
@@ -838,7 +838,7 @@ Ltac is_closed_term t :=
       fail 1 "The term" t "is not closed"
     ].
 
-(** Coq's [firstorder] tactic fails or loops on rather small goals already. In
+(** Rocq's [firstorder] tactic fails or loops on rather small goals already. In
 particular, on those generated by the tactic [unfold_elem_ofs] which is used
 to solve propositions on sets. The [naive_solver] tactic implements an
 ad-hoc and incomplete [firstorder]-like solver using Ltac's backtracking
@@ -853,7 +853,7 @@ We use a counter to make the search breath first. Breath first search ensures
 that a minimal number of hypotheses is instantiated, and thus reduced the
 posibility that an evar remains unresolved.
 
-Despite these limitations, it works much better than Coq's [firstorder] tactic
+Despite these limitations, it works much better than Rocq's [firstorder] tactic
 for the purposes of this development. This tactic either fails or proves the
 goal. *)
 Lemma forall_and_distr (A : Type) (P Q : A → Prop) :
