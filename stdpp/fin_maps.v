@@ -14,7 +14,7 @@ Unset Default Proof Using.
 (** We require Leibniz equality of finite maps to be extensional, i.e., to enjoy
 [(∀ i, m1 !! i = m2 !! i) → m1 = m2]. This is a very useful property as it
 avoids the need for setoid rewriting in proof. However, it comes at the cost of
-restricting what map implementations we support. Since Coq does not have
+restricting what map implementations we support. Since Rocq does not have
 quotient types, it rules out balanced search trees (AVL, red-black, etc.). We
 do provide a reasonably efficient implementation of binary tries (see [gmap]
 and [Pmap]). *)
@@ -173,7 +173,7 @@ Global Instance map_subseteq `{∀ A, Lookup K A (M A)} {A} : SubsetEq (M A) :=
 
 (** The union of two finite maps only has a meaningful definition for maps
 that are disjoint. However, as working with partial functions is inconvenient
-in Coq, we define the union as a total function. In case both finite maps
+in Rocq, we define the union as a total function. In case both finite maps
 have a value at the same index, we take the value of the first map. *)
 Global Instance map_union `{Merge M} {A} : Union (M A) := union_with (λ x _, Some x).
 Global Instance map_intersection `{Merge M} {A} : Intersection (M A) :=
@@ -2280,7 +2280,7 @@ Section merge.
   Context {A} (f : option A → option A → option A).
   Implicit Types m : M A.
 
-  (** These instances can in many cases not be applied automatically due to Coq
+  (** These instances can in many cases not be applied automatically due to Rocq
   unification bug #6294. Hence there are many explicit derived instances for
   specific operations such as union or difference in the rest of this file. *)
   Global Instance: LeftId (=) None f → LeftId (=@{M A}) ∅ (merge f).

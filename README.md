@@ -30,7 +30,7 @@ This list is incomplete, but notable side-effects include:
 * `Generalizable All Variables`: This option enables implicit generalization in
   arguments of the form `` `{...}`` (i.e., anonymous arguments) and in terms of
   shape `` `{}``/`` `[]``/`` `()``. See [Rocq's
-  manual](https://coq.inria.fr/distrib/current/refman/language/extensions/implicit-arguments.html#implicit-generalization)
+  manual](https://rocq-prover.org/doc/master/refman/language/extensions/implicit-arguments.html#implicit-generalization)
   for further details.
 * The behavior of `Program` is tweaked: `Unset Transparent Obligations`,
   `Obligation Tactic := idtac`, `Add Search Blacklist "_obligation_"`.  See

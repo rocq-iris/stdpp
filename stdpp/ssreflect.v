@@ -4,10 +4,10 @@ From Stdlib.ssr Require Export ssreflect.
 From stdpp Require Export prelude.
 From stdpp Require Import options.
 
-(** Restore Coq's normal "if" scope, ssr redefines it. *)
+(** Restore Rocq's normal "if" scope, ssr redefines it. *)
 Global Open Scope general_if_scope.
 
-(** See Coq issue #5706 *)
+(** See Rocq issue #5706 *)
 Global Set SsrOldRewriteGoalsOrder.
 
 (** Overwrite ssr's [done] tactic with ours *)

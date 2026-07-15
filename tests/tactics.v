@@ -140,7 +140,7 @@ Lemma inv_test_1 n : even (2 + n) → even n.
 Proof. intros H. inv H as [|? H']. Show. done. Qed.
 Lemma inv_test_2 (a b c d : nat) : a ≠ c → (a, b) = (c, d) → False.
 Proof.
-  (* Test taken from https://github.com/coq/coq/issues/2465 *)
+  (* Test taken from https://github.com/rocq-prover/rocq/issues/2465 *)
   intros DIFF EQ. inv EQ. (* Thanks to the simplify_eq this solves the goal. *)
 Qed.
 Check "inv_test_num".
@@ -281,7 +281,7 @@ Section f_equiv.
     x1 ≡ x2 →
     fn x1 ≡ fn x2.
   Proof.
-    (* The Coq tactic prefers the ⊆. *)
+    (* The Rocq tactic prefers the ⊆. *)
     intros. Morphisms.f_equiv. Fail assumption.
   Restart. Proof.
     intros. f_equiv. assumption.

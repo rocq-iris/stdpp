@@ -57,7 +57,7 @@ Tactic Notation "case_decide" "as" ident(Hd) :=
 Tactic Notation "case_decide" :=
   let H := fresh in case_decide as H.
 
-(** The tactic [solve_decision] uses Coq's [decide equality] tactic together
+(** The tactic [solve_decision] uses Rocq's [decide equality] tactic together
 with instance resolution to automatically generate decision procedures. *)
 Ltac solve_trivial_decision :=
   match goal with
@@ -167,8 +167,8 @@ Solve Obligations with firstorder congruence.
 (** * Instances of [RelDecision] *)
 Definition flip_dec {A} (R : relation A) `{!RelDecision R} :
   RelDecision (flip R) := λ x y, decide_rel R y x.
-(** We do not declare this as an actual instance since Coq can unify [flip ?R]
-with any relation. Coq's standard library is carrying out the same approach for
+(** We do not declare this as an actual instance since Rocq can unify [flip ?R]
+with any relation. Rocq's standard library is carrying out the same approach for
 the [Reflexive], [Transitive], etc, instance of [flip]. *)
 Global Hint Extern 3 (RelDecision (flip _)) => apply flip_dec : typeclass_instances.
 
@@ -262,7 +262,7 @@ Notation bool_decide_false := bool_decide_eq_false_2.
 
 (** * Decidable Sigma types *)
 (** Leibniz equality on Sigma types requires the equipped proofs to be
-equal as Coq does not support proof irrelevance. For decidable we
+equal as Rocq does not support proof irrelevance. For decidable we
 propositions we define the type [dsig P] whose Leibniz equality is proof
 irrelevant. That is [∀ x y : dsig P, x = y ↔ `x = `y]. *)
 Definition dsig `(P : A → Prop) `{∀ x : A, Decision (P x)} :=

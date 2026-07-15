@@ -1,17 +1,17 @@
 (** This files implements an efficient implementation of finite maps whose keys
-range over Coq's data type of any countable type [K]. The data structure is
+range over Rocq's data type of any countable type [K]. The data structure is
 similar to [Pmap], which in turn is based on the "canonical" binary tries
 representation by Appel and Leroy, https://hal.inria.fr/hal-03372247. It thus
 has the same good properties:
 
 - It guarantees logarithmic-time [lookup] and [partial_alter], and linear-time
-  [merge]. It has a low constant factor for computation in Coq compared to other
+  [merge]. It has a low constant factor for computation in Rocq compared to other
   versions (see the Appel and Leroy paper for benchmarks).
 - It satisfies extensional equality [(∀ i, m1 !! i = m2 !! i) → m1 = m2].
 - It can be used in nested recursive definitions, e.g.,
   [Inductive test := Test : gmap test → test]. This is possible because we do
   _not_ use a Sigma type to ensure canonical representations (a Sigma type would
-  break Coq's strict positivity check).
+  break Rocq's strict positivity check).
 
 Compared to [Pmap], we not only need to make sure the trie representation is
 canonical, we also need to make sure that all positions (of type positive) are
@@ -151,8 +151,8 @@ Global Instance gmap_empty `{Countable K} {A} : Empty (gmap K A) := GMap GEmpty.
 
 (** Block reduction, even on concrete [gmap]s.
 Marking [gmap_empty] as [simpl never] would not be enough, because of
-https://github.com/coq/coq/issues/2972 and
-https://github.com/coq/coq/issues/2986.
+https://github.com/rocq-prover/rocq/issues/2972 and
+https://github.com/rocq-prover/rocq/issues/2986.
 And marking [gmap] consumers as [simpl never] does not work either, see:
 https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/171#note_53216 *)
 Global Opaque gmap_empty.

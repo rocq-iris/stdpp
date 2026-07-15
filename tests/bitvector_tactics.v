@@ -40,7 +40,7 @@ Goal ∀ l r : bv 64, ∀ data : list (bv 64),
   bv_unsigned l < bv_unsigned ((r - l) ≫ 1 + l + 0) ≤ Z.of_nat (length data).
 Proof.
   intros. bv_simplify_arith select (¬ _ >= _). bv_simplify_arith.
-  split. (* We need to split since the [_ < _ ≤ _] notation differs between Coq versions. *) Show.
+  split. (* We need to split since the [_ < _ ≤ _] notation differs between Rocq versions. *) Show.
 Restart. Proof.
   intros. bv_simplify_arith select (¬ _ >= _). bv_solve.
 Qed.

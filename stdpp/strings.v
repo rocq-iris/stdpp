@@ -62,7 +62,7 @@ Local Fixpoint pos_to_string (p : positive) : string.
 Proof.
   (** The argument [p] is the [positive] that we are peeling off.
   The argument [a] is the constructor [Ascii] partially applied to some number
-  of Booleans (so its Coq type changes during the iteration).
+  of Booleans (so its Rocq type changes during the iteration).
   The argument [n] says how many more Booleans are needed to make this fully
   applied so that the [constr] has type ascii. *)
   let rec gen p a n :=

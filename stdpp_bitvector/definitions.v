@@ -512,7 +512,7 @@ Ltac bv_saturate :=
      [bv_unsigned_in_range] since hypothesis of the form [0 ≤ ... < ...]
      can cause significant slowdowns in
      [Z.euclidean_division_equations_cleanup] due to
-     https://github.com/coq/coq/pull/17984 . *)
+     https://github.com/rocq-prover/rocq/pull/17984 . *)
      learn_hyp (bv_unsigned_in_range_alt _ b) |
      learn_hyp (bv_signed_in_range _ b)
   ] end.

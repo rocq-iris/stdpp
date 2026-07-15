@@ -4,7 +4,7 @@ From stdpp Require Import options.
 Local Set Universe Polymorphism.
 Local Set Polymorphic Inductive Cumulativity.
 
-(** Without this flag, Coq minimizes some universes to [Set] when they
+(** Without this flag, Rocq minimizes some universes to [Set] when they
     should not be, e.g. in [texist_exist].
     See the [texist_exist_universes] test. *)
 Local Unset Universe Minimization ToSet.
@@ -16,7 +16,7 @@ Inductive tele : Type :=
 
 Global Arguments TeleS {_} _.
 
-(** The telescope version of Coq's function type *)
+(** The telescope version of Rocq's function type *)
 Fixpoint tele_fun (TT : tele) (T : Type) : Type :=
   match TT with
   | TeleO => T
@@ -54,16 +54,16 @@ Fixpoint tele_arg@{u} (t : tele@{u}) : Type@{u} :=
   end.
 Global Arguments tele_arg _ : simpl never.
 
-(* Coq has no idea that [unit] and [tele_arg_cons] have anything to do with
+(* Rocq has no idea that [unit] and [tele_arg_cons] have anything to do with
    telescopes. This only becomes a problem when concrete telescope arguments
    (of concrete telescopes) need to be typechecked. To work around this, we
    annotate the notations below with extra information to guide unification.
  *)
 
-(* The cast in the notation below is necessary to make Coq understand that
+(* The cast in the notation below is necessary to make Rocq understand that
    [TargO] can be unified with [tele_arg TeleO]. *)
 Notation TargO := (tt : tele_arg TeleO) (only parsing).
-(* The casts and annotations are necessary for Coq to typecheck nested [TargS]
+(* The casts and annotations are necessary for Rocq to typecheck nested [TargS]
    as well as the final [TargO] in a chain of [TargS]. *)
 Notation TargS a b :=
   ((@TeleArgCons _ (λ x, tele_arg (_ x)) a b) : (tele_arg (TeleS _))) (only parsing).
