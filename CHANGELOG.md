@@ -48,6 +48,9 @@ API-breaking change is listed.
   `set_bind_intersection`, `set_bind_intersection_L`, `set_bind_difference`,
   `set_bind_difference_L`, `set_bind_set_map`, `set_bind_set_map_L`. (by Janine
   Lohse)
+- Add tactic `destruct_clear H as pat`, which always clears `H`, even if it
+  is a section variable. This tactic is useful to avoid loops in tactics for
+  proof automation that repeatedly `destruct` hypotheses.
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
