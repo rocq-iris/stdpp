@@ -41,8 +41,13 @@ API-breaking change is listed.
   combine `set_to_map` with `kmap`.
 - Add lemmas for `set_to_map` involving `lookup`, `Inj`, `singleton`, `insert`,
   `delete`, `subseteq`, `disjoint`, `union`, `intersection`, `difference` and `dom`.
-- Replace lemmas `set_bind_disj_union` by `set_bind_union` and `set_bind_disj_union_L` by `set_bind_union_L` (disjointness not needed). (by Janine Lohse)
-- Add lemmas `set_bind_ext_L` `set_bind_empty`, `set_bind_empty_L`, `set_bind_intersection`, `set_bind_intersection_L`, `set_bind_difference`, `set_bind_difference_L`, `set_bind_set_map`, `set_bind_set_map_L`. (by Janine Lohse)
+- Replace lemmas `set_bind_disj_union` by `set_bind_union` and
+  `set_bind_disj_union_L` by `set_bind_union_L` (disjointness not needed).
+  (by Janine Lohse)
+- Add lemmas `set_bind_ext_L` `set_bind_empty`, `set_bind_empty_L`,
+  `set_bind_intersection`, `set_bind_intersection_L`, `set_bind_difference`,
+  `set_bind_difference_L`, `set_bind_set_map`, `set_bind_set_map_L`. (by Janine
+  Lohse)
 
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
