@@ -4,6 +4,18 @@ From Stdlib Require Export Lia.
 From stdpp Require Export decidable.
 From stdpp Require Import options.
 
+(** The tactic [destruct_clear H as pat] behaves like [destruct H as pat], except
+that it will always clear [H], even if it is a section variable. Ordinary [destruct]
+does not clear section variables. The [destruct_clear] tactic is useful to build
+tactics for proof automation that repeatedly [destruct] hypotheses (for instance
+[destruct_and!] and [naive_solver]).
+
+See also https://github.com/rocq-prover/rocq/issues/2901 and
+https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/720.
+
+In the implementation, we rely on the fact that after a [rename] of a section
+variable, it will be cleared by [destruct]. The [rename] also ensures that
+[destruct_clear H as [H|H]] works without name clashes. *)
 Tactic Notation "destruct_clear" hyp(H) :=
   let H' := fresh in rename H into H'; destruct H'.
 Tactic Notation "destruct_clear" hyp(H) "as" simple_intropattern(pat) :=
