@@ -2,6 +2,7 @@ image: ralfjung/opam-ci:opam2
 
 stages:
   - build
+  - notify
 
 variables:
   CPU_CORES: "10"
@@ -114,3 +115,18 @@ trigger-rocq.dev:
   - if: $CI_PROJECT_NAMESPACE != "iris"
     when: never
   - if: $CI_PIPELINE_SOURCE =~ /^(trigger|api|schedule)$/
+
+notify_on_schedule_failure:
+  stage: notify
+  needs: [ trigger-rocq.dev ]
+  tags:
+  - fp
+  variables:
+    MATTERMOST_NOTIFICATION_USERS: "@jung @robbertkrebbers"
+    NOTIFICATION_MESSAGE: "❌ **Nightly CI failed**"
+  script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.mpi-sws.org/iris/ci.git ci -b opam2 --depth 1
+    - ci/send-notification.sh
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      when: on_failure
