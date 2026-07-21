@@ -11,8 +11,9 @@ cat config/paths | grep "^[^#]\+" | sed "s/^/-Q /"
 
 echo
 echo "# Flags"
-# Adding "-arg " prefix to all non-empty, non-comment lines of [config/flags].
-cat config/flags | grep "^[^#]\+" | sed "s/^/-arg /"
+# Adding "-arg " prefix to all non-empty, non-comment lines of [config/flags]
+# after adding quotes around each line.
+cat config/flags | grep "^[^#]\+" | sed "s/\(.*\)/\"\1\"/" | sed "s/^/-arg /"
 
 # List of source files.
 echo

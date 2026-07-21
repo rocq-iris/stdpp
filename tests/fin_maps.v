@@ -1,6 +1,8 @@
 From stdpp Require Import fin_maps fin_map_dom.
 From stdpp Require Import strings pmap gmap.
 
+Local Unset Default Proof Using.
+
 (** * Tests involving the [FinMap] interfaces, i.e., tests that are not specific
 to an implementation of finite maps. *)
 Section map_disjoint.

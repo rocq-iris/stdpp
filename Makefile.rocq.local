@@ -13,10 +13,9 @@ COQ_REF=$(shell echo "$(COQ_VERSION)" | grep -E "^9\.(2)(\.|$$)" -q && echo 1)
 real-all: style $(if $(NO_TEST),,test)
 
 style:
-# Make sure everything imports the options, and some general linting.
+# Linting.
 	$(SHOW)"ROCQ lint"
 	$(HIDE)for FILE in $(VFILES); do \
-	  if ! grep -F -q 'From stdpp Require Import options.' "$$FILE"; then echo "ERROR: $$FILE does not import 'options'."; echo; exit 1; fi ; \
 	  ./rocq-lint.sh "$$FILE" || exit 1; \
 	done
 .PHONY: style

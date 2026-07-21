@@ -19,3 +19,12 @@
 # better alternatives (https://github.com/rocq-prover/rocq/issues/21896).
 -w
 -level-tolerance
+
+# Overwrite some default Rocq options
+-set
+'Default Goal Selector=!'
+-set
+'Default Proof Using=Type'
+# FIXME: cannot enable this yet as some files disable 'Default Proof Using'
+#-set
+#'Suggest Proof Using'
