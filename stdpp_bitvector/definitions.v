@@ -3,7 +3,6 @@ From Stdlib Require Znumtheory.
 From Stdlib Require Import ZifyNat.
 From stdpp Require Export numbers.
 From stdpp Require Import countable finite.
-From stdpp Require Import options.
 
 (** * bitvector library *)
 (** This file provides the [bv n] type for representing [n]-bit

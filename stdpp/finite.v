@@ -1,5 +1,4 @@
 From stdpp Require Export countable vector.
-From stdpp Require Import options.
 
 Class Finite A `{EqDecision A} := {
   enum : list A;

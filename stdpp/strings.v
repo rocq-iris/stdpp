@@ -2,7 +2,6 @@ From Stdlib Require Import Ascii.
 From Stdlib Require String.
 From stdpp Require Export list.
 From stdpp Require Import countable.
-From stdpp Require Import options.
 
 (** We define the ascii/string methods in corresponding modules, similar to what
 is done for numbers. These modules should generally not be imported, e.g., use

@@ -1,7 +1,6 @@
 From stdpp Require Export countable.
 From stdpp Require Import gmap.
 From stdpp Require ssreflect. (* don't import yet, but we'll later do that to use ssreflect rewrite *)
-From stdpp Require Import options.
 
 (** Multisets [gmultiset A] are represented as maps from [A] to natural numbers,
 which represent the multiplicity. To ensure we have canonical representations,

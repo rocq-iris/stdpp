@@ -13,7 +13,6 @@ and Leroy, https://hal.inria.fr/hal-03372247. It has various good properties:
   break Rocq's strict positivity check). *)
 From stdpp Require Export countable fin_maps fin_map_dom.
 From stdpp Require Import mapset.
-From stdpp Require Import options.
 
 Local Open Scope positive_scope.
 

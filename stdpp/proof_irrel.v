@@ -1,7 +1,6 @@
 (** This file collects facts on proof irrelevant types/propositions. *)
 From Stdlib Require Import Logic.EqdepFacts.
 From stdpp Require Export base.
-From stdpp Require Import options.
 
 Global Hint Extern 200 (ProofIrrel _) => progress (lazy beta) : typeclass_instances.
 

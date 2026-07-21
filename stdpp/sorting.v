@@ -3,7 +3,6 @@ standard library, but without using the module system. *)
 From Stdlib Require Export Sorted.
 From stdpp Require Export orders list.
 From stdpp Require Import sets.
-From stdpp Require Import options.
 
 Section merge_sort.
   Context {A} (R : relation A) `{∀ x y, Decision (R x y)}.

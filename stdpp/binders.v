@@ -7,7 +7,6 @@ This library is used in various Iris developments, like heap-lang, LambdaRust,
 Iron, Fairis. *)
 From stdpp Require Export strings.
 From stdpp Require Import sets countable finite fin_maps.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

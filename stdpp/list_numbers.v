@@ -1,7 +1,6 @@
 (** This file collects general purpose definitions and theorems on
 lists of numbers that are not in the Rocq standard library. *)
 From stdpp Require Export list_basics list_monad list_misc list_tactics.
-From stdpp Require Import options.
 
 Module Export list.
 

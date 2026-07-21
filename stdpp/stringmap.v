@@ -4,7 +4,6 @@ search trees (uncompressed Patricia trees) as implemented in the file [pmap]
 and guarantees logarithmic-time operations. *)
 From stdpp Require Export fin_maps pretty.
 From stdpp Require Import gmap.
-From stdpp Require Import options.
 
 Notation stringmap := (gmap string).
 Notation stringset := (gset string).

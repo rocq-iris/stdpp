@@ -1,7 +1,6 @@
 (** This file collects general purpose definitions and theorems on the option
 data type that are not in the Rocq standard library. *)
 From stdpp Require Export tactics.
-From stdpp Require Import options.
 
 Inductive option_reflect {A} (P : A → Prop) (Q : Prop) : option A → Type :=
   | ReflectSome x : P x → option_reflect P Q (Some x)

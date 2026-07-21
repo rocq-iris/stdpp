@@ -1,7 +1,6 @@
 (** This file implements finite set as unordered lists without duplicates
 removed. This implementation forms a monad. *)
 From stdpp Require Export sets list.
-From stdpp Require Import options.
 
 Record listset A := Listset { listset_car: list A }.
 Global Arguments listset_car {_} _ : assert.

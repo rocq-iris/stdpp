@@ -1,5 +1,4 @@
 From stdpp Require Export numbers base option.
-From stdpp Require Import options.
 
 Module Export list.
 

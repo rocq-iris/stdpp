@@ -1,6 +1,5 @@
 From Stdlib Require Export Permutation.
 From stdpp Require Export numbers base option list_basics list_relations.
-From stdpp Require Import options.
 
 Module Export list.
 

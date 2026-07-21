@@ -5,7 +5,6 @@ From Stdlib Require Import ssreflect.
 From Stdlib.btauto Require Export Btauto.
 From stdpp.bitvector Require Import definitions.
 From stdpp Require Export tactics numbers list.
-From stdpp Require Import options.
 
 (** * [bitblast] tactic: Solve integer goals by bitwise reasoning *)
 (** This file provides the [bitblast] tactic for bitwise reasoning

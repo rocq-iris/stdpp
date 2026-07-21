@@ -2,7 +2,6 @@
 tactics. It patches up some global options of ssreflect. *)
 From Stdlib.ssr Require Export ssreflect.
 From stdpp Require Export prelude.
-From stdpp Require Import options.
 
 (** Restore Rocq's normal "if" scope, ssr redefines it. *)
 Global Open Scope general_if_scope.

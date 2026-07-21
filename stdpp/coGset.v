@@ -6,7 +6,6 @@ Note that [coGset positive] cannot represent all elements of [coPset]
 infinite sets that cannot be represented). *)
 From stdpp Require Export sets countable.
 From stdpp Require Import decidable finite gmap coPset.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

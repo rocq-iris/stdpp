@@ -9,7 +9,6 @@ On the other hand, unlike [coGset], there is no notion of set difference (∖),
 and hence [topGset] is not a [Set_], only a [SemiSet]. *)
 From stdpp Require Export sets countable.
 From stdpp Require Import decidable finite gmap coPset.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

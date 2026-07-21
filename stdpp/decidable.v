@@ -3,7 +3,6 @@ with a decidable equality. Such propositions are collected by the [Decision]
 type class. *)
 From Stdlib Require Import Logic.Eqdep_dec.
 From stdpp Require Export proof_irrel.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

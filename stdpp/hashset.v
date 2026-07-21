@@ -3,7 +3,6 @@ using radix-2 search trees. Each hash bucket is thus indexed using an binary
 integer of type [Z], and contains an unordered list without duplicates. *)
 From stdpp Require Export fin_maps listset.
 From stdpp Require Import zmap.
-From stdpp Require Import options.
 
 Record hashset {A} (hash : A → Z) := Hashset {
   hashset_car : Zmap (list A);

@@ -10,7 +10,6 @@ Local Set Warnings "-stdlib-vector".
 From Stdlib Require Vector.
 From stdpp Require Import countable.
 From stdpp Require Export fin list.
-From stdpp Require Import options.
 Global Open Scope vector_scope.
 
 (** The type [vec n] represents lists of consisting of exactly [n] elements.

@@ -2,7 +2,6 @@
 maps. We provide such an axiomatization, instead of implementing the domain
 function in a generic way, to allow more efficient implementations. *)
 From stdpp Require Export sets fin_maps.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

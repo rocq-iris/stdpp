@@ -1,7 +1,6 @@
 From Stdlib.QArith Require Import QArith_base Qcanon.
 From stdpp Require Export list numbers list_numbers fin.
 From stdpp Require Import well_founded.
-From stdpp Require Import options.
 Local Open Scope positive.
 
 (** Note that [Countable A] gives rise to [EqDecision A] by checking equality of

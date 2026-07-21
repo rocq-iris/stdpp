@@ -2,7 +2,6 @@
 maps whose keys range over Rocq's data type of binary naturals [N]. *)
 From stdpp Require Import pmap mapset.
 From stdpp Require Export prelude fin_maps.
-From stdpp Require Import options.
 
 Local Open Scope N_scope.
 

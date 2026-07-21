@@ -1,7 +1,6 @@
 From stdpp Require Export strings.
 From stdpp Require Import relations numbers.
 From Stdlib Require Import Ascii.
-From stdpp Require Import options.
 
 Class Pretty A := pretty : A → string.
 Global Hint Mode Pretty ! : typeclass_instances.

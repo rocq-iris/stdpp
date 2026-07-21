@@ -9,7 +9,6 @@ also emitted by [Fin]. Let's just silence that. *)
 Local Set Warnings "-stdlib-vector".
 From Stdlib Require Fin.
 From stdpp Require Export base tactics.
-From stdpp Require Import options.
 
 (** * The fin type *)
 (** The type [fin n] represents natural numbers [i] with [0 ≤ i < n]. We
