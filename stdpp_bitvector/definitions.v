@@ -1172,6 +1172,37 @@ Section properties.
     by rewrite bv_zero_extend_unsigned', bv_concat_unsigned', Hb1, Z.shiftl_0_l, Z.lor_0_l.
   Qed.
 
+  Lemma bv_concat_extract_merge n1 n2 s k b :
+    (n = n1 + n2)%N →
+    (k = s + n1)%N →
+    bv_concat n (bv_extract k n2 b) (bv_extract s n1 b) = bv_extract s n b.
+  Proof.
+    intros -> ->. apply bv_eq.
+    rewrite bv_concat_unsigned, !bv_extract_unsigned, !bv_wrap_land; [|lia].
+    apply Z.bits_inj_iff' => i ?.
+    rewrite Z.lor_spec, Z.shiftl_spec, !Z.land_spec; [|done].
+    rewrite (Z.shiftr_spec _ (Z.of_N s) _); [|done].
+    (* Two cases i < n1 or i ≥ n1 *)
+    rewrite (Z.ones_spec (Z.of_N n1) _); [|lia..].
+    case_bool_decide.
+    - rewrite (Z.testbit_neg_r _ (i - Z.of_N n1)); [|lia]; simpl.
+      by rewrite !Z.ones_spec_low; [|lia..].
+    - rewrite andb_false_r, orb_false_r, Z.shiftr_spec, Z.ones_spec; [|lia..].
+      (* Bit test above bitvector, case of i ≥ n1+n2 *)
+      case_bool_decide.
+      + rewrite Z.ones_spec, bool_decide_eq_true_2; [|lia..].
+        do 2 f_equal. lia.
+      + by rewrite Z.ones_spec_high, !andb_false_r; [|lia].
+  Qed.
+
+  Lemma bv_concat_extract_id n1 n2 b :
+    (n = n1 + n2)%N →
+    bv_concat n (bv_extract n1 n2 b) (bv_extract 0 n1 b) = b.
+  Proof.
+    intros. rewrite bv_concat_extract_merge; [|lia..].
+    apply bv_eq. by rewrite bv_extract_0_unsigned, bv_wrap_bv_unsigned.
+  Qed.
+
   Lemma bv_zero_extend_idemp b:
     bv_zero_extend n b = b.
   Proof. apply bv_eq. by rewrite bv_zero_extend_unsigned. Qed.

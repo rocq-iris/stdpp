@@ -52,6 +52,10 @@ API-breaking change is listed.
   is a section variable. This tactic is useful to avoid loops in tactics for
   proof automation that repeatedly `destruct` hypotheses.
 
+**Changes in `stdpp_bitvector`:**
+
+- Add lemmas `bv_concat_extract_id` and `bv_concat_extract_merge` for bitvectors that enable to merge back a split bitvector into itself.
+
 The following `sed` script should perform most of the renaming
 (on macOS, replace `sed` by `gsed`, installed via e.g. `brew install gnu-sed`).
 Note that the script is not idempotent, do not run it twice.
