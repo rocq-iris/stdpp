@@ -67,17 +67,22 @@ Fixpoint tele_fun (TT : tele) (T : Type) : Type :=
 Notation "TT -t> A" :=
   (tele_fun TT A) (at level 99, A at level 200, right associativity).
 
-(** An eliminator for elements of [tele_fun].
+(** A general principle for invoking telescopic functions [f : TT -t> X]
+    "step by step", i.e., dealing with one binder at a time.
+    [tele_fold step f] for a telescope [x : X, y : Y, ...] expands to
+    [step (λ x : X, step (λ y : Y, ... (f x y ...)))]. In other words, [step]
+    is used to successively introduce all the binders, and then once
+    everything is in scope, [f] is being invoked.
     We use a [fix] because, for some reason, that makes stuff print nicer
     in the proofs in iris:bi/lib/telescopes.v *)
-Definition tele_fold {X Y} {TT : tele} (step : ∀ {A : Type}, (A → Y) → Y) (base : X → Y)
-  : (TT -t> X) → Y :=
-  (fix rec {TT} : (TT -t> X) → Y :=
-     match TT as TT return (TT -t> X) → Y with
-     | TeleO => λ x : X, base x
+Definition tele_fold {X} {TT : tele}
+    (step : ∀ {A : Type}, (A → X) → X) (f : TT -t> X) : X :=
+  (fix rec {TT} : (TT -t> X) → X :=
+     match TT as TT return (TT -t> X) → X with
+     | TeleO => λ f : X, f
      | TeleS b => λ f, step (λ x, rec (f x))
-     end) TT.
-Global Arguments tele_fold {_ _ !_} _ _ _ /.
+     end) TT f.
+Global Arguments tele_fold {_ !_} _ _ /.
 
 Fixpoint tele_app {TT : tele} {U} : (TT -t> U) -> TT → U :=
   match TT as TT return (TT -t> U) -> TT → U with
@@ -185,10 +190,10 @@ Notation "'λ..' x .. y , e" :=
 
 (** Telescopic quantifiers *)
 Definition tforall {TT : tele} (Ψ : TT → Prop) : Prop :=
-  tele_fold (λ (T : Type) (b : T → Prop), ∀ x : T, b x) (λ x, x) (tele_bind Ψ).
+  tele_fold (λ (T : Type) (b : T → Prop), ∀ x : T, b x) (tele_bind Ψ).
 Global Arguments tforall {!_} _ /.
 Definition texist {TT : tele} (Ψ : TT → Prop) : Prop :=
-  tele_fold ex (λ x, x) (tele_bind Ψ).
+  tele_fold ex (tele_bind Ψ).
 Global Arguments texist {!_} _ /.
 
 Notation "'∀..' x .. y , P" := (tforall (λ x, .. (tforall (λ y, P)) .. ))

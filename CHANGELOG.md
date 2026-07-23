@@ -51,6 +51,10 @@ API-breaking change is listed.
 - Add tactic `destruct_clear H as pat`, which always clears `H`, even if it
   is a section variable. This tactic is useful to avoid loops in tactics for
   proof automation that repeatedly `destruct` hypotheses.
+- Remove the `base` parameter of `tele_fold`. It is now always the identity
+  function, which is what every single user we found already used. The old
+  functionality is still available by combining `tele_map` and `tele_fold`. (by 
+  Thomas Somers)
 
 **Changes in `stdpp_bitvector`:**
 
