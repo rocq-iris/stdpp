@@ -1,6 +1,5 @@
 (** * Theorems on well founded relations *)
 From stdpp Require Import base.
-From stdpp Require Import options.
 
 (** Generate an induction principle for [Acc] for reasoning about recursion on
 [Acc], such as [countable.choose_proper].

@@ -1,5 +1,4 @@
 From stdpp Require Import base tactics.
-From stdpp Require Import options.
 
 Local Set Universe Polymorphism.
 Local Set Polymorphic Inductive Cumulativity.

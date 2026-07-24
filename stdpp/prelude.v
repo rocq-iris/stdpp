@@ -12,4 +12,3 @@ From stdpp Require Export
   list
   list_numbers
   lexico.
-From stdpp Require Import options.

@@ -2,7 +2,6 @@
 the development. *)
 From Stdlib Require Export Lia.
 From stdpp Require Export decidable.
-From stdpp Require Import options.
 
 (** The tactic [destruct_clear H as pat] behaves like [destruct H as pat], except
 that it will always clear [H], even if it is a section variable. Ordinary [destruct]

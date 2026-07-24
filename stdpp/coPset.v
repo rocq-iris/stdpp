@@ -29,7 +29,6 @@ if and only if they have the same elements:
 (a trie) that maps bitstrings to Booleans. *)
 From stdpp Require Export sets.
 From stdpp Require Import pmap gmap mapset.
-From stdpp Require Import options.
 Local Open Scope positive_scope.
 
 (** * The raw tree data structure *)

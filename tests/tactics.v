@@ -5,6 +5,7 @@ From Stdlib Require Import String.
 From stdpp Require Import tactics fin.
 
 Local Unset Mangle Names. (* for stable goal printing *)
+Local Unset Default Proof Using.
 Local Open Scope string_scope.
 
 Goal ∀ P1 P2 P3 P4 (P: Prop),

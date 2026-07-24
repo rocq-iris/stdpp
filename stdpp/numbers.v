@@ -25,7 +25,6 @@ From Stdlib Require Export EqdepFacts PArith NArith ZArith.
 From Stdlib Require Import QArith Qcanon.
 From stdpp Require Export base decidable option.
 From stdpp Require Import well_founded.
-From stdpp Require Import options.
 Local Open Scope nat_scope.
 
 Global Instance comparison_eq_dec : EqDecision comparison.

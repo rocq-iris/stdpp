@@ -1,6 +1,5 @@
 From stdpp Require Export list.
 From stdpp Require Import relations pretty.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

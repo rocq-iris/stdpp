@@ -3,7 +3,6 @@ importantly, it implements some tactics to automatically solve goals involving
 sets. *)
 From stdpp Require Export orders list list_numbers.
 From stdpp Require Import finite.
-From stdpp Require Import options.
 
 (* FIXME: This file needs a 'Proof Using' hint, but they need to be set
 locally (or things moved out of sections) as no default works well enough. *)

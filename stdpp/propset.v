@@ -1,6 +1,5 @@
 (** This file implements sets as functions into Prop. *)
 From stdpp Require Export sets.
-From stdpp Require Import options.
 
 Record propset (A : Type) : Type := PropSet { propset_car : A → Prop }.
 Add Printing Constructor propset.

@@ -4,7 +4,6 @@ induction principles for finite maps and implements the tactic
 [simplify_map_eq] to simplify goals involving finite maps. *)
 From Stdlib Require Import Permutation.
 From stdpp Require Export relations orders vector fin_sets.
-From stdpp Require Import options.
 
 (* FIXME: This file needs a 'Proof Using' hint, but they need to be set
 locally (or things moved out of sections) as no default works well enough. *)

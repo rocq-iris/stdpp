@@ -1,5 +1,4 @@
 From stdpp Require Export tactics.
-From stdpp Require Import options.
 
 Declare Scope stream_scope.
 Delimit Scope stream_scope with stream.

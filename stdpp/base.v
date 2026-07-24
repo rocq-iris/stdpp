@@ -16,7 +16,6 @@ From Stdlib.Program Require Export Basics Syntax.
 does load (and export!) some tacticals like [first] and [last]. *)
 From Stdlib Require ssreflect.
 
-From stdpp Require Import options.
 
 (** This notation is necessary to prevent [length] from being printed
 as [strings.length] if strings.v is imported and later base.v. See

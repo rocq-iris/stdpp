@@ -2,7 +2,6 @@
 These are particularly useful as we define the operational semantics as a
 small step semantics. *)
 From stdpp Require Export sets well_founded.
-From stdpp Require Import options.
 
 (** * Definitions *)
 Section definitions.

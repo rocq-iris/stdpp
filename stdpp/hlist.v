@@ -1,5 +1,4 @@
 From stdpp Require Import tactics.
-From stdpp Require Import options.
 Local Set Universe Polymorphism.
 
 (* Not using [list Type] in order to avoid universe inconsistencies *)

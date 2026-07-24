@@ -3,7 +3,6 @@ importantly, it implements a fold and size function and some useful induction
 principles on finite sets . *)
 From stdpp Require Import relations.
 From stdpp Require Export numbers sets.
-From stdpp Require Import options.
 
 (* Pick up extra assumptions from section parameters. *)
 Set Default Proof Using "Type*".

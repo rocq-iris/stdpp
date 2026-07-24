@@ -27,7 +27,6 @@ The predicate [P : positive → Prop] is considered irrelevant by extraction, so
 after extraction, the resulting data structure is identical to [Pmap]. *)
 From stdpp Require Export countable infinite fin_maps fin_map_dom.
 From stdpp Require Import mapset pmap.
-From stdpp Require Import options.
 
 Local Open Scope positive_scope.
 

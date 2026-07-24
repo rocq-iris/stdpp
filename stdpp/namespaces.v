@@ -1,5 +1,4 @@
 From stdpp Require Export countable coPset.
-From stdpp Require Import options.
 
 Record namespace := Namespace { namespace_car : list positive }.
 Global Instance namespace_eq_dec : EqDecision namespace.
