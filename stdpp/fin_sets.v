@@ -529,7 +529,7 @@ Section filter.
 
     Lemma filter_union_L X Y : filter P (X ∪ Y) = filter P X ∪ filter P Y.
     Proof. unfold_leibniz. apply filter_union. Qed.
-    Lemma filter_union_complement_L X Y : filter P X ∪ filter (λ x, ¬P x) X = X.
+    Lemma filter_union_complement_L X : filter P X ∪ filter (λ x, ¬P x) X = X.
     Proof. unfold_leibniz. apply filter_union_complement. Qed.
 
     Lemma filter_id_L X : filter P X = X ↔ ∀ x, x ∈ X → P x.
