@@ -55,6 +55,7 @@ API-breaking change is listed.
   function, which is what every single user we found already used. The old
   functionality is still available by combining `tele_map` and `tele_fold`. (by 
   Thomas Somers)
+- Remove superfluous argument in `filter_union_complement_L`.
 
 **Changes in `stdpp_bitvector`:**
 
