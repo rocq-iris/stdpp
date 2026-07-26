@@ -101,7 +101,7 @@ build-rocq.9.0.1:
 trigger-rocq.dev:
   <<: *template
   variables:
-    OPAM_PINS: "coq version $NIGHTLY_COQ"
+    OPAM_PINS: "rocq-core version $NIGHTLY_COQ"
     CI_COQCHK: "1"
   rules:
   - if: $CI_PROJECT_NAMESPACE != "iris"
