@@ -98,7 +98,7 @@ build-rocq.9.0.1:
     OPAM_PINS: "rocq-core version 9.0.1  rocq-stdlib version 9.0.0"
     DENY_WARNINGS: "1"
 
-trigger-rocq.dev:
+trigger-nightly:
   <<: *template
   variables:
     OPAM_PINS: "rocq-core version $NIGHTLY_COQ"
