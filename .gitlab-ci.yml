@@ -110,7 +110,7 @@ trigger-nightly:
 
 notify_on_schedule_failure:
   stage: notify
-  needs: [ trigger-rocq.dev ]
+  needs: [ trigger-nightly ]
   tags:
   - fp
   variables:
