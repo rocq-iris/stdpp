@@ -1,22 +1,45 @@
-1 goal
-  
-  X : tele
-  α, β, γ1, γ2 : X → Prop
-  ============================
-  accessor α β γ1 → accessor α β (λ.. x : X, γ1 x ∨ γ2 x)
-1 goal
-  
-  X : tele
-  α, β, γ1, γ2 : X → Prop
-  ============================
-  ∀.. x : X, γ1 x → (λ.. x0 : X, γ1 x0 ∨ γ2 x0) x
-1 goal
-  
-  X : tele
-  α, β, γ1, γ2 : X → Prop
-  x : X
-  Hγ : γ1 x
-  ============================
-  γ1 x ∨ γ2 x
 [TEST x y : nat, x = y]
      : Prop
+"aacc_notation_test"
+     : string
+1 goal
+  
+  α : nat → Prop
+  β, Φ : nat → list nat → Prop
+  ============================
+  AACC <{ ∃∃ n : nat, α n }> <{ ∀∀ l : list nat, n = length l ∧ β n l,
+  COMM Φ n l }>
+1 goal
+  
+  α : nat → Prop
+  β, Φ : nat → list nat → Prop
+  ============================
+  ∃ x : nat, α x ∧ ∀ x0 : list nat, x = length x0 ∧ β x x0 → Φ x x0
+1 goal
+  
+  X : tele
+  Y : tele
+  α : X → Prop
+  β, Φ1, Φ2 : X → Y → Prop
+  ============================
+  accessor α β Φ1 → accessor α β (λ.. (x : X) (y : Y), Φ1 x y ∨ Φ2 x y)
+1 goal
+  
+  X : tele
+  Y : tele
+  α : X → Prop
+  β, Φ1, Φ2 : X → Y → Prop
+  ============================
+  ∀.. (x : X) (y : Y), Φ1 x y
+                       → (λ.. (x0 : X) (y0 : Y), Φ1 x0 y0 ∨ Φ2 x0 y0) x y
+1 goal
+  
+  X : tele
+  Y : tele
+  α : X → Prop
+  β, Φ1, Φ2 : X → Y → Prop
+  x : X
+  y : Y
+  Hclose : Φ1 x y
+  ============================
+  Φ1 x y ∨ Φ2 x y
