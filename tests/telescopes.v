@@ -72,21 +72,25 @@ Check [TEST (x y : nat), x = y].
     - evarconv/new unification using [refine]
  *)
 Example tele_arg_notation_0 : [tele].
+Proof.
 assert_succeeds exact [tele_arg].
 assert_succeeds refine [tele_arg].
 Abort.
 
 Example tele_arg_notation_1 : [tele (_:nat)].
+Proof.
 assert_succeeds exact [tele_arg 0].
 assert_succeeds refine [tele_arg 0].
 Abort.
 
 Example tele_arg_notation_2 : [tele (_ : bool) (_ : nat)].
+Proof.
 assert_succeeds exact [tele_arg true; 0].
 assert_succeeds refine [tele_arg true; 0].
 Abort.
 
 Example tele_arg_notation_2_dep : [tele (b : bool) (_ : if b then nat else False)].
+Proof.
 assert_succeeds exact [tele_arg true; 0].
 assert_succeeds refine [tele_arg true; 0].
 Abort.

@@ -117,12 +117,14 @@ Qed.
 (fields other than the carrier omitted). *)
 Structure ofe := Ofe { ofe_car :> Type }.
 Goal ∀ A : ofe, True.
+Proof.
 intros A.
 let x := mk_evar A in idtac.
 Abort.
 (** More surprisingly, it also works for other coercions into a
 universe, like [Is_true : bool → Prop]. *)
 Goal True.
+Proof.
 let x := mk_evar true in idtac.
 Abort.
 

@@ -116,7 +116,7 @@ Proof. by destruct 1; constructor. Qed.
 Class SetUnfoldSimpl (P Q : Prop) := { set_unfold_simpl : SetUnfold P Q }.
 Global Hint Extern 0 (SetUnfoldSimpl _ _) => csimpl; constructor : typeclass_instances.
 
-Global Instance set_unfold_default P : SetUnfold P P | 1000. done. Qed.
+Global Instance set_unfold_default P : SetUnfold P P | 1000. Proof. done. Qed.
 Definition set_unfold_1 `{SetUnfold P Q} : P → Q := proj1 (set_unfold P Q).
 Definition set_unfold_2 `{SetUnfold P Q} : Q → P := proj2 (set_unfold P Q).
 

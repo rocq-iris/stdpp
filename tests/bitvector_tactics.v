@@ -96,11 +96,13 @@ Proof. intros ? H. bv_simplify H. Show. Abort.
 
 (* Check that bv_simplify isn't sensitive to BvWf proofs *)
 Goal Z_to_bv 64 8 = 8%bv.
+Proof.
   reduce_closed (Z_to_bv 64 8).
   bv_simplify.
   match goal with |- ?x = ?x => reflexivity end.
 Qed.
 
 Goal ∀ v : bv 8, bv_zero_extend 16 v = bv_sign_extend 16 (bv_zero_extend 9 v).
+Proof.
   intros. bv_simplify. bitblast.
 Qed.
