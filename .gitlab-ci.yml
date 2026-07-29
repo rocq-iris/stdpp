@@ -64,6 +64,7 @@ build-rocq.9.2.0:
     MANGLE_NAMES: "1"
     CI_COQCHK: "1"
     OPAM_PKG: "1"
+    OPAM_PKG_ALT_SOURCE_REPO: "https://github.com/rocq-iris/stdpp.git"
     DOC_DIR: "coqdoc@center.mpi-sws.org:stdpp"
   tags:
   - fp-timing
