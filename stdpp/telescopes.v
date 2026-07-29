@@ -157,11 +157,12 @@ Lemma tele_fun_id_eq {TT : tele} (x : TT) :
   tele_app tele_fun_id x = x.
 Proof. unfold tele_fun_id. rewrite tele_app_bind. done. Qed.
 
-Definition tele_fun_compose {TT1 TT2 TT3 : tele} :
-  (TT2 -t> TT3) → (TT1 -t> TT2) → (TT1 -t> TT3) :=
-  λ t1 t2, tele_bind (compose (tele_app t1) (tele_app t2)).
+Definition tele_fun_compose {TT1 TT2 TT3 : tele}
+    (f : TT2 -t> TT3) (g : TT1 -t> TT2) : TT1 -t> TT3 :=
+  tele_bind (compose (tele_app f) (tele_app g)).
 
-Lemma tele_fun_compose_eq {TT1 TT2 TT3 : tele} (f : TT2 -t> TT3) (g : TT1 -t> TT2) x :
+Lemma tele_fun_compose_eq {TT1 TT2 TT3 : tele}
+    (f : TT2 -t> TT3) (g : TT1 -t> TT2) (x : TT1) :
   tele_app (tele_fun_compose f g) x = (tele_app f ∘ tele_app g) x.
 Proof. unfold tele_fun_compose. rewrite tele_app_bind. done. Qed.
 
