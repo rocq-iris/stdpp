@@ -56,45 +56,64 @@ Proof.
   - intros [x xs]. by apply HS.
 Qed.
 
-(** The telescope version of Rocq's function type *)
-Fixpoint tele_fun (TT : tele) (T : Type) : Type :=
+(** The telescope version of Rocq's dependent function type. The iterated dependent
+  Rocq function [∀ (x1 : A1) .. (xn : An), B x1 .. xn] is the telescopic function
+  [Π.. (t : [tele (x1 : A1) .. (xn : An)]), (tele_app B t)], where [tele_app] is
+  telescopic function application as defined below.
+*)
+Fixpoint tele_fun (TT : tele) : (TT → Type) → Type :=
   match TT with
-  | TeleO => T
-  | TeleS b => ∀ x, tele_fun (b x) T
+  | TeleO => λ T, T tt
+  | @TeleS X TT' => λ T, ∀ x, tele_fun (TT' x) (λ t', T (TargS x t'))
   end.
 
+(** Notations for the dependent and non-dependent telescopic function types.
+  [Π..] is n-ary; each of the [x ... y] is a separate telescope. *)
+Notation "'Π..' x .. y , P" :=
+  (tele_fun _ (λ x, .. (tele_fun _ (λ y, P)) ..))
+  (at level 99, x binder, y binder, right associativity,
+   format "'[  ' 'Π..'  x  ..  y ']' ,  P").
 Notation "TT -t> A" :=
-  (tele_fun TT A) (at level 99, A at level 200, right associativity).
+  (Π.. x : tele_arg TT, A) (at level 99, A at level 200, right associativity).
 
-(** A general principle for invoking telescopic functions [f : TT -t> X]
-    "step by step", i.e., dealing with one binder at a time.
+(** A general principle for invoking non-dependent telescopic functions
+    [f : TT -t> B] "step by step", i.e., dealing with one binder at a time.
     [tele_fold step f] for a telescope [x : X, y : Y, ...] expands to
     [step (λ x : X, step (λ y : Y, ... (f x y ...)))]. In other words, [step]
     is used to successively introduce all the binders, and then once
     everything is in scope, [f] is being invoked.
+    The main use case is to represent repeated existential and universal
+    quantification (e.g. [∀ x y z, f x y z]) using telescopes. In that case,
+    [B] is a type that allows for universal or existential quantification, such
+    as [Prop], Iris's [iProp] (see iris:iris:bi/lib/telescopes.v), or semantic
+    interpretations of messages in Actris (see actris:actris/channel/proto.v).
+    The function [step] performs a single quantification, such that [step A f]
+    corresponds to [∀ x : A, f x] or [∃ x : A, f x].
     We use a [fix] because, for some reason, that makes stuff print nicer
     in the proofs in iris:bi/lib/telescopes.v *)
-Definition tele_fold {X} {TT : tele}
-    (step : ∀ {A : Type}, (A → X) → X) (f : TT -t> X) : X :=
-  (fix rec {TT} : (TT -t> X) → X :=
-     match TT as TT return (TT -t> X) → X with
-     | TeleO => λ f : X, f
+Definition tele_fold {B} {TT : tele}
+    (step : ∀ {A : Type}, (A → B) → B) (f : TT -t> B) : B :=
+  (fix rec {TT} : (TT -t> B) → B :=
+     match TT as TT return (TT -t> B) → B with
+     | TeleO => λ f : B, f
      | TeleS b => λ f, step (λ x, rec (f x))
      end) TT f.
 Global Arguments tele_fold {_ !_} _ _ /.
 
-Fixpoint tele_app {TT : tele} {U} : (TT -t> U) -> TT → U :=
-  match TT as TT return (TT -t> U) -> TT → U with
-  | TeleO => λ F _, F
-  | TeleS r => λ (F : TeleS r -t> U) '(TeleArgCons x b),
-      tele_app (F x) b
-  end.
+(** [tele_app] is used to turn a telescopic dependent function into a
+  Rocq dependent function that takes a single [tele_arg TT] argument. *)
+Fixpoint tele_app {TT : tele} {T : TT → Type} (F : Π.. t : TT,  T t) : ∀ t : TT, T t :=
+  match TT as TT return ∀ {T : TT → Type} (F : Π.. t : TT, T t), ∀ t : TT, T t with
+  | TeleO => λ T F 'tt, F
+  | @TeleS X TT' => λ T F '(TeleArgCons x t'),
+      @tele_app (TT' x) (λ t, T (TargS x t)) (F x) t'
+  end T F.
 (* The bidirectionality hint [&] simplifies defining tele_app-based notation
 such as the atomic updates and atomic triples in Iris. *)
 Global Arguments tele_app {!_ _} & _ !_ /.
 
 (** Inversion lemma for [tele_arg] *)
-Lemma tele_arg_inv {TT : tele} (a : tele_arg TT) :
+Lemma tele_arg_inv {TT : tele} (a : TT) :
   match TT as TT return tele_arg TT → Prop with
   | TeleO => λ a, a = TargO
   | TeleS f => λ a, ∃ x a', a = TargS x a'
@@ -106,35 +125,47 @@ Lemma tele_arg_S_inv {X} {f : X → tele} (a : TeleS f) :
   ∃ x a', a = TargS x a'.
 Proof. exact (tele_arg_inv a). Qed.
 
-(** Map below a tele_fun *)
-Fixpoint tele_map {TT : tele} {T U} : (T → U) → (TT -t> T) → TT -t> U :=
-  match TT as TT return (T → U) → (TT -t> T) → TT -t> U with
-  | TeleO => λ F : T → U, F
-  | @TeleS X b => λ (F : T → U) (f : TeleS b -t> T) (x : X),
-                  tele_map F (f x)
+(** Map below a dependent [tele_fun]. *)
+Fixpoint tele_map {TT : tele} :
+    ∀ {T U : TT → Type},
+      (∀ t, T t → U t) →
+      (Π.. t : TT, T t) →
+      (Π.. t : TT, U t) :=
+  match TT as TT return
+      ∀ {T U : TT → Type},
+        (∀ t, T t → U t) →
+        (Π.. t : TT, T t) →
+        (Π.. t : TT, U t) with
+  | TeleO => λ T U F, F tt
+  | @TeleS X TT' => λ T U F f x,
+      @tele_map (TT' x) (λ t', T (TargS x t'))
+        (λ t', U (TargS x t')) (λ t', F (TargS x t')) (f x)
   end.
 Global Arguments tele_map {!_ _ _} _ _ /.
 
-Lemma tele_map_app {TT : tele} {T U} (F : T → U) (t : TT -t> T) (x : TT) :
-  tele_app (tele_map F t) x = F (tele_app t x).
+Lemma tele_map_app {TT : tele} {T U : TT → Type}
+    (F : ∀ t, T t → U t) (f : Π.. t : TT, T t) (x : TT) :
+  tele_app (tele_map F f) x = F x (tele_app f x).
 Proof.
-  induction TT as [|X f IH]; simpl in *.
-  - rewrite (tele_arg_O_inv x). done.
+  induction TT as [|X f' IH]; simpl in *.
+  - by rewrite (tele_arg_O_inv x).
   - destruct (tele_arg_S_inv x) as [x' [a' ->]]. simpl.
-    rewrite <-IH. done.
+    rewrite <-(IH x' (λ t', T (TargS x' t')) (λ t', U (TargS x' t'))
+      (λ t', F (TargS x' t')) _ a'); done.
 Qed.
 
 (** Operate below [tele_fun]s with argument telescope [TT]. *)
-Fixpoint tele_bind {TT : tele} {U} : (TT → U) → TT -t> U :=
-  match TT as TT return (TT → U) → TT -t> U with
-  | TeleO => λ F, F tt
-  | @TeleS X b => λ (F : TeleS b → U) (x : X), (* b x -t> U *)
-      tele_bind (λ a, F (TargS x a))
+Fixpoint tele_bind {TT : tele} :
+    ∀ {U : TT → Type}, (∀ t : TT, U t) → Π.. t : TT, U t :=
+  match TT as TT return ∀ {U : TT → Type}, (∀ t : TT, U t) → Π.. t, U t with
+  | TeleO => λ U F, F tt
+  | @TeleS X TT' => λ U F x,
+      @tele_bind (TT' x) (λ t, U (TargS x t)) (λ t, F (TargS x t))
   end.
 Global Arguments tele_bind {!_ _} _ /.
 
 (* Show that tele_app ∘ tele_bind is the identity. *)
-Lemma tele_app_bind {TT : tele} {U} (f : TT → U) x :
+Lemma tele_app_bind {TT : tele} {U : TT → Type} (f : ∀ t : TT, U t) x :
   tele_app (tele_bind f) x = f x.
 Proof.
   induction TT as [|X b IH]; simpl in *.

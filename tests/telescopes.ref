@@ -43,3 +43,52 @@
   Hclose : Φ1 x y
   ============================
   Φ1 x y ∨ Φ2 x y
+"dep_aacc_notation_test"
+     : string
+1 goal
+  
+  α : nat → Prop
+  β, Φ : nat → list nat → Prop
+  ============================
+  AACC <{ ∃∃ n : nat, α n }> <{ ∀∀ v : vec nat n, β n v, COMM Φ n v }>
+  ↔ AACC <{ ∃∃ n : nat, α n }> <{ ∀∀ l : list nat, 
+    n = length l ∧ β n l, COMM Φ n l }>
+1 goal
+  
+  α : nat → Prop
+  β, Φ : nat → list nat → Prop
+  ============================
+  (∃ x : nat, α x ∧ ∀ x0 : vec nat x, β x x0 → Φ x x0)
+  ↔ ∃ x : nat, α x ∧ ∀ x0 : list nat, x = length x0 ∧ β x x0 → Φ x x0
+"dep_aacc_mono_disj"
+     : string
+1 goal
+  
+  X : tele
+  Y : X → tele
+  α : X → Prop
+  β, Φ1, Φ2 : ∀ x : X, Y x → Prop
+  ============================
+  dep_accessor α β Φ1
+  → dep_accessor α β (λ.. (x : X) (y : Y x), Φ1 x y ∨ Φ2 x y)
+1 goal
+  
+  X : tele
+  Y : X → tele
+  α : X → Prop
+  β, Φ1, Φ2 : ∀ x : X, Y x → Prop
+  ============================
+  ∀.. (x : X) (y : Y x), Φ1 x y
+                         → (λ.. (x0 : X) (y0 : Y x0), Φ1 x0 y0 ∨ Φ2 x0 y0) x
+                             y
+1 goal
+  
+  X : tele
+  Y : X → tele
+  α : X → Prop
+  β, Φ1, Φ2 : ∀ x : X, Y x → Prop
+  x : X
+  y : Y x
+  HΦ1 : Φ1 x y
+  ============================
+  Φ1 x y ∨ Φ2 x y
