@@ -124,12 +124,6 @@ Proof.
     rewrite <-IH. done.
 Qed.
 
-Global Instance tele_fmap {TT : tele} : FMap (tele_fun TT) := λ T U, tele_map.
-
-Lemma tele_fmap_app {T U} {TT : tele} (F : T → U) (t : TT -t> T) (x : TT) :
-  tele_app (F <$> t) x = F (tele_app t x).
-Proof. apply tele_map_app. Qed.
-
 (** Operate below [tele_fun]s with argument telescope [TT]. *)
 Fixpoint tele_bind {TT : tele} {U} : (TT → U) → TT -t> U :=
   match TT as TT return (TT → U) → TT -t> U with
