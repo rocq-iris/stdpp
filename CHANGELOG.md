@@ -56,6 +56,7 @@ API-breaking change is listed.
   functionality is still available by combining `tele_map` and `tele_fold`. (by 
   Thomas Somers)
 - Remove superfluous argument in `filter_union_complement_L`.
+- Remove `FMap` instance for telescopic functions. Use `tele_map` directly instead.
 
 **Changes in `stdpp_bitvector`:**
 
