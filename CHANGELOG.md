@@ -57,6 +57,9 @@ API-breaking change is listed.
   Thomas Somers)
 - Remove superfluous argument in `filter_union_complement_L`.
 - Remove `FMap` instance for telescopic functions. Use `tele_map` directly instead.
+- Generalize telescopic functions `tele_fun` to dependent functions, that is,
+  the type of `tele_fun` changed from `tele → Type → Type` to
+  `∀ (TT : tele), (TT → Type) → Type`. (by Thomas Somers)
 
 **Changes in `stdpp_bitvector`:**
 
