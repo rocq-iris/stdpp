@@ -477,6 +477,7 @@ Ltac f_equiv :=
      requires [Proper]ness of [f] or [g]). *)
   | H : _ ?f ?g |- ?R (?f ?x) (?g ?x) => solve [simple apply H]
   | H : _ ?f ?g |- ?R (?f ?x ?y) (?g ?x ?y) => solve [simple apply H]
+  | H : _ ?f ?g |- ?R (?f ?x ?y ?z) (?g ?x ?y ?z) => solve [simple apply H]
 
   (* Fallback case: try to infer the relation, and allow the function to not be
      syntactically the same on both sides. Unfortunately, very often, it will
