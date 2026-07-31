@@ -60,6 +60,8 @@ API-breaking change is listed.
 - Generalize telescopic functions `tele_fun` to dependent functions, that is,
   the type of `tele_fun` changed from `tele → Type → Type` to
   `∀ (TT : tele), (TT → Type) → Type`. (by Thomas Somers)
+- Teach `f_equiv` to solve goals like `f a b c ≡ g a b c` with `f ≡ g` being a
+  hypothesis.
 
 **Changes in `stdpp_bitvector`:**
 
