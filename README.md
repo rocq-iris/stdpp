@@ -1,4 +1,4 @@
-# Rocq-std++ [[rocqdoc]](https://plv.mpi-sws.org/coqdoc/stdpp/)
+# Rocq-std++ [[rocqdoc]](https://plv.mpi-sws.org/rocqdoc/stdpp/)
 
 This project contains an extended "Standard Library" for Rocq called rocq-std++.
 The key features of this library are as follows:
