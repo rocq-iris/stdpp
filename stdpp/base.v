@@ -277,9 +277,6 @@ Notation "X ≠@{ A } Y":= (¬X =@{ A } Y)
 Global Hint Extern 0 (_ = _) => reflexivity : core.
 Global Hint Extern 100 (_ ≠ _) => discriminate : core.
 
-Global Instance: ∀ A, PreOrder (=@{A}).
-Proof. split; repeat intro; congruence. Qed.
-
 (** ** Setoid equality *)
 (** We define an operational type class for setoid equality, i.e., the
 "canonical" equivalence for a type. The typeclass is tied to the \equiv
