@@ -63,8 +63,7 @@ API-breaking change is listed.
 - Teach `f_equiv` to solve goals like `f a b c ≡ g a b c` with `f ≡ g` being a
   hypothesis.
 - Add lemmas `fmap_Permutation_inv_l`, `fmap_Permutation_inv_r`, and instance
-  `list_fmap_Permutation_inj` (by Arthur Azevedo de Amorim)
-
+  `list_fmap_Permutation_inj`. (by Arthur Azevedo de Amorim)
 
 **Changes in `stdpp_bitvector`:**
 
