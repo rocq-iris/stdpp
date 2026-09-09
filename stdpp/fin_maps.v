@@ -197,8 +197,8 @@ is only well-behaved if [f] is injective, as otherwise it could map multiple
 entries into the same entry. All lemmas about [kmap f] thus have the premise
 [Inj (=) (=) f]. *)
 Definition kmap `{∀ A, Insert K2 A (M2 A), ∀ A, Empty (M2 A),
-    ∀ A, MapFold K1 A (M1 A)} {A} (f : K1 → K2) (m : M1 A) : M2 A :=
-  list_to_map (fmap (prod_map f id) (map_to_list m)).
+    ∀ A, MapFold K1 A (M1 A)} {A} (f : K1 → K2) : M1 A → M2 A :=
+  map_fold (λ i x, <[f i:=x]>) ∅.
 
 (* The zip operation on maps combines two maps key-wise. The keys of resulting
 map correspond to the keys that are in both maps. *)
@@ -4633,16 +4633,11 @@ Section kmap.
   Lemma lookup_kmap_Some {A} (m : M1 A) (j : K2) x :
     kmap f m !! j = Some x ↔ ∃ i, j = f i ∧ m !! i = Some x.
   Proof.
-    assert (∀ x',
-      (j, x) ∈ prod_map f id <$> map_to_list m →
-      (j, x') ∈ prod_map f id <$> map_to_list m → x = x').
-    { intros x'. rewrite !list_elem_of_fmap.
-      intros [[j' y1] [??]] [[? y2] [??]]; simplify_eq/=.
-      by apply (map_to_list_unique m j'). }
-    unfold kmap. rewrite <-elem_of_list_to_map', list_elem_of_fmap by done.
-    setoid_rewrite elem_of_map_to_list'. split.
-    - intros [[??] [??]]; naive_solver.
-    - intros [? [??]]. eexists (_, _); naive_solver.
+    unfold kmap. induction m as [|i x' m ?? IH] using map_first_key_ind.
+    { rewrite map_fold_empty. setoid_rewrite lookup_empty. naive_solver. }
+    rewrite map_fold_insert_first_key by done.
+    setoid_rewrite lookup_insert_Some.
+    rewrite IH. naive_solver.
   Qed.
   Lemma lookup_kmap_is_Some {A} (m : M1 A) (j : K2) :
     is_Some (kmap f m !! j) ↔ ∃ i, j = f i ∧ is_Some (m !! i).
@@ -4669,24 +4664,20 @@ Section kmap.
   Qed.
 
   Lemma kmap_empty {A} : kmap f ∅ =@{M2 A} ∅.
-  Proof. unfold kmap. by rewrite map_to_list_empty. Qed.
+  Proof. unfold kmap. by rewrite map_fold_empty. Qed.
   Lemma kmap_empty_iff {A} (m : M1 A) : kmap f m = ∅ ↔ m = ∅.
   Proof. rewrite !map_empty. setoid_rewrite lookup_kmap_None. naive_solver. Qed.
 
   Lemma kmap_singleton {A} i (x : A) : kmap f {[i:=x]} = {[f i:=x]}.
-  Proof. unfold kmap. by rewrite map_to_list_singleton. Qed.
+  Proof. unfold kmap. by rewrite map_fold_singleton. Qed.
 
   Lemma kmap_partial_alter {A} (g : option A → option A) (m : M1 A) i :
     kmap f (partial_alter g i m) = partial_alter g (f i) (kmap f m).
   Proof.
     apply map_eq; intros j. apply option_eq; intros y.
-    destruct (decide (j = f i)) as [->|?].
-    { by rewrite lookup_partial_alter_eq, !lookup_kmap, lookup_partial_alter_eq. }
-    rewrite lookup_partial_alter_ne, !lookup_kmap_Some by done. split.
-    - intros [i' [? Hm]]; simplify_eq/=.
-      rewrite lookup_partial_alter_ne in Hm by naive_solver. naive_solver.
-    - intros [i' [? Hm]]; simplify_eq/=. exists i'.
-      rewrite lookup_partial_alter_ne by naive_solver. naive_solver.
+    rewrite lookup_partial_alter_Some, !lookup_kmap_Some, lookup_kmap.
+    setoid_rewrite lookup_partial_alter_Some.
+    naive_solver.
   Qed.
   Lemma kmap_insert {A} (m : M1 A) i x :
     kmap f (<[i:=x]> m) = <[f i:=x]> (kmap f m).
