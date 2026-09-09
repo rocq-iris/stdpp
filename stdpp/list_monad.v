@@ -306,34 +306,29 @@ Section fmap.
   Lemma list_fmap_bind {C} (g : B → list C) l : (f <$> l) ≫= g = l ≫= g ∘ f.
   Proof. by induction l; f_equal/=. Qed.
 
-  Lemma fmap_Permutation_inv_l (xs : list A) (ys : list B) :
-    f <$> xs ≡ₚ ys → ∃ xs', ys = f <$> xs' ∧ xs ≡ₚ xs'.
+  Lemma fmap_Permutation_inv_l (l : list A) (k : list B) :
+    f <$> l ≡ₚ k → ∃ l', k = f <$> l' ∧ l ≡ₚ l'.
   Proof.
-    induction xs as [|x xs IH] in ys |- *; simpl.
-    - by intros ->%Permutation_nil; exists [].
-    - intros (ys1 & ys2 & eys & (xs' & eys' & exs)%IH)%Permutation_cons_inv_l.
-      exists (take (length ys1) xs' ++ x :: drop (length ys1) xs').
-      rewrite fmap_app, fmap_take, fmap_cons, fmap_drop.
-      rewrite <- eys', take_app_length, drop_app_length; split; trivial.
-      now rewrite exs, <- Permutation_middle, take_drop.
+    induction l as [|x l IH] in k |- *; simpl.
+    { intros ->%Permutation_nil. by exists []. }
+    intros (k1 & k2 & Hk & (l' & Hk' & Hl)%IH)%Permutation_cons_inv_l.
+    exists (take (length k1) l' ++ x :: drop (length k1) l').
+    rewrite fmap_app, fmap_take, fmap_cons, fmap_drop.
+    rewrite <-Hk', take_app_length, drop_app_length. split; [done|].
+    by rewrite Hl, <-Permutation_middle, take_drop.
   Qed.
 
-  Lemma fmap_Permutation_inv_r (ys : list B) (xs : list A) :
-    ys ≡ₚ f <$> xs → ∃ xs', ys = f <$> xs' ∧ xs' ≡ₚ xs.
+  Lemma fmap_Permutation_inv_r (k : list B) (l : list A) :
+    k ≡ₚ f <$> l → ∃ l', k = f <$> l' ∧ l' ≡ₚ l.
   Proof.
-    intros H%symmetry%fmap_Permutation_inv_l.
-    destruct H as (xs' & eys & exs'%symmetry); eauto.
+    intros (l' & ? & ?%symmetry)%symmetry%fmap_Permutation_inv_l; eauto.
   Qed.
 
   Global Instance list_fmap_Permutation_inj :
-    Inj (=) (=) f →
-    Inj (≡ₚ) (≡ₚ) (fmap f).
+    Inj (=) (=) f → Inj (≡ₚ) (≡ₚ) (fmap f).
   Proof.
-    intros inj_f xs ys (xs' & e1 & e2)%fmap_Permutation_inv_l.
-    assert (ys = xs') as -> by now apply (inj (fmap f : list _ → _)).
-    done.
+    intros ? l k (l' & ? & ?)%fmap_Permutation_inv_l. by simplify_eq.
   Qed.
-
 End fmap.
 
 Section ext.
