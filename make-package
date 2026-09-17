@@ -7,8 +7,8 @@ set -e
 # This is exactly how opam determines which make executable to use.
 OS=$(uname)
 MAKE="make"
-if [ $OS == "FreeBSD" ] || [ $OS == "OpenBSD" ] ||\
-       [ $OS == "NetBSD" ] || [ $OS == "DragonFly" ]; then
+if [ "$OS" = "FreeBSD" ] || [ "$OS" = "OpenBSD" ] ||\
+       [ "$OS" = "NetBSD" ] || [ "$OS" = "DragonFly" ]; then
     MAKE="gmake"
 fi
 
