@@ -11,7 +11,7 @@ and Leroy, https://hal.inria.fr/hal-03372247. It has various good properties:
   [Inductive test := Test : Pmap test → test]. This is possible because we do
   _not_ use a Sigma type to ensure canonical representations (a Sigma type would
   break Rocq's strict positivity check). *)
-From stdpp Require Export countable fin_maps fin_map_dom.
+From stdpp Require Export countable finite fin_maps fin_map_dom.
 From stdpp Require Import mapset.
 
 Local Open Scope positive_scope.
@@ -393,13 +393,8 @@ Proof.
     intros i x mt ? Hfold. apply Hinsert; [done|]. apply (Hfold 1).
 Qed.
 
-Global Program Instance Pmap_countable `{Countable A} : Countable (Pmap A) := {
-  encode m := encode (map_to_list m);
-  decode p := list_to_map <$> decode p
-}.
-Next Obligation.
-  intros A ?? m; simpl. rewrite decode_encode; simpl. by rewrite list_to_map_to_list.
-Qed.
+Global Program Instance Pmap_countable `{Countable A} : Countable (Pmap A) :=
+  map_countable.
 
 (** * Finite sets *)
 (** We construct sets of [positives]s satisfying extensional equality. *)

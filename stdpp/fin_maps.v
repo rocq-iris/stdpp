@@ -3,6 +3,7 @@ finite maps and collects some theory on it. Most importantly, it proves useful
 induction principles for finite maps and implements the tactic
 [simplify_map_eq] to simplify goals involving finite maps. *)
 From Stdlib Require Import Permutation.
+From stdpp Require Import countable finite.
 From stdpp Require Export relations orders vector fin_sets.
 
 (* FIXME: This file needs a 'Proof Using' hint, but they need to be set
@@ -1391,6 +1392,87 @@ Defined.
 
 Lemma map_choose_or_empty {A} (m : M A) : (∃ i x, m !! i = Some x) ∨ m = ∅.
 Proof. destruct (decide (m = ∅)); [right|left]; auto using map_choose. Qed.
+
+(** [Countable] and [Finite] *)
+(** These are not declared as [Instance] but can be used to construct instances
+for specific map implementations, see [gmap_countable], [Pmap_countable] and
+[gmap_finite].
+
+They cannot be instances because they depend on [EqDecision] of the the map
+type, while the [EqDecision] instance is not part of the [FinMap] instance. *)
+Program Definition map_countable
+    `{Countable K, Countable A, !EqDecision (M A)} : Countable (M A) := {|
+  encode m := encode (map_to_list m);
+  decode p := list_to_map <$> decode p
+|}.
+Next Obligation.
+  intros A ????? m; simpl. rewrite decode_encode; simpl.
+  by rewrite list_to_map_to_list.
+Qed.
+
+Fixpoint map_enum {A} (ks : list K) (xs : list A) : list (M A) :=
+  match ks with
+  | [] => [∅]
+  | k :: ks => let ms := map_enum ks xs in ms ++ x ← xs; <[k:=x]> <$> ms
+  end.
+
+Lemma map_enum_None {A} ks xs (m : M A) k :
+  m ∈ map_enum ks xs → k ∉ ks → m !! k = None.
+Proof.
+  intros Hm Hk. revert m Hm.
+  induction ks as [|k' ks IH]; intros m Hm; simplify_eq/=.
+  { apply list_elem_of_singleton in Hm as ->. by rewrite lookup_empty. }
+  apply not_elem_of_cons in Hk as [??].
+  apply elem_of_app in Hm
+    as [|(x&(m'&->&?)%list_elem_of_fmap&?)%list_elem_of_bind]; [by auto|].
+  rewrite lookup_insert_ne by done. eauto.
+Qed.
+
+Program Definition map_finite
+    `{Finite K, Finite A, !EqDecision (M A)} : Finite (M A) :=
+  {| enum := map_enum (enum K) (enum A) |}.
+Next Obligation.
+  intros ?? A ???. induction (NoDup_enum K) as [|k ks ?? IH]; simpl.
+  { repeat constructor. set_solver. }
+  apply NoDup_app; split_and!; [apply IH|..].
+  { intros m Hm' (x&(m'&->&?)%list_elem_of_fmap&?)%list_elem_of_bind.
+    eapply map_enum_None in Hm'; [|done]. by rewrite lookup_insert_eq in Hm'. }
+  apply NoDup_bind, NoDup_enum.
+  { intros m1 m2 m ?? (m1'&->&?)%list_elem_of_fmap (m2'&Hm&?)%list_elem_of_fmap.
+    apply (f_equal (lookup k)) in Hm. rewrite !lookup_insert_eq in Hm.
+    by simplify_eq. }
+  intros x ?. apply NoDup_fmap_2_strong, IH.
+  intros m1 m2 ?? Hm. apply map_eq; intros k'.
+  apply (f_equal (lookup k')) in Hm. rewrite !lookup_insert in Hm.
+  case_decide; simplify_eq; [|done].
+  by rewrite !(map_enum_None ks (enum A)) by done.
+Qed.
+Next Obligation.
+  intros ?? A ???. cut (∀ ks (m : M A), ∃ m',
+    m' ∈ map_enum ks (enum A) ∧ ∀ k, k ∈ ks → m !! k = m' !! k).
+  { intros help m. destruct (help (enum K) m) as (m' & ? & Hmm').
+    assert (m = m') as ->; [|done].
+    apply map_eq; intros k. apply Hmm', elem_of_enum. }
+  intros ks. induction ks as [|k ks IH]; intros m; simpl.
+  { exists ∅. split; [by left|]. set_solver. }
+  destruct (IH (delete k m)) as (m' & Hm' & Hmm').
+  destruct (m !! k) as [x|] eqn:Hk; simpl.
+  - exists (<[k:=x]> m'); split.
+    { apply elem_of_app; right.
+      apply list_elem_of_bind; exists x; split; [|apply elem_of_enum].
+      apply list_elem_of_fmap; eauto. }
+    intros k' [->|?]%elem_of_cons; rewrite lookup_insert.
+    { by rewrite decide_True. }
+    case_decide; simplify_eq; [done|].
+    rewrite <-Hmm' by done. by rewrite lookup_delete_ne.
+  - exists m'. split.
+    { apply elem_of_app. by left. }
+    intros k' [->|?]%elem_of_cons.
+    { rewrite Hk. destruct (decide (k ∈ ks)).
+      { by rewrite <-Hmm', lookup_delete_eq by done. }
+      by eapply symmetry, map_enum_None. }
+    rewrite <-Hmm', lookup_delete by done. case_decide; naive_solver.
+Qed.
 
 (** Properties of the imap function *)
 Lemma map_lookup_imap {A B} (f : K → A → option B) (m : M A) i :

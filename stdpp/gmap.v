@@ -25,7 +25,7 @@ the subset of valid positions, and instantiate it with [gmap_key K].
 
 The predicate [P : positive → Prop] is considered irrelevant by extraction, so
 after extraction, the resulting data structure is identical to [Pmap]. *)
-From stdpp Require Export countable infinite fin_maps fin_map_dom.
+From stdpp Require Export countable finite infinite fin_maps fin_map_dom.
 From stdpp Require Import mapset pmap.
 
 Local Open Scope positive_scope.
@@ -530,15 +530,11 @@ Proof.
     by rewrite Hk'.
 Qed.
 
-Global Program Instance gmap_countable
-    `{Countable K, Countable A} : Countable (gmap K A) := {
-  encode m := encode (map_to_list m : list (K * A));
-  decode p := list_to_map <$> decode p
-}.
-Next Obligation.
-  intros K ?? A ?? m; simpl. rewrite decode_encode; simpl.
-  by rewrite list_to_map_to_list.
-Qed.
+Global Program Instance gmap_countable `{Countable K, Countable A} :
+  Countable (gmap K A) := map_countable.
+
+Global Program Instance gmap_finite `{Finite K, Finite A} : Finite (gmap K A) :=
+  map_finite.
 
 (** Conversion to/from [Pmap] *)
 Local Definition gmap_dep_ne_to_pmap_ne {A} : ∀ {P}, gmap_dep_ne A P → Pmap_ne A :=
