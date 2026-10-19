@@ -33,8 +33,8 @@ tags: [
 ]
 
 depends: [
-  "rocq-core" { (>= "9.0" & < "9.4~") | (= "dev") }
-  "rocq-stdlib" { (>= "9.0") | (= "dev") }
+  "rocq-core" { (>= "9.1" & < "9.4~") | (= "dev") }
+  "rocq-stdlib" { (>= "9.2") | (= "dev") }
 ]
 conflicts: [
   "coq-stdpp"
