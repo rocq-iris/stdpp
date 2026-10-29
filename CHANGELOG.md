@@ -66,6 +66,9 @@ Rocq 9.3 is now supported.
   hypothesis.
 - Add lemmas `fmap_Permutation_inv_l`, `fmap_Permutation_inv_r`, and `Inj`
   instance for `fmap` on lists w.r.t. permutations. (by Arthur Azevedo de Amorim)
+- Add constructions `map_countable` and `map_finite` to establish `Countable`
+  and `Finite` for instances of `FinMap`.
+- Add `Finite` instance for `gmap`.
 
 **Changes in `stdpp_bitvector`:**
 
