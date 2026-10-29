@@ -305,6 +305,30 @@ Section fmap.
 
   Lemma list_fmap_bind {C} (g : B → list C) l : (f <$> l) ≫= g = l ≫= g ∘ f.
   Proof. by induction l; f_equal/=. Qed.
+
+  Lemma fmap_Permutation_inv_l (l : list A) (k : list B) :
+    f <$> l ≡ₚ k → ∃ l', k = f <$> l' ∧ l ≡ₚ l'.
+  Proof.
+    induction l as [|x l IH] in k |- *; simpl.
+    { intros ->%Permutation_nil. by exists []. }
+    intros (k1 & k2 & Hk & (l' & Hk' & Hl)%IH)%Permutation_cons_inv_l.
+    exists (take (length k1) l' ++ x :: drop (length k1) l').
+    rewrite fmap_app, fmap_take, fmap_cons, fmap_drop.
+    rewrite <-Hk', take_app_length, drop_app_length. split; [done|].
+    by rewrite Hl, <-Permutation_middle, take_drop.
+  Qed.
+
+  Lemma fmap_Permutation_inv_r (k : list B) (l : list A) :
+    k ≡ₚ f <$> l → ∃ l', k = f <$> l' ∧ l' ≡ₚ l.
+  Proof.
+    intros (l' & ? & ?%symmetry)%symmetry%fmap_Permutation_inv_l; eauto.
+  Qed.
+
+  Global Instance list_fmap_Permutation_inj :
+    Inj (=) (=) f → Inj (≡ₚ) (≡ₚ) (fmap f).
+  Proof.
+    intros ? l k (l' & ? & ?)%fmap_Permutation_inv_l. by simplify_eq.
+  Qed.
 End fmap.
 
 Section ext.

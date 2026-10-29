@@ -64,6 +64,8 @@ Rocq 9.3 is now supported.
   `∀ (TT : tele), (TT → Type) → Type`. (by Thomas Somers)
 - Teach `f_equiv` to solve goals like `f a b c ≡ g a b c` with `f ≡ g` being a
   hypothesis.
+- Add lemmas `fmap_Permutation_inv_l`, `fmap_Permutation_inv_r`, and `Inj`
+  instance for `fmap` on lists w.r.t. permutations. (by Arthur Azevedo de Amorim)
 
 **Changes in `stdpp_bitvector`:**
 
