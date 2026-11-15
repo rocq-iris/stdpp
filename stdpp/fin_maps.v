@@ -3547,21 +3547,21 @@ Lemma map_disjoint_union_list_r_2 {A} (ms : list (M A)) (m : M A) :
 Proof. by rewrite map_disjoint_union_list_r. Qed.
 
 Lemma lookup_union_list_None {A} (ms : list (M A)) i :
-  ⋃ ms !! i = None ↔ Forall (λ m, m !! i = None) ms.
+  (⋃ ms) !! i = None ↔ Forall (λ m, m !! i = None) ms.
 Proof.
   induction ms as [|m ms IH]; simpl.
   { by rewrite lookup_empty, Forall_nil. }
   rewrite lookup_union_None, Forall_cons. naive_solver.
 Qed.
 Lemma lookup_union_list_None_1 {A} (ms : list (M A)) i :
-  ⋃ ms !! i = None → Forall (λ m, m !! i = None) ms.
+  (⋃ ms) !! i = None → Forall (λ m, m !! i = None) ms.
 Proof. apply lookup_union_list_None. Qed.
 Lemma lookup_union_list_None_2 {A} (ms : list (M A)) i :
-  Forall (λ m, m !! i = None) ms → ⋃ ms !! i = None.
+  Forall (λ m, m !! i = None) ms → (⋃ ms) !! i = None.
 Proof. apply lookup_union_list_None. Qed.
 
 Lemma lookup_union_list_Some_1 {A} (ms : list (M A)) i x :
-  ⋃ ms !! i = Some x → ∃ m, m ∈ ms ∧ m !! i = Some x.
+  (⋃ ms) !! i = Some x → ∃ m, m ∈ ms ∧ m !! i = Some x.
 Proof.
   rewrite <-Exists_exists. induction ms as [|m ms IH]; simpl.
   { by rewrite lookup_empty, Exists_nil. }
@@ -3571,7 +3571,7 @@ Lemma lookup_union_list_Some_2 {A} (ms : list (M A)) m i x :
   m ∈ ms →
   map_disjoint_list ms →
   m !! i = Some x →
-  ⋃ ms !! i = Some x.
+  (⋃ ms) !! i = Some x.
 Proof.
   induction ms as [|m' ms IH]; simpl; [by rewrite elem_of_nil|].
   intros ?%elem_of_cons [?%map_disjoint_union_list_r ?]%map_disjoint_list_cons ?.
@@ -3579,7 +3579,7 @@ Proof.
 Qed.
 Lemma lookup_union_list_Some {A} (ms : list (M A)) i x :
   map_disjoint_list ms →
-  ⋃ ms !! i = Some x ↔ ∃ m, m ∈ ms ∧ m !! i = Some x.
+  (⋃ ms) !! i = Some x ↔ ∃ m, m ∈ ms ∧ m !! i = Some x.
 Proof.
   naive_solver eauto using lookup_union_list_Some_1, lookup_union_list_Some_2.
 Qed.
