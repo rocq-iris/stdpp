@@ -1360,7 +1360,10 @@ Global Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 (* Defining a generic notation does not seem possible with Rocq's
    recursive notation system, so we define individual notations
    for some cases relevant in practice. *)
-(* The "format" makes sure that linebreaks are placed after the separating semicolons [;] when printing. *)
+(* The "format" makes sure that linebreaks are placed after the separating
+semicolons [;] when printing. *)
+(* To avoid even more duplication, we do not include the only parsing versions
+with [ @{M} ]. *)
 Notation "{[ k1 := a1 ; k2 := a2 ]}" :=
   (<[ k1 := a1 ]>{[ k2 := a2 ]})
   (at level 0, format
