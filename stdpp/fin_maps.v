@@ -1723,7 +1723,7 @@ Section set_to_map.
   Qed.
 
   Lemma set_to_map_singleton (f : K → A) i :
-    set_to_map f ({[ i ]} : C) =@{M A} {[ i := f i ]}.
+    set_to_map f ({[ i ]} :> C) =@{M A} {[ i := f i ]}.
   Proof.
     by rewrite <-(right_id ∅ (∪) {[ i ]}), set_to_map_insert, set_to_map_empty.
   Qed.
