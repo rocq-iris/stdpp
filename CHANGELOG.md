@@ -69,6 +69,9 @@ Rocq 9.3 is now supported.
 - Add constructions `map_countable` and `map_finite` to establish `Countable`
   and `Finite` for instances of `FinMap`.
 - Add `Finite` instance for `gmap`.
+- Generalize `list_alter_id`. (by Alban Reynaud Michez)
+- Add lemma `list_alter_id_lookup_None`. (by Alban Reynaud Michez)
+- Rename `alter_id'` → `alter_id_lookup_None`.
 
 **Changes in `stdpp_bitvector`:**
 
@@ -83,6 +86,7 @@ sed -i -E -f- $(find theories -name "*.v") <<EOF
 s/\bvlookup_insert_self\b/vlookup_insert_id/g
 s/\bvlookup_insert\b/vlookup_insert_eq/g
 s/\bvinsert\b/insert/g
+s/\balter_id'\b/alter_id_lookup_None/g
 ```
 
 ## std++ 1.13.0 (2026-03-05)
