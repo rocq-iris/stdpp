@@ -584,7 +584,7 @@ Proof. intro. apply partial_alter_ext. intros [x|] ?; f_equal/=; auto. Qed.
 Lemma alter_id {A} (f : A → A) (m : M A) i :
   (∀ x, m !! i = Some x → f x = x) → alter f i m = m.
 Proof. intros. apply partial_alter_id. destruct (m !! i); f_equal/=; auto. Qed.
-Lemma alter_id' {A} (f : A → A) (m : M A) i :
+Lemma alter_id_lookup_None {A} (f : A → A) (m : M A) i :
   m !! i = None → alter f i m = m.
 Proof. intros. apply alter_id. naive_solver. Qed.
 

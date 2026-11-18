@@ -503,8 +503,11 @@ Lemma alter_app f l1 l2 i :
     else l1 ++ alter f (i - length l1) l2.
 Proof. case_decide; auto using alter_app_l, alter_app_r_alt with lia. Qed.
 
-Lemma list_alter_id f l i : (∀ x, f x = x) → alter f i l = l.
-Proof. intros ?. revert i. induction l; intros [|?]; f_equal/=; auto. Qed.
+Lemma list_alter_id f l i : (∀ x, l !! i = Some x → f x = x) → alter f i l = l.
+Proof. revert i. induction l as [|x l IH]; intros [|i] ?; f_equal/=; auto. Qed.
+Lemma list_alter_id_lookup_None f l i : l !! i = None → alter f i l = l.
+Proof. intros ?. apply list_alter_id. naive_solver. Qed.
+
 Lemma list_alter_ext f g l k i :
   (∀ x, l !! i = Some x → f x = g x) → l = k → alter f i l = alter g i k.
 Proof. intros H ->. revert i H. induction k; intros [|?] ?; f_equal/=; auto. Qed.
