@@ -249,7 +249,7 @@ Proof.
   - intros A P Hemp Hins [l Hl]. refine (natmap_fold_raw_ind
       (λ l, ∀ Hl, P (NatMap l Hl)) _ _ l Hl Hl); clear l Hl.
     { intros Hl.
-      by replace (NatMap _ Hl) with (∅ : natmap A) by (by apply natmap_eq). }
+      by replace (NatMap _ Hl) with ∅@{natmap A} by (by apply natmap_eq). }
     intros i x l Hl ? Hfold H Hxl.
     replace (NatMap _ Hxl) with (<[i:=x]> (NatMap _ Hl)) by (by apply natmap_eq).
     apply Hins; [done| |done].

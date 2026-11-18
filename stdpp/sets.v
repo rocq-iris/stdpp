@@ -205,9 +205,9 @@ Section set_unfold_simple.
   Implicit Types x y : A.
   Implicit Types X Y : C.
 
-  Global Instance set_unfold_empty x : SetUnfoldElemOf x (∅ : C) False.
+  Global Instance set_unfold_empty x : SetUnfoldElemOf x ∅@{C} False.
   Proof. constructor. split; [|done]. apply not_elem_of_empty. Qed.
-  Global Instance set_unfold_singleton x y : SetUnfoldElemOf x ({[ y ]} : C) (x = y).
+  Global Instance set_unfold_singleton x y : SetUnfoldElemOf x {[ y ]}@{C} (x = y).
   Proof. constructor; apply elem_of_singleton. Qed.
   Global Instance set_unfold_union x X Y P Q :
     SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
@@ -1105,9 +1105,9 @@ Section quantifiers.
     by rewrite (set_unfold (x ∈ X) _), (set_unfold (P x) _).
   Qed.
 
-  Lemma set_Forall_empty : set_Forall P (∅ : C).
+  Lemma set_Forall_empty : set_Forall P ∅@{C}.
   Proof. set_solver. Qed.
-  Lemma set_Forall_singleton x : set_Forall P ({[ x ]} : C) ↔ P x.
+  Lemma set_Forall_singleton x : set_Forall P {[ x ]}@{C} ↔ P x.
   Proof. set_solver. Qed.
   Lemma set_Forall_union X Y :
     set_Forall P X → set_Forall P Y → set_Forall P (X ∪ Y).
@@ -1119,9 +1119,9 @@ Section quantifiers.
   Lemma set_Forall_list_to_set l : set_Forall P (list_to_set (C:=C) l) ↔ Forall P l.
   Proof. rewrite Forall_forall. set_solver. Qed.
 
-  Lemma set_Exists_empty : ¬set_Exists P (∅ : C).
+  Lemma set_Exists_empty : ¬set_Exists P ∅@{C}.
   Proof. set_solver. Qed.
-  Lemma set_Exists_singleton x : set_Exists P ({[ x ]} : C) ↔ P x.
+  Lemma set_Exists_singleton x : set_Exists P {[ x ]}@{C} ↔ P x.
   Proof. set_solver. Qed.
   Lemma set_Exists_union_1 X Y : set_Exists P X → set_Exists P (X ∪ Y).
   Proof. set_solver. Qed.
@@ -1287,9 +1287,9 @@ Section set_finite_infinite.
   Global Instance set_finite_proper : Proper ((≡) ==> iff) (@set_finite A C _).
   Proof. intros X Y HX; apply exist_proper. by setoid_rewrite HX. Qed.
 
-  Lemma empty_finite : set_finite (∅ : C).
+  Lemma empty_finite : set_finite ∅@{C}.
   Proof. by exists []; intros ?; rewrite elem_of_empty. Qed.
-  Lemma singleton_finite (x : A) : set_finite ({[ x ]} : C).
+  Lemma singleton_finite (x : A) : set_finite {[ x ]}@{C}.
   Proof. exists [x]; intros y ->%elem_of_singleton; left. Qed.
   Lemma union_finite X Y : set_finite X → set_finite Y → set_finite (X ∪ Y).
   Proof.
@@ -1486,11 +1486,11 @@ Section minimal.
     minimal R x X ↔ ∀ y, y ∈ X → ¬R y x.
   Proof. unfold minimal; split; [eauto using minimal_strict_1|naive_solver]. Qed.
 
-  Lemma empty_minimal x : minimal R x (∅ : C).
+  Lemma empty_minimal x : minimal R x ∅@{C}.
   Proof. unfold minimal; set_solver. Qed.
-  Lemma singleton_minimal x : minimal R x ({[ x ]} : C).
+  Lemma singleton_minimal x : minimal R x {[ x ]}@{C}.
   Proof. unfold minimal; set_solver. Qed.
-  Lemma singleton_minimal_not_above y x : ¬R y x → minimal R x ({[ y ]} : C).
+  Lemma singleton_minimal_not_above y x : ¬R y x → minimal R x {[ y ]}@{C}.
   Proof. unfold minimal; set_solver. Qed.
   Lemma union_minimal X Y x :
     minimal R x X → minimal R x Y → minimal R x (X ∪ Y).

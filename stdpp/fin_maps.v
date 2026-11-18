@@ -55,7 +55,7 @@ Class FinMap K M `{FMap M, ∀ A, Lookup K A (M A), ∀ A, Empty (M A), ∀ A,
     PartialAlter K A (M A), OMap M, Merge M, ∀ A, MapFold K A (M A),
     EqDecision K} := {
   map_eq {A} (m1 m2 : M A) : (∀ i, m1 !! i = m2 !! i) → m1 = m2;
-  lookup_empty {A} i : (∅ : M A) !! i = None;
+  lookup_empty {A} i : ∅@{M A} !! i = None;
   lookup_partial_alter_eq {A} f (m : M A) i :
     partial_alter f i m !! i = f (m !! i);
   lookup_partial_alter_ne {A} f (m : M A) i j :
@@ -329,11 +329,11 @@ Proof.
   - intros -> i. by rewrite lookup_empty.
   - intros Hm. apply map_eq. intros i. by rewrite Hm, lookup_empty.
 Qed.
-Lemma lookup_empty_is_Some {A} i : ¬is_Some ((∅ : M A) !! i).
+Lemma lookup_empty_is_Some {A} i : ¬is_Some (∅@{M A} !! i).
 Proof. rewrite lookup_empty. by inv 1. Qed.
-Lemma lookup_empty_Some {A} i (x : A) : ¬(∅ : M A) !! i = Some x.
+Lemma lookup_empty_Some {A} i (x : A) : ∅@{M A} !! i ≠ Some x.
 Proof. by rewrite lookup_empty. Qed.
-Lemma lookup_total_empty `{!Inhabited A} i : (∅ : M A) !!! i = inhabitant.
+Lemma lookup_total_empty `{!Inhabited A} i : ∅@{M A} !!! i = inhabitant.
 Proof. by rewrite lookup_total_alt, lookup_empty. Qed.
 Lemma map_subset_empty {A} (m : M A) : m ⊄ ∅.
 Proof.
@@ -924,36 +924,36 @@ Qed.
 
 (** ** Properties of the singleton maps *)
 Lemma lookup_singleton {A} i j (x : A) :
-  ({[i:=x]} : M A) !! j = if decide (i = j) then Some x else None.
+  {[i:=x]}@{M A} !! j = if decide (i = j) then Some x else None.
 Proof.
   unfold singletonM, map_singleton. by rewrite lookup_insert, lookup_empty.
 Qed.
-Lemma lookup_singleton_eq {A} i (x : A) : ({[i:=x]} : M A) !! i = Some x.
+Lemma lookup_singleton_eq {A} i (x : A) : {[i:=x]}@{M A} !! i = Some x.
 Proof. apply lookup_partial_alter_eq. Qed.
 Lemma lookup_singleton_ne {A} i j (x : A) :
-  i ≠ j → ({[i:=x]} : M A) !! j = None.
+  i ≠ j → {[i:=x]}@{M A} !! j = None.
 Proof. intros. by rewrite lookup_singleton, decide_False. Qed.
 
 Lemma lookup_total_singleton `{!Inhabited A} i j (x : A) :
-  ({[i:=x]} : M A) !!! j = if decide (i = j) then x else inhabitant.
+  {[i:=x]}@{M A} !!! j = if decide (i = j) then x else inhabitant.
 Proof. rewrite lookup_total_alt, lookup_singleton. by case_decide. Qed.
 Lemma lookup_total_singleton_eq `{!Inhabited A} i (x : A) :
-  ({[i:=x]} : M A) !!! i = x.
+  {[i:=x]}@{M A} !!! i = x.
 Proof. by rewrite lookup_total_alt, lookup_singleton_eq. Qed.
 Lemma lookup_total_singleton_ne `{!Inhabited A} i j (x : A) :
-  i ≠ j → ({[i:=x]} : M A) !!! j = inhabitant.
+  i ≠ j → {[i:=x]}@{M A} !!! j = inhabitant.
 Proof. intros. by rewrite lookup_total_alt, lookup_singleton_ne. Qed.
 
 Lemma lookup_singleton_Some {A} i j (x y : A) :
-  ({[i:=x]} : M A) !! j = Some y ↔ i = j ∧ x = y.
+  {[i:=x]}@{M A} !! j = Some y ↔ i = j ∧ x = y.
 Proof.
   rewrite <-insert_empty,lookup_insert_Some, lookup_empty; intuition congruence.
 Qed.
 Lemma lookup_singleton_is_Some {A} i j (x : A) :
-  is_Some (({[i:=x]} : M A) !! j) ↔ i = j.
+  is_Some ({[i:=x]}@{M A} !! j) ↔ i = j.
 Proof. unfold is_Some. setoid_rewrite lookup_singleton_Some. naive_solver. Qed.
 Lemma lookup_singleton_None {A} i j (x : A) :
-  ({[i:=x]} : M A) !! j = None ↔ i ≠ j.
+  {[i:=x]}@{M A} !! j = None ↔ i ≠ j.
 Proof. by rewrite eq_None_not_Some, lookup_singleton_is_Some. Qed.
 
 Global Instance map_singleton_inj {A} : Inj2 (=) (=) (=) (singletonM (M:=M A)).
@@ -1319,7 +1319,7 @@ Proof.
   - by rewrite !list_to_map_to_list.
 Qed.
 Lemma map_to_list_singleton {A} i (x : A) :
-  map_to_list ({[i:=x]} : M A) = [(i,x)].
+  map_to_list {[i:=x]}@{M A} = [(i,x)].
 Proof.
   apply Permutation_singleton_r. unfold singletonM, map_singleton.
   by rewrite map_to_list_insert, map_to_list_empty by eauto using lookup_empty.
@@ -1546,7 +1546,7 @@ Proof.
 Qed.
 
 (** ** Properties of the size operation *)
-Lemma map_size_empty {A} : size (∅ : M A) = 0.
+Lemma map_size_empty {A} : size ∅@{M A} = 0.
 Proof. by rewrite <-length_map_to_list, map_to_list_empty. Qed.
 Lemma map_size_empty_iff {A} (m : M A) : size m = 0 ↔ m = ∅.
 Proof.
@@ -1557,7 +1557,7 @@ Proof. apply map_size_empty_iff. Qed.
 Lemma map_size_non_empty_iff {A} (m : M A) : size m ≠ 0 ↔ m ≠ ∅.
 Proof. by rewrite map_size_empty_iff. Qed.
 
-Lemma map_size_singleton {A} i (x : A) : size ({[i:=x]} : M A) = 1.
+Lemma map_size_singleton {A} i (x : A) : size {[i:=x]}@{M A} = 1.
 Proof. by rewrite <-length_map_to_list, map_to_list_singleton. Qed.
 
 Lemma map_size_ne_0_lookup {A} (m : M A) :
@@ -1700,7 +1700,7 @@ Section set_to_map.
     Inj (=@{C}) (=@{M A}) (set_to_map f) | 0.
   Proof. intros X1 X2. unfold_leibniz. apply set_to_map_inj. Qed.
 
-  Lemma set_to_map_empty (f : K → A) : set_to_map f (∅ : C) =@{M A} ∅.
+  Lemma set_to_map_empty (f : K → A) : set_to_map f ∅@{C} =@{M A} ∅.
   Proof.
     apply map_eq; intros i. apply option_eq; intros x.
     rewrite lookup_set_to_map_Some, lookup_empty. set_solver.
@@ -1723,7 +1723,7 @@ Section set_to_map.
   Qed.
 
   Lemma set_to_map_singleton (f : K → A) i :
-    set_to_map f ({[ i ]} :> C) =@{M A} {[ i := f i ]}.
+    set_to_map f {[ i ]}@{C} =@{M A} {[ i := f i ]}.
   Proof.
     by rewrite <-(right_id ∅ (∪) {[ i ]}), set_to_map_insert, set_to_map_empty.
   Qed.
@@ -1756,7 +1756,7 @@ Section map_to_set.
     - intros (i&x&?&?). exists (i,x). by rewrite elem_of_map_to_list.
   Qed.
   Lemma map_to_set_empty (f : K → A → B) :
-    map_to_set f (∅ : M A) = (∅ : C).
+    map_to_set f ∅@{M A} = ∅@{C}.
   Proof. unfold map_to_set; simpl. by rewrite map_to_list_empty. Qed.
   Lemma map_to_set_insert (f : K → A → B)(m : M A) i x :
     m !! i = None →
@@ -1965,7 +1965,7 @@ Section map_Forall.
     - intros Hforall [i x]. rewrite elem_of_map_to_list. by apply (Hforall i x).
     - intros Hforall i x. rewrite <-elem_of_map_to_list. by apply (Hforall (i,x)).
   Qed.
-  Lemma map_Forall_empty : map_Forall P (∅ : M A).
+  Lemma map_Forall_empty : map_Forall P ∅@{M A}.
   Proof. intros i x. by rewrite lookup_empty. Qed.
   Lemma map_Forall_impl (Q : K → A → Prop) m :
     map_Forall P m → (∀ i x, P i x → Q i x) → map_Forall Q m.
@@ -1987,7 +1987,7 @@ Section map_Forall.
       map_Forall_insert_1_2, map_Forall_insert_2.
   Qed.
   Lemma map_Forall_singleton (i : K) (x : A) :
-    map_Forall P ({[i:=x]} : M A) ↔ P i x.
+    map_Forall P {[i:=x]}@{M A} ↔ P i x.
   Proof.
     unfold map_Forall. setoid_rewrite lookup_singleton_Some. naive_solver.
   Qed.
@@ -2048,7 +2048,7 @@ Section map_Exists.
     - intros [? [? [? ?]]]. eexists (_, _). by rewrite elem_of_map_to_list.
     - intros [[??] [??]]. eexists _, _. by rewrite <-elem_of_map_to_list.
   Qed.
-  Lemma map_Exists_empty : ¬ map_Exists P (∅ : M A).
+  Lemma map_Exists_empty : ¬ map_Exists P ∅@{M A}.
   Proof. intros [?[?[Hm ?]]]. by rewrite lookup_empty in Hm. Qed.
   Lemma map_Exists_impl (Q : K → A → Prop) m :
     map_Exists P m → (∀ i x, P i x → Q i x) → map_Exists Q m.
@@ -2070,7 +2070,7 @@ Section map_Exists.
       map_Exists_insert_2_1, map_Exists_insert_2_2.
   Qed.
   Lemma map_Exists_singleton (i : K) (x : A) :
-    map_Exists P ({[i:=x]} : M A) ↔ P i x.
+    map_Exists P {[i:=x]}@{M A} ↔ P i x.
   Proof.
     unfold map_Exists. setoid_rewrite lookup_singleton_Some. naive_solver.
   Qed.
@@ -2710,7 +2710,7 @@ Section map_Forall2.
     map_Forall2 R' m1 m2.
   Proof. intros Hm ? i. destruct (Hm i); constructor; eauto. Qed.
 
-  Lemma map_Forall2_empty : map_Forall2 R (∅ : M A) ∅.
+  Lemma map_Forall2_empty : map_Forall2 R ∅@{M A} ∅.
   Proof. intros i. rewrite !lookup_empty. constructor. Qed.
   Lemma map_Forall2_empty_inv_l (m2 : M B) : map_Forall2 R ∅ m2 → m2 = ∅.
   Proof.
@@ -2772,7 +2772,7 @@ Section map_Forall2.
   Qed.
 
   Lemma map_Forall2_singleton i x1 x2 :
-    map_Forall2 R ({[i:=x1]} : M A) {[i:=x2]} ↔ R i x1 x2.
+    map_Forall2 R {[i:=x1]}@{M A} {[i:=x2]} ↔ R i x1 x2.
   Proof.
     rewrite <-!insert_empty, map_Forall2_insert by (by rewrite lookup_empty).
     naive_solver eauto using map_Forall2_empty.
@@ -5184,10 +5184,10 @@ Section img.
 
   (** Set solver instances *)
   Global Instance set_unfold_map_img_empty x :
-    SetUnfoldElemOf x (map_img (∅:M A)) False.
+    SetUnfoldElemOf x (map_img ∅@{M A}) False.
   Proof. constructor. by rewrite map_img_empty, elem_of_empty. Qed.
   Global Instance set_unfold_map_img_singleton x i y :
-    SetUnfoldElemOf x (map_img ({[i:=y]}:M A)) (x = y).
+    SetUnfoldElemOf x (map_img {[i:=y]}@{M A}) (x = y).
   Proof. constructor. by rewrite map_img_singleton, elem_of_singleton. Qed.
 End img.
 
@@ -5263,7 +5263,7 @@ Section map_compose.
 
   Lemma map_compose_empty_r m : m ∘ₘ ∅ =@{MA C} ∅.
   Proof. apply omap_empty. Qed.
-  Lemma map_compose_empty_l n : (∅ : MB C) ∘ₘ n =@{MA C} ∅.
+  Lemma map_compose_empty_l n : ∅@{MB C} ∘ₘ n =@{MA C} ∅.
   Proof.
     apply map_eq. intros k. rewrite map_lookup_compose, lookup_empty.
     destruct (n !! k); simpl; [|done]. apply lookup_empty.
@@ -5362,7 +5362,7 @@ Section map_compose.
   Proof. intros. by apply omap_singleton_None. Qed.
 
   Lemma map_compose_singletons a b c :
-    ({[b:=c]} : MB C) ∘ₘ {[a:=b]} =@{MA C} {[a:=c]}.
+    {[b:=c]}@{MB C} ∘ₘ {[a:=b]} =@{MA C} {[a:=c]}.
   Proof. by apply map_compose_singleton_Some, lookup_insert_eq. Qed.
 End map_compose.
 

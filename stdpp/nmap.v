@@ -60,7 +60,7 @@ Proof.
   - intros A P Hemp Hins [mx t].
     induction t as [|i x t ? Hfold IH] using map_fold_fmap_ind.
     { destruct mx as [x|]; [|done].
-      replace (NMap (Some x) ∅) with (<[0:=x]> ∅ : Nmap _) by done.
+      replace (NMap (Some x) ∅) with (<[0:=x]> ∅@{Nmap _}) by done.
       by apply Hins. }
     apply (Hins (N.pos i) x (NMap mx t)); [done| |done].
     intros A' B f g b. apply Hfold.

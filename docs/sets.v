@@ -139,8 +139,8 @@ pretty (or useful) to look at. *)
 (** [elements] converts a set to a (unsorted) list. *)
 Eval vm_compute in elements (add_one (evens {[ 10; 11; 14 ]})).
 Eval vm_compute in elements (evens (until_n 40)).
-Eval vm_compute in fresh ({[ 10; 12 ]} : gset nat).
-Eval vm_compute in size ({[ 10; 12 ]} : gset nat).
+Eval vm_compute in fresh {[ 10; 12 ]}@{gset nat}.
+Eval vm_compute in size {[ 10; 12 ]}@{gset nat}.
 (** You can use [bool_decide] to turn decidable [Prop]s into [bool]s. *)
 Eval vm_compute in bool_decide (10 ∈ evens {[ 10; 11 ]}).
 Eval vm_compute in bool_decide ({[ 10; 14; 17 ]} ⊂ until_n 40).

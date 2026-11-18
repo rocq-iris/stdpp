@@ -116,7 +116,7 @@ Proof. rewrite (dom_insert _). set_solver. Qed.
 Lemma dom_insert_subseteq_compat_l {A} (m : M A) i x X :
   X ⊆ dom m → X ⊆ dom (<[i:=x]> m).
 Proof. intros. trans (dom m); eauto using dom_insert_subseteq. Qed.
-Lemma dom_singleton {A} (i : K) (x : A) : dom ({[i:=x]} : M A) ≡ {[ i ]}.
+Lemma dom_singleton {A} (i : K) (x : A) : dom {[i:=x]}@{M A} ≡ {[ i ]}.
 Proof. rewrite <-insert_empty, dom_insert, dom_empty; set_solver. Qed.
 Lemma dom_delete {A} (m : M A) i : dom (delete i m) ≡ dom m ∖ {[ i ]}.
 Proof.
@@ -391,7 +391,7 @@ Section leibniz.
   Lemma dom_insert_lookup_L {A} (m : M A) i x :
     is_Some (m !! i) → dom (<[i:=x]> m) = dom m.
   Proof. unfold_leibniz; apply dom_insert_lookup. Qed.
-  Lemma dom_singleton_L {A} (i : K) (x : A) : dom ({[i:=x]} : M A) = {[ i ]}.
+  Lemma dom_singleton_L {A} (i : K) (x : A) : dom {[i:=x]}@{M A} = {[ i ]}.
   Proof. unfold_leibniz; apply dom_singleton. Qed.
   Lemma dom_delete_L {A} (m : M A) i : dom (delete i m) = dom m ∖ {[ i ]}.
   Proof. unfold_leibniz; apply dom_delete. Qed.
@@ -436,7 +436,7 @@ Lemma dom_kmap_L `{!Elements K D, !FinSet K D, FinMapDom K2 M2 D2}
 Proof. unfold_leibniz. by apply dom_kmap. Qed.
 
 (** * Set solver instances *)
-Global Instance set_unfold_dom_empty {A} i : SetUnfoldElemOf i (dom (∅:M A)) False.
+Global Instance set_unfold_dom_empty {A} i : SetUnfoldElemOf i (dom ∅@{M A}) False.
 Proof. constructor. by rewrite dom_empty, elem_of_empty. Qed.
 Global Instance set_unfold_dom_alter {A} f i j (m : M A) Q :
   SetUnfoldElemOf i (dom m) Q →
@@ -457,7 +457,7 @@ Proof.
     (set_unfold_elem_of _ (dom _) _), elem_of_singleton.
 Qed.
 Global Instance set_unfold_dom_singleton {A} i j x :
-  SetUnfoldElemOf i (dom ({[j:=x]} : M A)) (i = j).
+  SetUnfoldElemOf i (dom {[j:=x]}@{M A}) (i = j).
 Proof. constructor. by rewrite dom_singleton, elem_of_singleton. Qed.
 Global Instance set_unfold_dom_union {A} i (m1 m2 : M A) Q1 Q2 :
   SetUnfoldElemOf i (dom m1) Q1 → SetUnfoldElemOf i (dom m2) Q2 →

@@ -86,7 +86,7 @@ Proof.
   - intros. by rewrite !elem_of_elements, E.
 Qed.
 
-Lemma elements_empty : elements (∅ : C) = [].
+Lemma elements_empty : elements ∅@{C} = [].
 Proof.
   apply elem_of_nil_inv; intros x.
   rewrite elem_of_elements, elem_of_empty; tauto.
@@ -109,7 +109,7 @@ Proof.
   intros y; rewrite elem_of_elements, elem_of_union, elem_of_singleton.
   by rewrite elem_of_cons, elem_of_elements.
 Qed.
-Lemma elements_singleton x : elements ({[ x ]} : C) = [x].
+Lemma elements_singleton x : elements {[ x ]}@{C} = [x].
 Proof.
   apply Permutation_singleton_r. by rewrite <-(right_id ∅ (∪) {[x]}),
     elements_union_singleton, elements_empty by set_solver.
@@ -146,7 +146,7 @@ Qed.
 Global Instance set_size_proper: Proper ((≡) ==> (=)) (@size C _).
 Proof. intros ?? E. apply Permutation_length. by rewrite E. Qed.
 
-Lemma size_empty : size (∅ : C) = 0.
+Lemma size_empty : size ∅@{C} = 0.
 Proof. unfold size, set_size. simpl. by rewrite elements_empty. Qed.
 Lemma size_empty_iff X : size X = 0 ↔ X ≡ ∅.
 Proof.
@@ -175,7 +175,7 @@ Proof.
   contradict Hsz. rewrite HX, size_empty; lia.
 Qed.
 
-Lemma size_singleton (x : A) : size ({[ x ]} : C) = 1.
+Lemma size_singleton (x : A) : size {[ x ]}@{C} = 1.
 Proof. unfold size, set_size. simpl. by rewrite elements_singleton. Qed.
 Lemma size_singleton_inv X x y : size X = 1 → x ∈ X → y ∈ X → x = y.
 Proof.
@@ -297,10 +297,10 @@ Lemma set_fold_proper {B} (R : relation B) `{!PreOrder R}
 Proof. intros ?? E. apply (foldr_permutation R f b); auto. by rewrite E. Qed.
 
 Lemma set_fold_empty {B} (f : A → B → B) (b : B) :
-  set_fold f b (∅ : C) = b.
+  set_fold f b ∅@{C} = b.
 Proof. by unfold set_fold; simpl; rewrite elements_empty. Qed.
 Lemma set_fold_singleton {B} (f : A → B → B) (b : B) (a : A) :
-  set_fold f b ({[a]} : C) = f a b.
+  set_fold f b {[a]}@{C} = f a b.
 Proof. by unfold set_fold; simpl; rewrite elements_singleton. Qed.
 
 (** The following lemma shows that folding over two sets separately (using the

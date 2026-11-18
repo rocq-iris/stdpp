@@ -10,12 +10,12 @@ Lemma elem_of_list_bind_again {A B} (x : B) (l : list A) f :
 Proof. set_solver. Qed.
 
 (** Should not leave any evars, see issue #163 *)
-Goal {[0]} ∪ dom (∅ : gmap nat nat) ≠ ∅.
+Goal {[0]} ∪ dom ∅@{gmap nat nat} ≠ ∅.
 Proof. set_solver. Qed.
 
 (** Check that [set_solver] works with [set_Exists] and [set_Forall]. Test cases
 from issue #178. *)
-Lemma set_Exists_set_solver : set_Exists (.= 10) ({[ 10 ]} : gset nat).
+Lemma set_Exists_set_solver : set_Exists (.= 10) {[ 10 ]}@{gset nat}.
 Proof. set_solver. Qed.
 
 Lemma set_Forall_set_solver `{Set_ A C} (X : C) x : set_Forall (.≠ x) X ↔ x ∉ X.
