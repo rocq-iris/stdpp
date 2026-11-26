@@ -28,11 +28,11 @@ fi
 
 # Generate _RocqProject file and Makefile
 rm -f "$ROCQFILE"
-# Get the right "-Q" line.
+# Get the right "-Q" line for $PROJECT.
 grep -E "^-Q $PROJECT[ /]" _RocqProject >> "$ROCQFILE"
-# Get the flags.
+# Get all flags.
 grep -E "^-arg " _RocqProject >> "$ROCQFILE"
-# Get the files.
+# Get the files for $PROJECT.
 grep -E "^$PROJECT/" _RocqProject >> "$ROCQFILE"
 # Now we can generate the makefile.
 "${COQBIN}rocq" makefile -f "$ROCQFILE" -o "$MAKEFILE"
