@@ -11,13 +11,13 @@ Global Instance: Params (@cons) 1 := {}.
 Global Instance: Params (@app) 1 := {}.
 
 (** [head] and [tail] are defined as [parsing only] for [hd_error] and [tl] in
-the Rocq standard library. We redefine these notations to make sure they also
+the Rocq standard library. We redefine these abbreviations to make sure they also
 pretty print properly. *)
-Notation head := hd_error.
-Notation tail := tl.
+Abbreviation head := hd_error.
+Abbreviation tail := tl.
 
-Notation take := firstn.
-Notation drop := skipn.
+Abbreviation take := firstn.
+Abbreviation drop := skipn.
 
 Global Arguments head {_} _ : assert.
 Global Arguments tail {_} _ : assert.
@@ -126,7 +126,7 @@ Global Arguments last : simpl nomatch.
 
 (** Functions to fold over a list. We redefine [foldl] with the arguments in
 the same order as in Haskell. *)
-Notation foldr := fold_right.
+Abbreviation foldr := fold_right.
 Definition foldl {A B} (f : A → B → A) : A → list B → A :=
   fix go a l := match l with [] => a | x :: l => go (f a x) l end.
 

@@ -18,7 +18,7 @@ Section merge_sort.
     end.
   Global Arguments list_merge !_ !_ / : assert.
 
-  Local Notation stack := (list (option (list A))).
+  Local Abbreviation stack := (list (option (list A))).
   Fixpoint merge_list_to_stack (st : stack) (l : list A) : stack :=
     match st with
     | [] => [Some l]
@@ -218,7 +218,7 @@ Section merge_sort_correct.
     - by rewrite IH2, Permutation_middle.
   Qed.
 
-  Local Notation stack := (list (option (list A))).
+  Local Abbreviation stack := (list (option (list A))).
   Inductive merge_stack_Sorted : stack → Prop :=
     | merge_stack_Sorted_nil : merge_stack_Sorted []
     | merge_stack_Sorted_cons_None st :

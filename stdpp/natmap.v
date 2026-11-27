@@ -3,7 +3,7 @@ over Rocq's data type of unary natural numbers [nat]. The implementation equips
 a list with a proof of canonicity. *)
 From stdpp Require Import fin_maps mapset.
 
-Notation natmap_raw A := (list (option A)).
+Abbreviation natmap_raw A := (list (option A)).
 Definition natmap_wf {A} (l : natmap_raw A) :=
   match last l with None => True | Some x => is_Some x end.
 Global Instance natmap_wf_pi {A} (l : natmap_raw A) : ProofIrrel (natmap_wf l).
@@ -280,7 +280,7 @@ Proof.
 Qed.
 
 (** Finally, we can construct sets of [nat]s satisfying extensional equality. *)
-Notation natset := (mapset natmap).
+Abbreviation natset := (mapset natmap).
 Global Instance natmap_dom {A} : Dom (natmap A) natset := mapset_dom.
 Global Instance: FinMapDom nat natmap natset := mapset_dom_spec.
 

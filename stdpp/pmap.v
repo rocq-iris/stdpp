@@ -321,7 +321,7 @@ Section Pmap_merge.
 End Pmap_merge.
 
 Section Pmap_fold.
-  Local Notation Pmap_fold f := (Pmap_fold_aux (Pmap_ne_fold f)).
+  Local Abbreviation Pmap_fold f := (Pmap_fold_aux (Pmap_ne_fold f)).
 
   Local Lemma Pmap_fold_PNode {A B} (f : positive → A → B → B) i y ml mx mr :
     Pmap_fold f i y (PNode ml mx mr) = Pmap_fold f i~1
@@ -398,6 +398,6 @@ Global Program Instance Pmap_countable `{Countable A} : Countable (Pmap A) :=
 
 (** * Finite sets *)
 (** We construct sets of [positives]s satisfying extensional equality. *)
-Notation Pset := (mapset Pmap).
+Abbreviation Pset := (mapset Pmap).
 Global Instance Pmap_dom {A} : Dom (Pmap A) Pset := mapset_dom.
 Global Instance Pmap_dom_spec : FinMapDom positive Pmap Pset := mapset_dom_spec.

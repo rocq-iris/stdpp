@@ -20,7 +20,7 @@ Fixpoint to_list {A} (t : rlist A) : list A :=
   match t with
   | rnil => [] | rnode l => [l] | rapp t1 t2 => to_list t1 ++ to_list t2
   end.
-Notation env A := (list (list A)) (only parsing).
+Abbreviation env A := (list (list A)) (only parsing).
 Definition eval {A} (E : env A) : rlist nat → list A :=
   fix go t :=
   match t with

@@ -16,11 +16,11 @@ Global Open Scope vector_scope.
 Whereas the standard library declares exactly the same notations for vectors as
 used for lists, we use slightly different notations so it becomes easier to use
 lists and vectors together. *)
-Notation vec := Vector.t.
-Notation vnil := Vector.nil.
+Abbreviation vec := Vector.t.
+Abbreviation vnil := Vector.nil.
 Global Arguments vnil {_}.
-Notation vcons := Vector.cons.
-Notation vapp := Vector.append.
+Abbreviation vcons := Vector.cons.
+Abbreviation vapp := Vector.append.
 Global Arguments vcons {_} _ {_} _.
 
 Infix ":::" := vcons (at level 60, right associativity) : vector_scope.
@@ -38,7 +38,7 @@ Notation "(.+++ w )" := (λ v, vapp v w) (only parsing) : vector_scope.
 (** Similar to [fin], we provide an inversion principle that keeps the length
 fixed. We define a tactic [inv_vec v] to perform case analysis on [v], using
 this inversion principle. *)
-Notation vec_0_inv := Vector.case0.
+Abbreviation vec_0_inv := Vector.case0.
 Definition vec_S_inv {A n} (P : vec A (S n) → Type)
   (Hcons : ∀ x v, P (x ::: v)) v : P v.
 Proof.
@@ -55,7 +55,7 @@ Global Instance vector_lookup_total A : ∀ m, LookupTotal (fin m) A (vec A m) :
 
 (** The tactic [vec_double_ind v1 v2] performs double induction on [v1] and [v2]
 provided that they have the same length. *)
-Notation vec_rect2 := Vector.rect2.
+Abbreviation vec_rect2 := Vector.rect2.
 Ltac vec_double_ind v1 v2 :=
   match type of v1 with
   | vec _ ?n =>
@@ -66,7 +66,7 @@ Ltac vec_double_ind v1 v2 :=
     match goal with |- ∀ n v1 v2, @?P n v1 v2 => apply (vec_rect2 P) end
   end.
 
-Notation vcons_inj := VectorSpec.cons_inj.
+Abbreviation vcons_inj := VectorSpec.cons_inj.
 Lemma vcons_inj_1 {A n} x y (v w : vec A n) : x ::: v = y ::: w → x = y.
 Proof. apply vcons_inj. Qed.
 Lemma vcons_inj_2 {A n} x y (v w : vec A n) : x ::: v = y ::: w → v = w.
@@ -119,7 +119,7 @@ do not define it as a coercion, as it would otherwise introduce ambiguity. *)
 Fixpoint vec_to_list {A n} (v : vec A n) : list A :=
   match v with [#] => [] | x ::: v => x :: vec_to_list v end.
 Coercion vec_to_list : vec >-> list.
-Notation list_to_vec := Vector.of_list.
+Abbreviation list_to_vec := Vector.of_list.
 
 Lemma vec_to_list_cons {A n} x (v : vec A n) :
   vec_to_list (x ::: v) = x :: vec_to_list v.
@@ -241,7 +241,7 @@ Proof.
 Qed.
 
 (** The function [vmap f v] applies a function [f] element wise to [v]. *)
-Notation vmap := Vector.map.
+Abbreviation vmap := Vector.map.
 
 Lemma vlookup_map `(f : A → B) {n} (v : vec A n) i :
   vmap f v !!! i = f (v !!! i).
@@ -252,7 +252,7 @@ Proof. induction v as [|??? IHv]; simpl; [done|]. by rewrite IHv. Qed.
 
 (** The function [vzip_with f v w] combines the vectors [v] and [w] element
 wise using the function [f]. *)
-Notation vzip_with := Vector.map2.
+Abbreviation vzip_with := Vector.map2.
 
 Lemma vlookup_zip_with `(f : A → B → C) {n} (v1 : vec A n) (v2 : vec B n) i :
   vzip_with f v1 v2 !!! i = f (v1 !!! i) (v2 !!! i).
@@ -277,9 +277,9 @@ Global Instance vec_insert A : ∀ m, Insert (fin m) A (vec A m) :=
   | FS j => vec_S_inv _ (λ x v, x ::: <[j:=a]> v)
   end.
 
-(* Back-compat notation for [vinsert] *)
+(* Back-compat abbreviation for [vinsert] *)
 #[deprecated(note="Use `<[_:=_]>` or `insert` instead")]
-Notation vinsert := (@insert _ _ _ (@vec_insert _ _)) (only parsing).
+Abbreviation vinsert := (@insert _ _ _ (@vec_insert _ _)) (only parsing).
 
 Lemma vec_to_list_insert {A n} i x (v : vec A n) :
   vec_to_list (<[i:=x]> v) = <[fin_to_nat i:=x]> (vec_to_list v).

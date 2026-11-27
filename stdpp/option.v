@@ -69,7 +69,7 @@ Section Forall.
 End Forall.
 
 (** The eliminator with the identity function. *)
-Notation default := (from_option id).
+Abbreviation default := (from_option id).
 
 (** An alternative, but equivalent, definition of equality on the option
 data type. This theorem is useful to prove that two options are the same. *)

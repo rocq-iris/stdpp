@@ -5,10 +5,6 @@
 # - Quotes (single/double) are not allowed.
 # - Empty lines and lines starting with '#' are ignored.
 
-# Needs Rocq 9.2.
--w
--notation-for-abbreviation
-
 # The ltac_expr case of this is very annoying to deal with so we are hoping for
 # better alternatives (https://github.com/rocq-prover/rocq/issues/21896).
 -w

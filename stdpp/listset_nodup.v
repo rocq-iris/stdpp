@@ -12,7 +12,7 @@ Global Arguments listset_nodup_prf {_} _ : assert.
 
 Section list_set.
 Context `{EqDecision A}.
-Notation C := (listset_nodup A).
+Abbreviation C := (listset_nodup A).
 
 Global Instance listset_nodup_elem_of: ElemOf A C := λ x l, x ∈ listset_nodup_car l.
 Global Instance listset_nodup_empty: Empty C := ListsetNoDup [] (@NoDup_nil_2 _).

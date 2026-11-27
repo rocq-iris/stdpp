@@ -14,7 +14,7 @@ define [mapset' Munit] with [Munit : Type] as a record, and then [mapset M] with
 fails otherwise. *)
 Record mapset' (Munit : Type) : Type :=
   Mapset { mapset_car: Munit }.
-Notation mapset M := (mapset' (M unit)).
+Abbreviation mapset M := (mapset' (M unit)).
 Global Arguments Mapset {_} _ : assert.
 Global Arguments mapset_car {_} _ : assert.
 

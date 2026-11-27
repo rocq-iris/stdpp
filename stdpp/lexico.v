@@ -2,7 +2,7 @@
 and proves that it is a partial order having a strong variant of trichotomy. *)
 From stdpp Require Import numbers.
 
-Notation cast_trichotomy T :=
+Abbreviation cast_trichotomy T :=
   match T with
   | inleft (left _) => inleft (left _)
   | inleft (right _) => inleft (right _)

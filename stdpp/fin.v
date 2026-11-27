@@ -17,8 +17,8 @@ define a scope [fin], in which we declare notations for small literals of the
 counting at [0]. This way, the embedding [fin_to_nat] preserves [0], and allows
 us to define [fin_to_nat] as a coercion without introducing notational
 ambiguity. *)
-Notation fin := Fin.t.
-Notation FS := Fin.FS.
+Abbreviation fin := Fin.t.
+Abbreviation FS := Fin.FS.
 
 Declare Scope fin_scope.
 Delimit Scope fin_scope with fin.
@@ -34,8 +34,8 @@ Fixpoint fin_to_nat {n} (i : fin n) : nat :=
   match i with 0%fin => 0 | FS i => S (fin_to_nat i) end.
 Coercion fin_to_nat : fin >-> nat.
 
-Notation nat_to_fin := Fin.of_nat_lt.
-Notation fin_rect2 := Fin.rect2.
+Abbreviation nat_to_fin := Fin.of_nat_lt.
+Abbreviation fin_rect2 := Fin.rect2.
 
 Global Instance fin_dec {n} : EqDecision (fin n).
 Proof.
@@ -54,7 +54,7 @@ In the tactic [inv_fin i] to perform dependent case analysis on [i], we
 therefore do not have to generalize over the index [n] and all assumptions
 depending on it. Notice that contrary to [dependent destruction], which uses
 the [JMeq_eq] axiom, the tactic [inv_fin] produces axiom free proofs.*)
-Notation fin_0_inv := Fin.case0.
+Abbreviation fin_0_inv := Fin.case0.
 
 Definition fin_S_inv {n} (P : fin (S n) → Type)
   (H0 : P 0%fin) (HS : ∀ i, P (FS i)) (i : fin (S n)) : P i.

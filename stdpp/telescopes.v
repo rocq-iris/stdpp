@@ -39,10 +39,10 @@ Global Arguments tele_arg _ : simpl never.
 
 (* The cast in the notation below is necessary to make Rocq understand that
    [TargO] can be unified with [tele_arg TeleO]. *)
-Notation TargO := (tt : tele_arg TeleO) (only parsing).
+Abbreviation TargO := (tt : tele_arg TeleO) (only parsing).
 (* The casts and annotations are necessary for Rocq to typecheck nested [TargS]
    as well as the final [TargO] in a chain of [TargS]. *)
-Notation TargS a b :=
+Abbreviation TargS a b :=
   ((@TeleArgCons _ (λ x, tele_arg (_ x)) a b) : (tele_arg (TeleS _))) (only parsing).
 Coercion tele_arg : tele >-> Sortclass.
 

@@ -22,7 +22,7 @@ as [strings.length] if strings.v is imported and later base.v. See
 also strings.v and
 https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/144 and
 https://gitlab.mpi-sws.org/iris/stdpp/-/merge_requests/129. *)
-Notation length := Datatypes.length.
+Abbreviation length := Datatypes.length.
 
 (** * Enable implicit generalization. *)
 (** This option enables implicit generalization in arguments of the form
@@ -160,7 +160,7 @@ Existing Class TCFalse.
 fails. This is useful as a guard for certain instances together with
 classes like [TCFastDone] (see [tactics.v]) to prevent infinite loops
 (e.g. when saturating the context). *)
-Notation TCUnless P := (TCIf P TCFalse TCTrue).
+Abbreviation TCUnless P := (TCIf P TCFalse TCTrue).
 
 Inductive TCForall {A} (P : A → Prop) : list A → Prop :=
   | TCForall_nil : TCForall P []
@@ -395,7 +395,7 @@ Class RelDecision {A B} (R : A → B → Prop) :=
   decide_rel x y :: Decision (R x y).
 Global Hint Mode RelDecision ! ! ! : typeclass_instances.
 Global Arguments decide_rel {_ _} _ {_} _ _ : simpl never, assert.
-Notation EqDecision A := (RelDecision (=@{A})).
+Abbreviation EqDecision A := (RelDecision (=@{A})).
 
 (** ** Inhabited types *)
 (** This type class collects types that are inhabited. *)
@@ -451,7 +451,7 @@ Class Trichotomy {A} (R : relation A) :=
 Class TrichotomyT {A} (R : relation A) :=
   trichotomyT x y : {R x y} + {x = y} + {R y x}.
 
-Notation Involutive R f := (Cancel R f f).
+Abbreviation Involutive R f := (Cancel R f f).
 Lemma involutive {A} {R : relation A} (f : A → A) `{Involutive R f} x :
   R (f (f x)) x.
 Proof. auto. Qed.
@@ -688,7 +688,7 @@ Global Instance list_inhabited {A} : Inhabited (list A) := populate [].
 Definition zip_with {A B C} (f : A → B → C) : list A → list B → list C :=
   fix go l1 l2 :=
   match l1, l2 with x1 :: l1, x2 :: l2 => f x1 x2 :: go l1 l2 | _ , _ => [] end.
-Notation zip := (zip_with pair).
+Abbreviation zip := (zip_with pair).
 
 (** ** Booleans *)
 (** The following coercion allows us to use Booleans as propositions. *)
@@ -1304,15 +1304,15 @@ Global Hint Mode MThrow ! ! : typeclass_instances.
 
 (** We use unit as the error content for monads that can only report an error
     without any payload like an option *)
-Global Notation MFail := (MThrow ()).
-Global Notation mfail := (mthrow ()).
+Global Abbreviation MFail := (MThrow ()).
+Global Abbreviation mfail := (mthrow ()).
 
 Definition guard_or {E} (e : E) `{MThrow E M, MRet M} P `{Decision P} : M P :=
   match decide P with
   | left H => mret H
   | right _ => mthrow e
   end.
-Global Notation guard := (guard_or ()).
+Global Abbreviation guard := (guard_or ()).
 
 
 (** * Operations on maps *)

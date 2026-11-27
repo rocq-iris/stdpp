@@ -107,7 +107,7 @@ Global Hint Transparent BvWf andb Is_true Z.ltb Z.leb Z.compare Pos.compare
   Pos.compare_cont bv_modulus Z.pow Z.pow_pos Pos.iter Z.mul Pos.mul Z.of_N
   : bv_unfold_db.
 
-Notation bv_suwrap signed := (if signed then bv_swrap else bv_wrap).
+Abbreviation bv_suwrap signed := (if signed then bv_swrap else bv_wrap).
 
 Class BvUnfold (n : N) (signed : bool) (wrapped : bool) (b : bv n) (z : Z) := {
     bv_unfold_proof : ((if signed then bv_signed else bv_unsigned) b) =

@@ -610,7 +610,7 @@ Proof. unfold_leibniz. by apply set_map_difference. Qed.
 Section set_bind.
   Context `{SemiSet B SB}.
 
-  Local Notation set_bind := (set_bind (A:=A) (SA:=C) (SB:=SB)).
+  Local Abbreviation set_bind := (set_bind (A:=A) (SA:=C) (SB:=SB)).
 
   Lemma elem_of_set_bind (f : A → SB) (X : C) y :
     y ∈ set_bind f X ↔ ∃ x, x ∈ X ∧ y ∈ f x.
@@ -703,7 +703,7 @@ Section set_omap.
   Context `{SemiSet B D}.
   Implicit Types (f : A → option B).
   Implicit Types (x : A) (y : B).
-  Notation set_omap := (set_omap (C:=C) (D:=D)).
+  Abbreviation set_omap := (set_omap (C:=C) (D:=D)).
 
   Lemma elem_of_set_omap f X y : y ∈ set_omap f X ↔ ∃ x, x ∈ X ∧ f x = Some y.
   Proof.
