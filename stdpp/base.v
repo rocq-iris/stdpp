@@ -1041,6 +1041,7 @@ intersection [(∩)], and difference [(∖)], the singleton [{[_]}], the subset
 Class Empty A := empty: A.
 Global Hint Mode Empty ! : typeclass_instances.
 Notation "∅" := empty (format "∅") : stdpp_scope.
+Notation "∅@{ A }" := (empty (A:=A)) (only parsing) : stdpp_scope.
 
 Global Instance empty_inhabited `(Empty A) : Inhabited A := populate ∅.
 
@@ -1094,6 +1095,11 @@ Notation "{[ x ]}" := (singleton x) (at level 0) : stdpp_scope.
 Notation "{[ x ; y ; .. ; z ]}" :=
   (union .. (union (singleton x) (singleton y)) .. (singleton z))
   (at level 0) : stdpp_scope.
+Notation "{[ x ]}@{ B }" := (singleton (B:=B) x)
+  (only parsing) : stdpp_scope.
+Notation "{[ x ; y ; .. ; z ]}@{ B }" :=
+  (union .. (union (singleton (B:=B) x) (singleton (B:=B) y)) .. (singleton (B:=B) z))
+  (only parsing) : stdpp_scope.
 
 Class SubsetEq A := subseteq: relation A.
 Global Hint Mode SubsetEq ! : typeclass_instances.
@@ -1165,6 +1171,12 @@ Notation "{[+ x +]}" := (singletonMS x)
 Notation "{[+ x ; y ; .. ; z +]}" :=
   (disj_union .. (disj_union (singletonMS x) (singletonMS y)) .. (singletonMS z))
   (at level 0, format "{[+  x ;  y ;  .. ;  z  +]}") : stdpp_scope.
+Notation "{[+ x +]}@{ B }" := (singletonMS (B:=B) x)
+  (only parsing) : stdpp_scope.
+Notation "{[+ x ; y ; .. ; z +]}@{ B }" :=
+  (disj_union .. (disj_union (singletonMS (B:=B) x)
+    (singletonMS (B:=B) y)) .. (singletonMS (B:=B) z))
+  (only parsing) : stdpp_scope.
 
 Definition option_to_set `{Singleton A C, Empty C} (mx : option A) : C :=
   match mx with None => ∅ | Some x => {[ x ]} end.
@@ -1328,11 +1340,13 @@ Notation "(.!!! i )" := (lookup_total i) (only parsing) : stdpp_scope.
 Global Arguments lookup_total _ _ _ _ !_ !_ / : simpl nomatch, assert.
 
 (** The singleton map *)
-Class SingletonM K A M := singletonM: K → A → M.
+Class SingletonM K A M := singletonM : K → A → M.
 Global Hint Mode SingletonM - - ! : typeclass_instances.
 Global Instance: Params (@singletonM) 5 := {}.
 Notation "{[ k := a ]}" := (singletonM k a)
   (at level 0, format "{[ k := a ]}") : stdpp_scope.
+Notation "{[ k := a ]}@{ M }" := (singletonM (M:=M) k a)
+  (only parsing) : stdpp_scope.
 
 (** The function insert [<[k:=a]>m] should update the element at key [k] with
 value [a] in [m]. *)
@@ -1347,7 +1361,10 @@ Global Arguments insert _ _ _ _ !_ _ !_ / : simpl nomatch, assert.
 (* Defining a generic notation does not seem possible with Rocq's
    recursive notation system, so we define individual notations
    for some cases relevant in practice. *)
-(* The "format" makes sure that linebreaks are placed after the separating semicolons [;] when printing. *)
+(* The "format" makes sure that linebreaks are placed after the separating
+semicolons [;] when printing. *)
+(* To avoid even more duplication, we do not include the only parsing versions
+with [ @{M} ]. *)
 Notation "{[ k1 := a1 ; k2 := a2 ]}" :=
   (<[ k1 := a1 ]>{[ k2 := a2 ]})
   (at level 0, format

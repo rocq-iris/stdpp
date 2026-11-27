@@ -34,10 +34,10 @@ Section map_dom.
   Context `{FinMapDom K M D}.
 
   Lemma set_solver_dom_subseteq {A} (i j : K) (x y : A) :
-    {[i; j]} ⊆ dom (<[i:=x]> (<[j:=y]> (∅ : M A))).
+    {[i; j]} ⊆ dom (<[i:=x]> (<[j:=y]> ∅@{M A})).
   Proof. set_solver. Qed.
 
-  Lemma set_solver_dom_disjoint {A} (X : D) : dom (∅ : M A) ## X.
+  Lemma set_solver_dom_disjoint {A} (X : D) : dom ∅@{M A} ## X.
   Proof. set_solver. Qed.
 
   Lemma set_solver_dom_kmap {A} `{FinMapDom K2 M2 D2}
@@ -51,7 +51,7 @@ Section map_img.
   Context `{FinMap K M, Set_ A SA}.
 
   Lemma set_solver_map_img i x :
-    map_img (∅ : M A) ⊆@{SA} map_img ({[ i := x ]} : M A).
+    map_img ∅@{M A} ⊆@{SA} map_img {[ i := x ]}@{M A}.
   Proof. set_unfold. set_solver. Qed.
 
   Lemma set_solver_map_img_kmap `{FinMap K2 M2, SemiSet A SA}
@@ -73,7 +73,7 @@ Proof.
   Show.
 Abort.
 
-Goal elements (C := gset nat) {[1; 2; 3]} = [].
+Goal elements {[1; 2; 3]}@{gset nat} = [].
 Proof.
   Fail progress simpl.
   Fail progress cbn.
@@ -88,14 +88,14 @@ Proof.
   Show.
 Abort.
 
-Goal 1%positive ∈ dom (M := Pmap nat) (<[ 1%positive := 2 ]> ∅).
+Goal 1%positive ∈ dom (<[ 1%positive := 2 ]> ∅@{Pmap nat}).
 Proof.
   Fail progress simpl.
   Fail progress cbn.
   Show.
 Abort.
 
-Goal 1 ∈ dom (M := gmap nat nat) (<[ 1 := 2 ]> ∅).
+Goal 1 ∈ dom (<[ 1 := 2 ]> ∅@{gmap nat nat}).
 Proof.
   Fail progress simpl.
   Fail progress cbn.
@@ -456,7 +456,7 @@ Next Obligation.
 Qed.
 
 Goal
-  ({[ GTest {[ 1 := GTest ∅ ]} := "foo" ]} : gmap (gtest nat) string)
+  {[ GTest {[ 1 := GTest ∅ ]} := "foo" ]}@{gmap (gtest nat) string}
   !! GTest {[ 1 := GTest ∅ ]} = Some "foo".
 Proof. reflexivity. Qed.
 

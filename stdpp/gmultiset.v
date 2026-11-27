@@ -317,10 +317,10 @@ Section multiset_unfold.
   Proof. constructor. by rewrite <-(multiset_unfold x X n). Qed.
 
   Global Instance set_unfold_gmultiset_empty x :
-    SetUnfoldElemOf x (∅ : gmultiset A) False.
+    SetUnfoldElemOf x ∅@{gmultiset A} False.
   Proof. constructor. apply gmultiset_elem_of_empty. Qed.
   Global Instance set_unfold_gmultiset_singleton x y :
-    SetUnfoldElemOf x ({[+ y +]} : gmultiset A) (x = y).
+    SetUnfoldElemOf x {[+ y +]}@{gmultiset A} (x = y).
   Proof. constructor; apply gmultiset_elem_of_singleton. Qed.
   Global Instance set_unfold_gmultiset_union x X Y P Q :
     SetUnfoldElemOf x X P → SetUnfoldElemOf x Y Q →
@@ -611,7 +611,7 @@ Section more_lemmas.
   Proof. induction n; multiset_solver. Qed.
 
   (** Properties of the elements operation *)
-  Lemma gmultiset_elements_empty : elements (∅ : gmultiset A) = [].
+  Lemma gmultiset_elements_empty : elements ∅@{gmultiset A} = [].
   Proof.
     unfold elements, gmultiset_elements; simpl. by rewrite map_to_list_empty.
   Qed.
@@ -627,7 +627,7 @@ Section more_lemmas.
   Lemma gmultiset_elements_empty_inv X : elements X = [] → X = ∅.
   Proof. apply gmultiset_elements_empty_iff. Qed.
 
-  Lemma gmultiset_elements_singleton x : elements ({[+ x +]} : gmultiset A) = [ x ].
+  Lemma gmultiset_elements_singleton x : elements {[+ x +]}@{gmultiset A} = [ x ].
   Proof.
     unfold elements, gmultiset_elements; simpl. by rewrite map_to_list_singleton.
   Qed.
@@ -671,10 +671,10 @@ Section more_lemmas.
 
   (** Properties of the set_fold operation *)
   Lemma gmultiset_set_fold_empty {B} (f : A → B → B) (b : B) :
-    set_fold f b (∅ : gmultiset A) = b.
+    set_fold f b ∅@{gmultiset A} = b.
   Proof. by unfold set_fold; simpl; rewrite gmultiset_elements_empty. Qed.
   Lemma gmultiset_set_fold_singleton {B} (f : A → B → B) (b : B) (a : A) :
-    set_fold f b ({[+ a +]} : gmultiset A) = f a b.
+    set_fold f b {[+ a +]}@{gmultiset A} = f a b.
   Proof. by unfold set_fold; simpl; rewrite gmultiset_elements_singleton. Qed.
   Lemma gmultiset_set_fold_disj_union_strong {B} (R : relation B) `{!PreOrder R}
       (f : A → B → B) (b : B) X Y :
@@ -725,7 +725,7 @@ Section more_lemmas.
   Qed.
 
   (** Properties of the size operation *)
-  Lemma gmultiset_size_empty : size (∅ : gmultiset A) = 0.
+  Lemma gmultiset_size_empty : size ∅@{gmultiset A} = 0.
   Proof. done. Qed.
   Lemma gmultiset_size_empty_iff X : size X = 0 ↔ X = ∅.
   Proof.
@@ -751,7 +751,7 @@ Section more_lemmas.
     contradict Hsz. rewrite HX, gmultiset_size_empty; lia.
   Qed.
 
-  Lemma gmultiset_size_singleton x : size ({[+ x +]} : gmultiset A) = 1.
+  Lemma gmultiset_size_singleton x : size {[+ x +]}@{gmultiset A} = 1.
   Proof.
     unfold size, gmultiset_size; simpl. by rewrite gmultiset_elements_singleton.
   Qed.

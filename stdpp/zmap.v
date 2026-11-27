@@ -1,4 +1,4 @@
-(** This files extends the implementation of finite over [positive] to finite
+ (** This files extends the implementation of finite over [positive] to finite
 maps whose keys range over Rocq's data type of binary naturals [Z]. *)
 From stdpp Require Import pmap mapset.
 From stdpp Require Export prelude fin_maps.
@@ -65,7 +65,7 @@ Proof.
     induction t as [|i x t ? Hfold IH] using map_fold_fmap_ind.
     { induction t' as [|i x t' ? Hfold IH] using map_fold_fmap_ind.
       { destruct mx as [x|]; [|done].
-        replace (ZMap (Some x) ∅ ∅) with (<[0:=x]> ∅ : Zmap _) by done.
+        replace (ZMap (Some x) ∅ ∅) with (<[0:=x]> ∅@{Zmap _}) by done.
         by apply Hins. }
       apply (Hins (Z.neg i) x (ZMap mx ∅ t')); [done| |done].
       intros A' B f g b. apply Hfold. }

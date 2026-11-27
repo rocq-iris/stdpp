@@ -72,6 +72,8 @@ Rocq 9.3 is supported now, and Rocq 9.0 and 9.1 are no longer supported.
 - Generalize `list_alter_id`. (by Alban Reynaud Michez)
 - Add lemma `list_alter_id_lookup_None`. (by Alban Reynaud Michez)
 - Rename `alter_id'` → `alter_id_lookup_None`.
+- Add parsing only notations to construct sets and maps with a type annotation:
+  `∅@{C}`, `{[ x ]}@{C}`, `{[+ x +]}@{C}`, and `{[ i := x ]}@{M}`.
 
 **Changes in `stdpp_bitvector`:**
 
