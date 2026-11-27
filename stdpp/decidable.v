@@ -70,20 +70,20 @@ Ltac solve_decision :=
 
 (** The following combinators are useful to create Decision proofs in
 combination with the [refine] tactic. *)
-Notation swap_if S := (match S with left H => right H | right H => left H end).
-Notation cast_if S := (if S then left _ else right _).
-Notation cast_if_and S1 S2 := (if S1 then cast_if S2 else right _).
-Notation cast_if_and3 S1 S2 S3 := (if S1 then cast_if_and S2 S3 else right _).
-Notation cast_if_and4 S1 S2 S3 S4 :=
+Abbreviation swap_if S := (match S with left H => right H | right H => left H end).
+Abbreviation cast_if S := (if S then left _ else right _).
+Abbreviation cast_if_and S1 S2 := (if S1 then cast_if S2 else right _).
+Abbreviation cast_if_and3 S1 S2 S3 := (if S1 then cast_if_and S2 S3 else right _).
+Abbreviation cast_if_and4 S1 S2 S3 S4 :=
   (if S1 then cast_if_and3 S2 S3 S4 else right _).
-Notation cast_if_and5 S1 S2 S3 S4 S5 :=
+Abbreviation cast_if_and5 S1 S2 S3 S4 S5 :=
   (if S1 then cast_if_and4 S2 S3 S4 S5 else right _).
-Notation cast_if_and6 S1 S2 S3 S4 S5 S6 :=
+Abbreviation cast_if_and6 S1 S2 S3 S4 S5 S6 :=
   (if S1 then cast_if_and5 S2 S3 S4 S5 S6 else right _).
-Notation cast_if_or S1 S2 := (if S1 then left _ else cast_if S2).
-Notation cast_if_or3 S1 S2 S3 := (if S1 then left _ else cast_if_or S2 S3).
-Notation cast_if_not_or S1 S2 := (if S1 then cast_if S2 else left _).
-Notation cast_if_not S := (if S then right _ else left _).
+Abbreviation cast_if_or S1 S2 := (if S1 then left _ else cast_if S2).
+Abbreviation cast_if_or3 S1 S2 S3 := (if S1 then left _ else cast_if_or S2 S3).
+Abbreviation cast_if_not_or S1 S2 := (if S1 then cast_if S2 else left _).
+Abbreviation cast_if_not S := (if S then right _ else left _).
 
 (** * Instances of [Decision] *)
 (** Instances of [Decision] for operators of propositional logic. *)
@@ -256,8 +256,8 @@ Tactic Notation "compute_by" tactic(tac) :=
   tac; compute_done.
 
 (** Backwards compatibility notations. *)
-Notation bool_decide_true := bool_decide_eq_true_2.
-Notation bool_decide_false := bool_decide_eq_false_2.
+Abbreviation bool_decide_true := bool_decide_eq_true_2.
+Abbreviation bool_decide_false := bool_decide_eq_false_2.
 
 (** * Decidable Sigma types *)
 (** Leibniz equality on Sigma types requires the equipped proofs to be

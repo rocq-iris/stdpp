@@ -58,7 +58,7 @@ Definition rtsc {A} (R : relation A) := rtc (sc R).
 (** Weakly and strongly normalizing elements. *)
 Definition wn {A} (R : relation A) (x : A) := ∃ y, rtc R x y ∧ nf R y.
 
-Notation sn R := (Acc (flip R)).
+Abbreviation sn R := (Acc (flip R)).
 
 (** The various kinds of "confluence" properties. Any relation that has the
 diamond property is confluent, and any confluent relation is locally confluent.
@@ -563,7 +563,7 @@ End properties.
 (** * Theorems on sub relations *)
 Section subrel.
   Context {A} (R1 R2 : relation A).
-  Notation subrel := (∀ x y, R1 x y → R2 x y).
+  Abbreviation subrel := (∀ x y, R1 x y → R2 x y).
   Lemma red_subrel x : subrel → red R1 x → red R2 x.
   Proof. intros ? [y ?]; eauto. Qed.
   Lemma nf_subrel x : subrel → nf R2 x → nf R1 x.

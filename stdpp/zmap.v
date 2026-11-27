@@ -75,6 +75,6 @@ Qed.
 
 (** * Finite sets *)
 (** We construct sets of [Z]s satisfying extensional equality. *)
-Notation Zset := (mapset Zmap).
+Abbreviation Zset := (mapset Zmap).
 Global Instance Zmap_dom {A} : Dom (Zmap A) Zset := mapset_dom.
 Global Instance: FinMapDom Z Zmap Zset := mapset_dom_spec.

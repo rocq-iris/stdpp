@@ -68,6 +68,6 @@ Qed.
 
 (** * Finite sets *)
 (** We construct sets of [N]s satisfying extensional equality. *)
-Notation Nset := (mapset Nmap).
+Abbreviation Nset := (mapset Nmap).
 Global Instance Nmap_dom {A} : Dom (Nmap A) Nset := mapset_dom.
 Global Instance: FinMapDom N Nmap Nset := mapset_dom_spec.

@@ -75,8 +75,8 @@ Infix "`min`" := Nat.min (at level 35) : nat_scope.
 
 (** TODO: Consider removing these notations to avoid populting the global
 scope? *)
-Notation lcm := Nat.lcm.
-Notation divide := Nat.divide.
+Abbreviation lcm := Nat.lcm.
+Abbreviation divide := Nat.divide.
 Notation "( x | y )" := (divide x y) : nat_scope.
 
 Module Nat.

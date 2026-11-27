@@ -206,7 +206,7 @@ map correspond to the keys that are in both maps. *)
 Definition map_zip_with `{Merge M} {A B C} (f : A → B → C) : M A → M B → M C :=
   merge (λ mx my,
     match mx, my with Some x, Some y => Some (f x y) | _, _ => None end).
-Notation map_zip := (map_zip_with pair).
+Abbreviation map_zip := (map_zip_with pair).
 
 Global Instance map_filter
     `{MapFold K A M, Insert K A M, Empty M} : Filter (K * A) M :=
@@ -4710,7 +4710,7 @@ End map_seqZ.
 Section kmap.
   Context `{FinMap K1 M1} `{FinMap K2 M2}.
   Context (f : K1 → K2) `{!Inj (=) (=) f}.
-  Local Notation kmap := (kmap (M1:=M1) (M2:=M2)).
+  Local Abbreviation kmap := (kmap (M1:=M1) (M2:=M2)).
 
   Lemma lookup_kmap_Some {A} (m : M1 A) (j : K2) x :
     kmap f m !! j = Some x ↔ ∃ i, j = f i ∧ m !! i = Some x.
@@ -4893,7 +4893,7 @@ Section preimg.
   pre-image is a map of sets. To support general sets, we would need setoid
   equality on sets, and thus setoid equality on maps. *)
   Context `{FinMap K MK, FinMap A MA, FinSet K SK, !LeibnizEquiv SK}.
-  Local Notation map_preimg :=
+  Local Abbreviation map_preimg :=
     (map_preimg (K:=K) (A:=A) (MKA:=MK A) (MASK:=MA SK) (SK:=SK)).
   Implicit Types m : MK A.
 
@@ -4988,7 +4988,7 @@ Section img.
   Implicit Types X : SA.
 
   (* avoid writing ≡@{D} everywhere... *)
-  Notation map_img := (map_img (M:=M A) (SA:=SA)).
+  Abbreviation map_img := (map_img (M:=M A) (SA:=SA)).
 
   Lemma elem_of_map_img m x : x ∈ map_img m ↔ ∃ i, m !! i = Some x.
   Proof. unfold map_img. rewrite elem_of_map_to_set. naive_solver. Qed.
@@ -5393,8 +5393,8 @@ Qed.
 (** * Curry and uncurry *)
 Section curry_uncurry.
   Context `{FinMap K1 M1, FinMap K2 M2, FinMap (K1 * K2) MC} {A : Type}.
-  Notation map_curry := (map_curry (M1:=M1) (M2:=M2)).
-  Notation map_uncurry := (map_uncurry (M12:=MC)).
+  Abbreviation map_curry := (map_curry (M1:=M1) (M2:=M2)).
+  Abbreviation map_uncurry := (map_uncurry (M12:=MC)).
 
   Lemma lookup_map_uncurry (m : M1 (M2 A)) i j :
     map_uncurry m !! (i,j) = m !! i ≫= (.!! j).

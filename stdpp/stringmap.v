@@ -5,8 +5,8 @@ and guarantees logarithmic-time operations. *)
 From stdpp Require Export fin_maps pretty.
 From stdpp Require Import gmap.
 
-Notation stringmap := (gmap string).
-Notation stringset := (gset string).
+Abbreviation stringmap := (gmap string).
+Abbreviation stringset := (gset string).
 
 (** * Generating fresh strings *)
 Section stringmap.

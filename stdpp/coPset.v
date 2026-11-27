@@ -111,7 +111,7 @@ Local Fixpoint coPset_elem_of_raw (p : positive) (t : coPset_raw) {struct t} : b
   | coPNode _ l _, p~0 => coPset_elem_of_raw p l
   | coPNode _ _ r, p~1 => coPset_elem_of_raw p r
   end.
-Local Notation e_of := coPset_elem_of_raw.
+Local Abbreviation e_of := coPset_elem_of_raw.
 Local Arguments coPset_elem_of_raw _ !_ / : simpl nomatch, assert.
 Local Lemma coPset_elem_of_node b l r p :
   e_of p (coPNode' b l r) = e_of p (coPNode b l r).
