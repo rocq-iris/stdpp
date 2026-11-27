@@ -178,8 +178,7 @@ Ltac simpl_bool :=
          end.
 
 (** * [simplify_bitblast_index] *)
-Create HintDb simplify_bitblast_index_db discriminated.
-
+Create Rewrite HintDb simplify_bitblast_index_db.
 Global Hint Rewrite
   Z.sub_add
   Z.add_simpl_r
@@ -375,7 +374,7 @@ Lemma bitblast_mod z1 z2 z2' n b1 :
   Bitblast (z1 `mod` z2) n ((bool_decide (z2' < 0 ∧ 0 ≤ n) || bool_decide (n < z2')) && b1).
 Proof.
   move => [->] [<-]. constructor.
-  case_bool_decide => /=. { rewrite Z.pow_neg_r ?Zmod_0_r; [done|lia]. }
+  case_bool_decide => /=. { rewrite Z.pow_neg_r ?Z.mod_0_r; [done|lia]. }
   destruct (decide (0 ≤ n)). 2: { rewrite !Z.testbit_neg_r ?andb_false_r //; lia. }
   rewrite -Z.land_ones; [|lia]. rewrite Z.land_spec Z.ones_spec; [|lia..].
   by rewrite andb_comm.

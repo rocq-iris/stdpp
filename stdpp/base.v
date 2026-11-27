@@ -209,6 +209,7 @@ Inductive TCEq {A} (x : A) : A → Prop := TCEq_refl : TCEq x x.
 Existing Class TCEq.
 Global Existing Instance TCEq_refl.
 Global Hint Mode TCEq ! - - : typeclass_instances.
+Scheme Rewriting for TCEq.
 
 Lemma TCEq_eq {A} (x1 x2 : A) : TCEq x1 x2 ↔ x1 = x2.
 Proof. split; destruct 1; reflexivity. Qed.

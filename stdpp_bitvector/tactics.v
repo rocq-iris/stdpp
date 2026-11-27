@@ -90,7 +90,7 @@ Qed.
 (** * [bv_simplify] rewrite database *)
 (** The [bv_simplify] database collects rewrite rules that rewrite
 bitvectors into other bitvectors. *)
-Create HintDb bv_simplify discriminated. (* Technically not necessary for rewrite db. *)
+Create Rewrite HintDb bv_simplify.
 Global Hint Rewrite @bv_concat_0 using done : bv_simplify.
 Global Hint Rewrite @bv_extract_concat_later
   @bv_extract_concat_here using lia : bv_simplify.
@@ -420,7 +420,7 @@ Ltac bv_unfold :=
 (** * [bv_unfolded_simplify] rewrite database *)
 (** The [bv_unfolded_simplify] database collects rewrite rules that
 should be used to simplify the goal after Z is bv_unfolded. *)
-Create HintDb bv_unfolded_simplify discriminated. (* Technically not necessary for rewrite db. *)
+Create Rewrite HintDb bv_unfolded_simplify.
 Global Hint Rewrite Z.shiftr_0_r Z.lor_0_r Z.lor_0_l : bv_unfolded_simplify.
 Global Hint Rewrite Z.land_ones using lia : bv_unfolded_simplify.
 Global Hint Rewrite bv_wrap_bv_wrap using lia : bv_unfolded_simplify.
@@ -430,7 +430,7 @@ Global Hint Rewrite
 (** * [bv_unfolded_to_arith] rewrite database *)
 (** The [bv_unfolded_to_arith] database collects rewrite rules that
 convert bitwise operations to arithmetic operations in preparation for lia. *)
-Create HintDb bv_unfolded_to_arith discriminated. (* Technically not necessary for rewrite db. *)
+Create Rewrite HintDb bv_unfolded_to_arith.
 Global Hint Rewrite <-Z.opp_lnot : bv_unfolded_to_arith.
 Global Hint Rewrite Z.shiftl_mul_pow2 Z.shiftr_div_pow2 using lia : bv_unfolded_to_arith.
 
