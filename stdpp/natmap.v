@@ -30,6 +30,8 @@ Global Arguments NatMap {_} _ _ : assert.
 Global Arguments natmap_car {_} _ : assert.
 Global Arguments natmap_prf {_} _ : assert.
 
+Create Rewrite HintDb natmap.
+
 Lemma natmap_eq {A} (m1 m2 : natmap A) :
   m1 = m2 ↔ natmap_car m1 = natmap_car m2.
 Proof.
