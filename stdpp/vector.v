@@ -277,7 +277,7 @@ Global Instance vec_insert A : ∀ m, Insert (fin m) A (vec A m) :=
   | FS j => vec_S_inv _ (λ x v, x ::: <[j:=a]> v)
   end.
 
-(* Back-compat notation for [vinsert] *)
+(* Back-compat abbreviation for [vinsert] *)
 #[deprecated(note="Use `<[_:=_]>` or `insert` instead")]
 Abbreviation vinsert := (@insert _ _ _ (@vec_insert _ _)) (only parsing).
 

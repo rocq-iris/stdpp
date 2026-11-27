@@ -255,7 +255,7 @@ Tactic Notation "compute_done" :=
 Tactic Notation "compute_by" tactic(tac) :=
   tac; compute_done.
 
-(** Backwards compatibility notations. *)
+(** Backwards compatibility abbreviations. *)
 Abbreviation bool_decide_true := bool_decide_eq_true_2.
 Abbreviation bool_decide_false := bool_decide_eq_false_2.
 

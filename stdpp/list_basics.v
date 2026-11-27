@@ -11,7 +11,7 @@ Global Instance: Params (@cons) 1 := {}.
 Global Instance: Params (@app) 1 := {}.
 
 (** [head] and [tail] are defined as [parsing only] for [hd_error] and [tl] in
-the Rocq standard library. We redefine these notations to make sure they also
+the Rocq standard library. We redefine these abbreviations to make sure they also
 pretty print properly. *)
 Abbreviation head := hd_error.
 Abbreviation tail := tl.
