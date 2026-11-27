@@ -3,8 +3,7 @@ API-breaking change is listed.
 
 ## std++ master
 
-Rocq 9.3 is now supported.
-Support for Rocq 9.0 and Rocq-Stdlib 9.0 has been dropped.
+Rocq 9.3 is supported now, and Rocq 9.0 and 9.1 are no longer supported.
 
 **Detailed list of changes:**
 
